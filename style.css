@@ -5,12 +5,14 @@
 }
 
 body {
-  --background-primary: #f5f5f5;
-  --text-primary: #673ab7;
-  --background-secondary: #ededed;
-  --text-secondary: #f0f0f0;
-  --background-tertiary: #454545;
-  --background-quaternary: #f3dfef;
+  --calc-background: #f5f5f5;
+  --header-line: #e6e6e6;
+  --input-text: #f0f0f0;
+  --input-background: #454545;
+  --button-text: #673ab7;
+  --button-background: #ededed;
+  --colorized-button-background: #f3dfef;
+  --button-border: rgba(103, 58, 182, 0.05);
 
   min-height: 100vh;
 
@@ -25,10 +27,22 @@ body {
   padding: 12px 0;
 }
 
+.dark-theme {
+  --calc-background: #3c3c3c;
+  --header-line: #484848;
+  --input-text: #505050;
+  --input-background: #f6f6f6;
+  --button-text: #a64cb6;
+  --button-background: #e9e9e9;
+  --colorized-button-background: #b9d1e0;
+  --button-border: rgba(103, 58, 182, 0.15);
+}
+
 body main {
-  background-color: var(--background-primary);
+  background-color: var(--calc-background);
   border-radius: 6px;
-  box-shadow: 2px 2px 16px rgba(0, 0, 0, 0.3)
+  box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.5);
+  transition-duration: 0.25s;
 }
 
 body main header {
@@ -36,7 +50,21 @@ body main header {
   justify-content: space-between;
 
   padding: 12px 10px 10px 16px;
-  border-bottom: 1px solid #dfdfdf;
+  border-bottom: 1px solid var(--header-line);
+}
+
+body main header div:first-child button {
+  background-color: #606060;
+  color: #f8f8f8;
+
+  border: 0;
+  border-radius: 2px;
+
+  padding: 4px 8px;
+}
+
+body main header div:first-child button:hover {
+  filter: brightness(0.95);
 }
 
 body main header div:last-child {
@@ -49,6 +77,11 @@ body main header div:last-child button {
   font-size: 0;
   background-color: transparent;
   border: 0;
+  transition-duration: 0.15s;
+}
+
+body main header div:last-child button:active {
+  transform: scale(0.97);
 }
 
 body main header div button img {
@@ -68,8 +101,8 @@ body main section input {
   text-align: right;
   font-size: 20px;
 
-  background-color: var(--background-tertiary);
-  color: var(--text-secondary);
+  background-color: var(--input-background);
+  color: var(--input-text);
 
   cursor: default;
   outline: 0;
@@ -77,29 +110,30 @@ body main section input {
   border-radius: 2px;
   
   margin-bottom: 20px;
+  transition-duration: 0.25s;
 }
 
 body main section input::placeholder {
-  color: var(--text-secondary);
+  color: var(--input-text);
 }
 
 body main section button {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  border: 1.5px solid rgba(103, 58, 182, 0.05);
+  border: 1.5px solid var(--button-border);
 
   font-weight: 400;
   font-family: Roboto, sans-serif;
   font-size: 16px;
 
-  color: var(--text-primary);
-  background-color: var(--background-secondary);
+  color: var(--button-text);
+  background-color: var(--button-background);
   transition-duration: 0.25s;
 }
 
 body main section button:last-child {
-  background-color: var(--background-quaternary);
+  background-color: var(--colorized-button-background);
 }
 
 body main section div button:hover {
@@ -112,7 +146,7 @@ body main section div button:active {
 }
 
 body main section div:first-of-type button {
-  background-color: var(--background-quaternary);
+  background-color: var(--colorized-button-background);
 }
 
 body main section div:last-child button:first-child {
