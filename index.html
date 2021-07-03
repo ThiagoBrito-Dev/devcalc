@@ -15,51 +15,54 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
-  <main>
+<body onload="initializeInterface()">
+  <main id="calc-container" style="opacity: 0">
     <header>
       <div>
         <button id="result-mode" onclick="toggleResultMode()">RAD</button>
       </div>
       <div>
         <button onclick="toggleTheme()">
-          <img src="assets/moon.png" id="theme-icon" alt="Trocar tema">
+          <img src="" id="theme-icon" class="icon" alt="Trocar tema">
         </button>
         <button>
-          <img src="assets/options.png" id="options" alt="Opções">
+          <img src="" id="options-icon" class="icon" alt="Opções">
         </button>
       </div>
     </header>
     <section>
-      <input type="text" placeholder="0">
+      <input type="text" id="expression" style="height: 48px; margin-bottom: 20px;" placeholder="0">
+      <p id="expression-result" hidden></p>
       <div>
-        <button>C</button>
-        <button>CE</button>
-        <button>DEV</button>
-        <button>÷</button>
+        <button class="colorized-button" onclick="clearExpressions()">C</button>
+        <button class="colorized-button colorized-icon-button" onclick="deleteLastSymbol()">
+          <img src="" id="delete-icon" class="icon" alt="Apagar último número/símbolo" />
+        </button>
+        <button class="colorized-button">DEV</button>
+        <button class="colorized-button">÷</button>
       </div>
       <div>
         <button>7</button>
         <button>8</button>
         <button>9</button>
-        <button>x</button>
+        <button class="colorized-button">x</button>
       </div>
       <div>
         <button>4</button>
         <button>5</button>
         <button>6</button>
-        <button>-</button>
+        <button class="colorized-button">-</button>
       </div>
       <div>
         <button>1</button>
         <button>2</button>
         <button>3</button>
-        <button>+</button>
+        <button class="colorized-button">+</button>
       </div>
       <div>
         <button>0</button>
         <button>,</button>
-        <button>=</button>
+        <button class="colorized-button">=</button>
       </div>
     </section>
   </main>
