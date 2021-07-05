@@ -57,8 +57,9 @@ function addOperatorsOnDisplay(operator) {
 }
 
 function calculateResult() {
-  if ((expressionInput.value).indexOf(expressionOperator) != -1) {
-    const completeExpression = (expressionInput.value).replace('x', '*').replace('÷', '/')
+  const completeExpression = (expressionInput.value).replace('x', '*').replace('÷', '/');
+
+  if (completeExpression.indexOf(expressionOperator) != -1) {
     let numbers = completeExpression.split(expressionOperator)
 
     if (numbers[0] != '' && numbers[1] != '') {
