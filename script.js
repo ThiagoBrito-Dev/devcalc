@@ -68,7 +68,7 @@ function addOperatorsOnDisplay(operator) {
       expressionInput.value += operator;
     }
   } else {
-    if (expression.length > 1) {
+    if (expression.length > 1 || !isNaN(Number(lastSymbol))) {
       if (lastSymbol == '+' || lastSymbol == '-' || lastSymbol == 'x' || lastSymbol == '÷') {
         expressionArray.pop();
 
