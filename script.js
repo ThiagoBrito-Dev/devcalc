@@ -16,6 +16,7 @@ function initializeInterface() {
   toggleImageSource(userTheme);
 
   calcContainer.style.opacity = 1;
+  expressionResult.style.display = "none";
 }
 
 function toggleTheme() {
@@ -25,6 +26,9 @@ function toggleTheme() {
   toggleImageSource(currentTheme);
 
   localStorage.setItem('userTheme', currentTheme);
+
+  expressionInput.style.transitionDuration = '0.25s';
+  expressionResult.style.transitionDuration = '0.25s';
 }
 
 function toggleImageSource(theme) {
@@ -41,28 +45,58 @@ function toggleResultMode() {
 }
 
 function addNumbersOnDisplay(number) {
-  expressionInput.value += number;
+  const expression = expressionInput.value;
+  const lastSymbol = Number(expression[expression.length - 1]);
+
+  if (number != ',' || expressionInput.value.length >= 1 && !isNaN(lastSymbol)) {
+    expressionInput.value += number;
+  }
 }
 
 function addOperatorsOnDisplay(operator) {
-  expressionOperator = operator;
+  let expression = expressionInput.value;
+  let expressionArray = [];
 
-  if (operator == '*') {
-    operator = 'x';
-  } else if (operator == '/') {
-    operator = '÷';
+  for (let symbol in expression) {
+    expressionArray.push(expression[symbol]);
   }
 
-  expressionInput.value += operator;
+  const lastSymbol = expressionArray[expressionArray.length - 1];
+
+  if (!expression) {
+    if (operator == '-') {
+      expressionInput.value += operator;
+    }
+  } else {
+    if (expression.length > 1) {
+      if (lastSymbol == '+' || lastSymbol == '-' || lastSymbol == 'x' || lastSymbol == '÷') {
+        expressionArray.pop();
+
+        if (lastSymbol == '-' && operator == '-') {
+          operator = '+';
+        } else if (lastSymbol == '-' && operator == '+') {
+          operator = '-';
+        }
+      }
+
+      expressionOperator = operator;
+
+      expression = expressionArray.join('');
+      expression += operator;
+      expressionInput.value = expression.replace('*', 'x').replace('/', '÷');
+    }
+  }
 }
 
 function calculateResult() {
   const completeExpression = (expressionInput.value).replace('x', '*').replace('÷', '/');
 
   if (completeExpression.indexOf(expressionOperator) != -1) {
-    let numbers = completeExpression.split(expressionOperator)
+    let numbers = completeExpression.split(expressionOperator);
+    numbers = [numbers[0].replace(',', '.'), numbers[1].replace(',', '.')];
 
     if (numbers[0] != '' && numbers[1] != '') {
+      console.log('Passou por aqui 2');
       numbers = [Number(numbers[0]), Number(numbers[1])];
       let result;
 
@@ -85,6 +119,7 @@ function calculateResult() {
         }
       }
 
+      result = String(result).replace('.', ',');
       display(result);
     }
   }
@@ -92,15 +127,21 @@ function calculateResult() {
 
 function display(result) {
   expressionInput.style.height = '48px';
-  expressionInput.style.marginBottom = '20px';
+  expressionInput.style.transitionDuration = '0s';
+  expressionInput.style.borderRadius = '2px';
+  expressionInput.style.padding = '0px 8px 0 0';
+
   expressionResult.style.display = 'none';
 
   if (result) {
-    expressionInput.style.height = '32px';
-    expressionInput.style.marginBottom = '0';
-    expressionResult.style.marginBottom = '20px';
-    expressionResult.textContent = result;
+    expressionInput.style.height = '26.5px';
+    expressionInput.style.borderRadius = '2px 2px 0 0';
+    expressionInput.style.padding = '4px 8px 0 0';
+
     expressionResult.style.display = 'block';
+    expressionResult.style.borderRadius = '0 0 2px 2px';
+
+    expressionResult.textContent = result;
   }
 }
 
@@ -116,8 +157,8 @@ function deleteLastSymbol() {
     let expression = expressionInput.value;
     let expressionArray = [];
 
-    for (let letter in expression) {
-      expressionArray.push(expression[letter]);
+    for (let symbol in expression) {
+      expressionArray.push(expression[symbol]);
     }
 
     expressionArray.pop();
