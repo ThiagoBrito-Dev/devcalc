@@ -8,6 +8,7 @@ const deleteIcon = document.querySelector('#delete-icon');
 
 let currentMode;
 let expressionOperator;
+let lastNumber;
 
 function initializeInterface() {
   const userTheme = localStorage.getItem('userTheme');
@@ -48,8 +49,24 @@ function addNumbersOnDisplay(number) {
   const expression = expressionInput.value;
   const lastSymbol = Number(expression[expression.length - 1]);
 
-  if (number != ',' || expressionInput.value.length >= 1 && !isNaN(lastSymbol)) {
+  if (number != ',' || expression.length >= 1 && !isNaN(lastSymbol)) {
     expressionInput.value += number;
+    triggerCalculation();
+  }
+}
+
+function triggerCalculation() {
+  const expression = (expressionInput.value).replace('x', '*').replace('÷', '/')
+
+  if (isNaN(Number(expressionInput.value))) {
+    if (expressionResult.textContent) {
+      const splittedExpression = expression.split(expressionOperator);
+
+      lastNumber = splittedExpression[splittedExpression.length - 1];
+      calculateResult();
+    } else {
+      calculateResult();
+    }
   }
 }
 
@@ -69,7 +86,7 @@ function addOperatorsOnDisplay(operator) {
     }
   } else {
     if (expression.length > 1 || !isNaN(Number(lastSymbol))) {
-      if (lastSymbol == '+' || lastSymbol == '-' || lastSymbol == 'x' || lastSymbol == '÷') {
+      if (isNaN(Number(lastSymbol))) {
         expressionArray.pop();
 
         if (lastSymbol == '-' && operator == '-') {
@@ -81,6 +98,7 @@ function addOperatorsOnDisplay(operator) {
 
       expressionOperator = operator;
 
+
       expression = expressionArray.join('');
       expression += operator;
       expressionInput.value = expression.replace('*', 'x').replace('/', '÷');
@@ -90,13 +108,28 @@ function addOperatorsOnDisplay(operator) {
 
 function calculateResult() {
   const completeExpression = (expressionInput.value).replace('x', '*').replace('÷', '/');
+  const firstSymbol = completeExpression[0];
 
   if (completeExpression.indexOf(expressionOperator) != -1) {
-    let numbers = completeExpression.split(expressionOperator);
+    let shortExpression = completeExpression;
+
+    if (expressionResult.textContent) {
+      let firstNumber = expressionResult.textContent;
+      shortExpression = firstNumber + expressionOperator + lastNumber;
+    }
+
+    let numbers = shortExpression.split(expressionOperator);
+    console.log(numbers);
+
+    if (isNaN(firstSymbol)) {
+      shortExpression = completeExpression.slice(1);
+      numbers = shortExpression.split(expressionOperator);
+      numbers[0] = firstSymbol + numbers[0];
+    }
+
     numbers = [numbers[0].replace(',', '.'), numbers[1].replace(',', '.')];
 
     if (numbers[0] != '' && numbers[1] != '') {
-      console.log('Passou por aqui 2');
       numbers = [Number(numbers[0]), Number(numbers[1])];
       let result;
 
