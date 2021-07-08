@@ -9,6 +9,11 @@ const deleteIcon = document.querySelector('#delete-icon');
 let currentMode;
 let expressionOperator;
 let lastNumber;
+let isSameExpression = false;
+let isDeleting = false;
+
+let expression = '9.5+3+5-8*7/2';
+let expressionArray = [];
 
 function initializeInterface() {
   const userTheme = localStorage.getItem('userTheme');
@@ -51,22 +56,29 @@ function addNumbersOnDisplay(number) {
 
   if (number != ',' || expression.length >= 1 && !isNaN(lastSymbol)) {
     expressionInput.value += number;
-    triggerCalculation();
+
+    if (isNaN(Number(expressionInput.value))) {
+      triggerCalculation();
+    }
   }
 }
 
 function triggerCalculation() {
   const expression = (expressionInput.value).replace('x', '*').replace('÷', '/')
 
-  if (isNaN(Number(expressionInput.value))) {
-    if (expressionResult.textContent) {
-      const splittedExpression = expression.split(expressionOperator);
+  if (expressionResult.textContent) {
+    const splittedExpression = expression.split(expressionOperator);
 
-      lastNumber = splittedExpression[splittedExpression.length - 1];
-      calculateResult();
-    } else {
-      calculateResult();
+    lastNumber = splittedExpression[splittedExpression.length - 1];
+    lastNumber = lastNumber.replace(',', '.');
+
+    if (lastNumber.includes('.')) {
+      isSameExpression = true;
     }
+
+    calculateResult();
+  } else {
+    calculateResult();
   }
 }
 
@@ -112,9 +124,35 @@ function calculateResult() {
 
   if (completeExpression.indexOf(expressionOperator) != -1) {
     let shortExpression = completeExpression;
+    let result = '';
 
     if (expressionResult.textContent) {
-      let firstNumber = expressionResult.textContent;
+      let firstNumber = (expressionResult.textContent).replace(',', '.');
+
+      if (isSameExpression) {
+        const diferenceBetweenExpressionNumbers = Number(lastNumber
+          .slice(0, -1)
+          .replace(',', '.'));
+        firstNumber = Number(firstNumber);
+
+        switch (expressionOperator) {
+          case '+':
+            firstNumber = firstNumber - diferenceBetweenExpressionNumbers;
+            break;
+          case '-':
+            firstNumber = firstNumber + diferenceBetweenExpressionNumbers;
+            break;
+          case '*':
+            firstNumber = firstNumber / diferenceBetweenExpressionNumbers;
+            break;
+          case '/':
+            firstNumber = firstNumber * diferenceBetweenExpressionNumbers;
+        }
+      } else if (isDeleting && lastNumber == '') {
+        display(result);
+      }
+
+      isSameExpression = false;
       shortExpression = firstNumber + expressionOperator + lastNumber;
     }
 
@@ -131,7 +169,6 @@ function calculateResult() {
 
     if (numbers[0] != '' && numbers[1] != '') {
       numbers = [Number(numbers[0]), Number(numbers[1])];
-      let result;
 
       switch (expressionOperator) {
         case '+': {
@@ -197,5 +234,9 @@ function deleteLastSymbol() {
     expressionArray.pop();
     expression = expressionArray.join('');
     expressionInput.value = expression;
+
+    isDeleting = true;
+    triggerCalculation();
+    isDeleting = false;
   }
 }
