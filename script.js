@@ -129,7 +129,7 @@ function calculateResult() {
     if (expressionResult.textContent) {
       let firstNumber = (expressionResult.textContent).replace(',', '.');
 
-      if (isSameExpression) {
+      if (isSameExpression || lastNumber.length > 1) {
         const diferenceBetweenExpressionNumbers = Number(lastNumber
           .slice(0, -1)
           .replace(',', '.'));
