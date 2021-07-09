@@ -11,9 +11,10 @@ let expressionOperator;
 let lastNumber;
 let isSameExpression = false;
 let isDeleting = false;
-
-let expression = '9.5+3+5-8*7/2';
-let expressionArray = [];
+let lastDigit;
+let isLastExpression = false;
+let currentExpressionNumber = '';
+let firstPosition;
 
 function initializeInterface() {
   const userTheme = localStorage.getItem('userTheme');
@@ -58,28 +59,12 @@ function addNumbersOnDisplay(number) {
     expressionInput.value += number;
 
     if (isNaN(Number(expressionInput.value))) {
-      triggerCalculation();
+      triggerCalculation(number);
     }
   }
-}
 
-function triggerCalculation() {
-  const expression = (expressionInput.value).replace('x', '*').replace('÷', '/')
-
-  if (expressionResult.textContent) {
-    const splittedExpression = expression.split(expressionOperator);
-
-    lastNumber = splittedExpression[splittedExpression.length - 1];
-    lastNumber = lastNumber.replace(',', '.');
-
-    if (lastNumber.includes('.')) {
-      isSameExpression = true;
-    }
-
-    calculateResult();
-  } else {
-    calculateResult();
-  }
+  checkAndChangeFontSize();
+  formatExpressionNumbers(number);
 }
 
 function addOperatorsOnDisplay(operator) {
@@ -116,58 +101,164 @@ function addOperatorsOnDisplay(operator) {
       expressionInput.value = expression.replace('*', 'x').replace('/', '÷');
     }
   }
+
+  currentExpressionNumber = '';
+  firstPosition = ''
+  checkAndChangeFontSize();
+}
+
+function focalizeResult() {
+  setElementsToDefaultStyling();
+
+  expressionInput.value = expressionResult.textContent;
+}
+
+function checkAndChangeFontSize() {
+  const expression = expressionInput.value;
+
+  expressionInput.style.fontSize = expression.length >= 18 ? '16.5px' : '20px';
+}
+
+function formatExpressionNumbers(number) {
+  const numbersArray = [];
+  const expressionArray = [];
+  let expression = expressionInput.value;
+
+  if (currentExpressionNumber == '') {
+    firstPosition = expression.indexOf(number, expression.length - 1);
+  }
+
+  for (let symbol in expression) {
+    expressionArray.push(expression[symbol]);
+  }
+
+  currentExpressionNumber += number;
+
+  if (!expression.includes(',')) {
+    if (currentExpressionNumber.length >= 4 && currentExpressionNumber.length < 7) {
+      for (let number in currentExpressionNumber) {
+        numbersArray.push(currentExpressionNumber[number]);
+      }
+
+      numbersArray.reverse();
+      numbersArray.splice(3, 0, '.');
+      numbersArray.reverse();
+
+      expressionArray.splice(firstPosition, numbersArray.length - 1, numbersArray.join(''));
+    }
+
+    expression = expressionArray.join('');
+    expressionInput.value = expression;
+  }
+}
+
+function triggerCalculation() {
+  const expression = (expressionInput.value).replace('x', '*').replace('÷', '/')
+  const splittedExpression = expression.split(expressionOperator);
+
+  if (splittedExpression.length == 2 && !splittedExpression[1]) {
+    isLastExpression = true;
+  } else {
+    isLastExpression = false;
+  }
+
+  if (expressionResult.textContent) {
+    lastNumber = splittedExpression[splittedExpression.length - 1];
+    lastNumber = lastNumber.replace(',', '.');
+
+    if (lastDigit == '') {
+      lastDigit = lastNumber;
+    }
+
+    if (lastNumber.includes('.') || lastNumber.length >= 1) {
+      isSameExpression = true;
+    }
+
+    calculateResult();
+  } else {
+    calculateResult();
+  }
+
+  lastDigit = lastNumber;
 }
 
 function calculateResult() {
-  const completeExpression = (expressionInput.value).replace('x', '*').replace('÷', '/');
+  let completeExpression = (expressionInput.value).replace('x', '*').replace('÷', '/')
+
+  if (completeExpression.includes('.')) {
+    completeExpression = completeExpression.replace('.', '');
+  } else {
+    completeExpression = completeExpression.replace(',', '.');
+  }
+
   const firstSymbol = completeExpression[0];
 
-  if (completeExpression.indexOf(expressionOperator) != -1) {
-    let shortExpression = completeExpression;
-    let result = '';
+  if (!isLastExpression) {
+    if (completeExpression.indexOf(expressionOperator) != -1) {
+      let shortExpression = completeExpression;
+      let result = '';
 
-    if (expressionResult.textContent) {
-      let firstNumber = (expressionResult.textContent).replace(',', '.');
+      if (expressionResult.textContent) {
+        let firstNumber = (expressionResult.textContent).replace(',', '.');
 
-      if (isSameExpression || lastNumber.length > 1) {
-        const diferenceBetweenExpressionNumbers = Number(lastNumber
-          .slice(0, -1)
-          .replace(',', '.'));
-        firstNumber = Number(firstNumber);
+        if (isSameExpression && !isDeleting) {
+          const diferenceBetweenExpressionNumbers = Number(lastNumber
+            .slice(0, -1)
+            .replace(',', '.'));
+          firstNumber = Number(firstNumber);
 
-        switch (expressionOperator) {
-          case '+':
-            firstNumber = firstNumber - diferenceBetweenExpressionNumbers;
-            break;
-          case '-':
-            firstNumber = firstNumber + diferenceBetweenExpressionNumbers;
-            break;
-          case '*':
-            firstNumber = firstNumber / diferenceBetweenExpressionNumbers;
-            break;
-          case '/':
-            firstNumber = firstNumber * diferenceBetweenExpressionNumbers;
+          switch (expressionOperator) {
+            case '+':
+              firstNumber = firstNumber - diferenceBetweenExpressionNumbers;
+              break;
+            case '-':
+              firstNumber = firstNumber + diferenceBetweenExpressionNumbers;
+              break;
+            case '*':
+              firstNumber = firstNumber / diferenceBetweenExpressionNumbers;
+              break;
+            case '/':
+              firstNumber = firstNumber * diferenceBetweenExpressionNumbers;
+              break;
+          }
         }
-      } else if (isDeleting && lastNumber == '') {
-        display(result);
+
+        isSameExpression = false;
+
+        if (isDeleting) {
+
+          if (lastDigit) {
+            firstNumber = Number(firstNumber);
+            lastDigit = Number(lastDigit);
+
+            switch (expressionOperator) {
+              case '+':
+                firstNumber = firstNumber - lastDigit;
+                break;
+              case '-':
+                firstNumber = firstNumber + lastDigit;
+                break;
+              case '*':
+                firstNumber = firstNumber / lastDigit;
+                break;
+              case '/':
+                firstNumber = firstNumber * lastDigit;
+                break;
+            }
+          }
+        }
+
+        shortExpression = firstNumber + expressionOperator + lastNumber;
       }
 
-      isSameExpression = false;
-      shortExpression = firstNumber + expressionOperator + lastNumber;
-    }
+      let numbers = shortExpression.split(expressionOperator);
 
-    let numbers = shortExpression.split(expressionOperator);
-    console.log(numbers);
+      if (isNaN(firstSymbol)) {
+        shortExpression = completeExpression.slice(1);
+        numbers = shortExpression.split(expressionOperator);
+        numbers[0] = firstSymbol + numbers[0];
+      }
 
-    if (isNaN(firstSymbol)) {
-      shortExpression = completeExpression.slice(1);
-      numbers = shortExpression.split(expressionOperator);
-      numbers[0] = firstSymbol + numbers[0];
-    }
-
-    numbers = [numbers[0].replace(',', '.'), numbers[1].replace(',', '.')];
-
-    if (numbers[0] != '' && numbers[1] != '') {
       numbers = [Number(numbers[0]), Number(numbers[1])];
 
       switch (expressionOperator) {
@@ -190,36 +281,45 @@ function calculateResult() {
       }
 
       result = String(result).replace('.', ',');
-      display(result);
+      showResult(result);
     }
+  } else {
+    expressionResult.textContent = '';
+    setElementsToDefaultStyling();
   }
 }
 
-function display(result) {
+function applyNewStyles() {
+  expressionInput.style.height = '26.5px';
+  expressionInput.style.borderRadius = '2px 2px 0 0';
+  expressionInput.style.padding = '4px 8px 0 0';
+
+  expressionResult.style.display = 'block';
+  expressionResult.style.borderRadius = '0 0 2px 2px';
+}
+
+function showResult(result) {
+  applyNewStyles();
+
+  expressionResult.textContent = result;
+}
+
+function setElementsToDefaultStyling() {
   expressionInput.style.height = '48px';
   expressionInput.style.transitionDuration = '0s';
   expressionInput.style.borderRadius = '2px';
   expressionInput.style.padding = '0px 8px 0 0';
 
   expressionResult.style.display = 'none';
-
-  if (result) {
-    expressionInput.style.height = '26.5px';
-    expressionInput.style.borderRadius = '2px 2px 0 0';
-    expressionInput.style.padding = '4px 8px 0 0';
-
-    expressionResult.style.display = 'block';
-    expressionResult.style.borderRadius = '0 0 2px 2px';
-
-    expressionResult.textContent = result;
-  }
 }
 
 function clearExpressions() {
   expressionInput.value = '';
   expressionResult.textContent = '';
+  currentExpressionNumber = '';
+  firstPosition = ''
 
-  display();
+  setElementsToDefaultStyling();
 }
 
 function deleteLastSymbol() {
@@ -238,5 +338,7 @@ function deleteLastSymbol() {
     isDeleting = true;
     triggerCalculation();
     isDeleting = false;
+
+    checkAndChangeFontSize();
   }
 }
