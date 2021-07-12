@@ -6,7 +6,7 @@
 
 body {
   --calc-background: #f5f5f5;
-  --mode-button-text: #404040;  
+  --mode-button-text: #404040;
   --mode-button-background: #dfdfdf;
   --header-line: #e6e6e6;
   --input-text: #f0f0f0;
@@ -23,19 +23,19 @@ body {
   justify-content: center;
   align-items: center;
 
-  background-image: url('assets/background-md.jpg');
+  background-image: url("assets/background-md.jpg");
   background-repeat: no-repeat;
   background-size: cover;
 
   font-family: Roboto, sans-serif;
   font-size: 16px;
-  
+
   padding: 12px 0;
 }
 
 .dark-theme {
   --calc-background: #3c3c3c;
-  --mode-button-text: #fcfcfc;  
+  --mode-button-text: #fcfcfc;
   --mode-button-background: #606060;
   --header-line: #484848;
   --input-text: #505050;
@@ -111,7 +111,7 @@ body main section p {
 
   border-radius: 0 0 2px 2px;
   text-align: right;
-  
+
   padding: 0 8px 2px 0;
   cursor: default;
 }
@@ -167,7 +167,7 @@ body main section div button:hover {
 }
 
 body main section div button:active {
-  transform: scale(0.95)
+  transform: scale(0.95);
 }
 
 body main section div:last-child button:first-child {

@@ -1,10 +1,10 @@
-const calcContainer = document.querySelector('#calc-container');
-const resultMode = document.querySelector('#result-mode');
-const themeIcon = document.querySelector('#theme-icon');
-const optionsIcon = document.querySelector('#options-icon');
-const expressionInput = document.querySelector('#expression');
-const expressionResult = document.querySelector('#result');
-const deleteIcon = document.querySelector('#delete-icon');
+const calcContainer = document.querySelector("#calc-container");
+const resultMode = document.querySelector("#result-mode");
+const themeIcon = document.querySelector("#theme-icon");
+const optionsIcon = document.querySelector("#options-icon");
+const expressionInput = document.querySelector("#expression");
+const expressionResult = document.querySelector("#result");
+const deleteIcon = document.querySelector("#delete-icon");
 
 let currentMode;
 let expressionOperator;
@@ -13,11 +13,11 @@ let isSameExpression = false;
 let isDeleting = false;
 let lastDigit;
 let isLastExpression = false;
-let currentExpressionNumber = '';
+let currentExpressionNumber = "";
 let firstPosition;
 
 function initializeInterface() {
-  const userTheme = localStorage.getItem('userTheme');
+  const userTheme = localStorage.getItem("userTheme");
 
   document.body.classList = userTheme;
   toggleImageSource(userTheme);
@@ -27,35 +27,37 @@ function initializeInterface() {
 }
 
 function toggleTheme() {
-  document.body.classList.toggle('dark-theme');
+  document.body.classList.toggle("dark-theme");
 
   const currentTheme = document.body.classList.value;
   toggleImageSource(currentTheme);
 
-  localStorage.setItem('userTheme', currentTheme);
+  localStorage.setItem("userTheme", currentTheme);
 
-  expressionInput.style.transitionDuration = '0.25s';
-  expressionResult.style.transitionDuration = '0.25s';
+  expressionInput.style.transitionDuration = "0.25s";
+  expressionResult.style.transitionDuration = "0.25s";
 }
 
 function toggleImageSource(theme) {
-  const isDarkTheme = theme == 'dark-theme';
+  const isDarkTheme = theme == "dark-theme";
 
-  themeIcon.src = isDarkTheme ? 'assets/sun.png' : 'assets/moon.png';
-  optionsIcon.src = isDarkTheme ? 'assets/options-white.png' : 'assets/options.png';
-  deleteIcon.src = isDarkTheme ? 'assets/delete-dark.png' : 'assets/delete.png';
+  themeIcon.src = isDarkTheme ? "assets/sun.png" : "assets/moon.png";
+  optionsIcon.src = isDarkTheme
+    ? "assets/options-white.png"
+    : "assets/options.png";
+  deleteIcon.src = isDarkTheme ? "assets/delete-dark.png" : "assets/delete.png";
 }
 
 function toggleResultMode() {
   currentMode = resultMode.textContent;
-  resultMode.textContent = currentMode == 'RAD' ? 'GRAU' : 'RAD';
+  resultMode.textContent = currentMode == "RAD" ? "GRAU" : "RAD";
 }
 
 function addNumbersOnDisplay(number) {
   const expression = expressionInput.value;
   const lastSymbol = Number(expression[expression.length - 1]);
 
-  if (number != ',' || expression.length >= 1 && !isNaN(lastSymbol)) {
+  if (number != "," || (expression.length >= 1 && !isNaN(lastSymbol))) {
     expressionInput.value += number;
 
     if (isNaN(Number(expressionInput.value))) {
@@ -78,7 +80,7 @@ function addOperatorsOnDisplay(operator) {
   const lastSymbol = expressionArray[expressionArray.length - 1];
 
   if (!expression) {
-    if (operator == '-') {
+    if (operator == "-") {
       expressionInput.value += operator;
     }
   } else {
@@ -86,24 +88,23 @@ function addOperatorsOnDisplay(operator) {
       if (isNaN(Number(lastSymbol))) {
         expressionArray.pop();
 
-        if (lastSymbol == '-' && operator == '-') {
-          operator = '+';
-        } else if (lastSymbol == '-' && operator == '+') {
-          operator = '-';
+        if (lastSymbol == "-" && operator == "-") {
+          operator = "+";
+        } else if (lastSymbol == "-" && operator == "+") {
+          operator = "-";
         }
       }
 
       expressionOperator = operator;
 
-
-      expression = expressionArray.join('');
+      expression = expressionArray.join("");
       expression += operator;
-      expressionInput.value = expression.replace('*', 'x').replace('/', '÷');
+      expressionInput.value = expression.replace("*", "x").replace("/", "÷");
     }
   }
 
-  currentExpressionNumber = '';
-  firstPosition = ''
+  currentExpressionNumber = "";
+  firstPosition = "";
   checkAndChangeFontSize();
 }
 
@@ -116,7 +117,7 @@ function focalizeResult() {
 function checkAndChangeFontSize() {
   const expression = expressionInput.value;
 
-  expressionInput.style.fontSize = expression.length >= 18 ? '16.5px' : '20px';
+  expressionInput.style.fontSize = expression.length >= 18 ? "16.5px" : "20px";
 }
 
 function formatExpressionNumbers(number) {
@@ -124,7 +125,7 @@ function formatExpressionNumbers(number) {
   const expressionArray = [];
   let expression = expressionInput.value;
 
-  if (currentExpressionNumber == '') {
+  if (currentExpressionNumber == "") {
     firstPosition = expression.indexOf(number, expression.length - 1);
   }
 
@@ -134,26 +135,33 @@ function formatExpressionNumbers(number) {
 
   currentExpressionNumber += number;
 
-  if (!expression.includes(',')) {
-    if (currentExpressionNumber.length >= 4 && currentExpressionNumber.length < 7) {
+  if (!expression.includes(",")) {
+    if (
+      currentExpressionNumber.length >= 4 &&
+      currentExpressionNumber.length < 7
+    ) {
       for (let number in currentExpressionNumber) {
         numbersArray.push(currentExpressionNumber[number]);
       }
 
       numbersArray.reverse();
-      numbersArray.splice(3, 0, '.');
+      numbersArray.splice(3, 0, ".");
       numbersArray.reverse();
 
-      expressionArray.splice(firstPosition, numbersArray.length - 1, numbersArray.join(''));
+      expressionArray.splice(
+        firstPosition,
+        numbersArray.length,
+        numbersArray.join("")
+      );
     }
 
-    expression = expressionArray.join('');
+    expression = expressionArray.join("");
     expressionInput.value = expression;
   }
 }
 
 function triggerCalculation() {
-  const expression = (expressionInput.value).replace('x', '*').replace('÷', '/')
+  const expression = expressionInput.value.replace("x", "*").replace("÷", "/");
   const splittedExpression = expression.split(expressionOperator);
 
   if (splittedExpression.length == 2 && !splittedExpression[1]) {
@@ -164,13 +172,13 @@ function triggerCalculation() {
 
   if (expressionResult.textContent) {
     lastNumber = splittedExpression[splittedExpression.length - 1];
-    lastNumber = lastNumber.replace(',', '.');
+    lastNumber = lastNumber.replace(",", ".");
 
-    if (lastDigit == '') {
+    if (lastDigit == "") {
       lastDigit = lastNumber;
     }
 
-    if (lastNumber.includes('.') || lastNumber.length >= 1) {
+    if (lastNumber.includes(".") || lastNumber.length >= 1) {
       isSameExpression = true;
     }
 
@@ -183,12 +191,14 @@ function triggerCalculation() {
 }
 
 function calculateResult() {
-  let completeExpression = (expressionInput.value).replace('x', '*').replace('÷', '/')
+  let completeExpression = expressionInput.value
+    .replace("x", "*")
+    .replace("÷", "/");
 
-  if (completeExpression.includes('.')) {
-    completeExpression = completeExpression.replace('.', '');
+  if (completeExpression.includes(".")) {
+    completeExpression = completeExpression.replace(".", "");
   } else {
-    completeExpression = completeExpression.replace(',', '.');
+    completeExpression = completeExpression.replace(",", ".");
   }
 
   const firstSymbol = completeExpression[0];
@@ -196,28 +206,28 @@ function calculateResult() {
   if (!isLastExpression) {
     if (completeExpression.indexOf(expressionOperator) != -1) {
       let shortExpression = completeExpression;
-      let result = '';
+      let result = "";
 
       if (expressionResult.textContent) {
-        let firstNumber = (expressionResult.textContent).replace(',', '.');
+        let firstNumber = expressionResult.textContent.replace(",", ".");
 
         if (isSameExpression && !isDeleting) {
-          const diferenceBetweenExpressionNumbers = Number(lastNumber
-            .slice(0, -1)
-            .replace(',', '.'));
+          const diferenceBetweenExpressionNumbers = Number(
+            lastNumber.slice(0, -1).replace(",", ".")
+          );
           firstNumber = Number(firstNumber);
 
           switch (expressionOperator) {
-            case '+':
+            case "+":
               firstNumber = firstNumber - diferenceBetweenExpressionNumbers;
               break;
-            case '-':
+            case "-":
               firstNumber = firstNumber + diferenceBetweenExpressionNumbers;
               break;
-            case '*':
+            case "*":
               firstNumber = firstNumber / diferenceBetweenExpressionNumbers;
               break;
-            case '/':
+            case "/":
               firstNumber = firstNumber * diferenceBetweenExpressionNumbers;
               break;
           }
@@ -226,22 +236,21 @@ function calculateResult() {
         isSameExpression = false;
 
         if (isDeleting) {
-
           if (lastDigit) {
             firstNumber = Number(firstNumber);
             lastDigit = Number(lastDigit);
 
             switch (expressionOperator) {
-              case '+':
+              case "+":
                 firstNumber = firstNumber - lastDigit;
                 break;
-              case '-':
+              case "-":
                 firstNumber = firstNumber + lastDigit;
                 break;
-              case '*':
+              case "*":
                 firstNumber = firstNumber / lastDigit;
                 break;
-              case '/':
+              case "/":
                 firstNumber = firstNumber * lastDigit;
                 break;
             }
@@ -262,40 +271,40 @@ function calculateResult() {
       numbers = [Number(numbers[0]), Number(numbers[1])];
 
       switch (expressionOperator) {
-        case '+': {
+        case "+": {
           result = numbers[0] + numbers[1];
-          break
+          break;
         }
-        case '-': {
+        case "-": {
           result = numbers[0] - numbers[1];
-          break
+          break;
         }
-        case '*': {
+        case "*": {
           result = numbers[0] * numbers[1];
-          break
+          break;
         }
-        case '/': {
+        case "/": {
           result = numbers[0] / numbers[1];
-          break
+          break;
         }
       }
 
-      result = String(result).replace('.', ',');
+      result = String(result).replace(".", ",");
       showResult(result);
     }
   } else {
-    expressionResult.textContent = '';
+    expressionResult.textContent = "";
     setElementsToDefaultStyling();
   }
 }
 
 function applyNewStyles() {
-  expressionInput.style.height = '26.5px';
-  expressionInput.style.borderRadius = '2px 2px 0 0';
-  expressionInput.style.padding = '4px 8px 0 0';
+  expressionInput.style.height = "26.5px";
+  expressionInput.style.borderRadius = "2px 2px 0 0";
+  expressionInput.style.padding = "4px 8px 0 0";
 
-  expressionResult.style.display = 'block';
-  expressionResult.style.borderRadius = '0 0 2px 2px';
+  expressionResult.style.display = "block";
+  expressionResult.style.borderRadius = "0 0 2px 2px";
 }
 
 function showResult(result) {
@@ -305,19 +314,19 @@ function showResult(result) {
 }
 
 function setElementsToDefaultStyling() {
-  expressionInput.style.height = '48px';
-  expressionInput.style.transitionDuration = '0s';
-  expressionInput.style.borderRadius = '2px';
-  expressionInput.style.padding = '0px 8px 0 0';
+  expressionInput.style.height = "48px";
+  expressionInput.style.transitionDuration = "0s";
+  expressionInput.style.borderRadius = "2px";
+  expressionInput.style.padding = "0px 8px 0 0";
 
-  expressionResult.style.display = 'none';
+  expressionResult.style.display = "none";
 }
 
 function clearExpressions() {
-  expressionInput.value = '';
-  expressionResult.textContent = '';
-  currentExpressionNumber = '';
-  firstPosition = ''
+  expressionInput.value = "";
+  expressionResult.textContent = "";
+  currentExpressionNumber = "";
+  firstPosition = "";
 
   setElementsToDefaultStyling();
 }
@@ -332,7 +341,7 @@ function deleteLastSymbol() {
     }
 
     expressionArray.pop();
-    expression = expressionArray.join('');
+    expression = expressionArray.join("");
     expressionInput.value = expression;
 
     isDeleting = true;
