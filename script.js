@@ -116,7 +116,11 @@ function focalizeResult() {
 function checkAndChangeFontSize() {
   const expression = expressionInput.value;
 
-  expressionInput.style.fontSize = expression.length >= 18 ? "16.5px" : "20px";
+  if (expression.length >= 18 && expressionInput.style.fontSize != "16.5px") {
+    expressionInput.style.fontSize = "16.5px";
+  } else if (expressionInput.style.fontSize == "16.5px") {
+    expressionInput.style.fontSize = "20px";
+  }
 }
 
 function formatExpressionNumbers(number = "") {
