@@ -133,18 +133,16 @@ function formatExpressionNumbers(number = "") {
 
   currentExpressionNumber += number;
 
-  if (!expression.includes(",")) {
-    if (currentExpressionNumber.length >= 4) {
-      const formattedExpressionNumber = Number(
-        currentExpressionNumber
-      ).toLocaleString("pt-BR");
+  if (!expression.includes(",") && currentExpressionNumber) {
+    const formattedExpressionNumber = Number(
+      currentExpressionNumber
+    ).toLocaleString("pt-BR");
 
-      expressionArray.splice(
-        firstPosition,
-        formattedExpressionNumber.length,
-        formattedExpressionNumber
-      );
-    }
+    expressionArray.splice(
+      firstPosition,
+      formattedExpressionNumber.length + 1,
+      formattedExpressionNumber
+    );
   }
 
   expression = expressionArray.join("");
@@ -200,7 +198,9 @@ function calculateResult() {
       let result = "";
 
       if (expressionResult.textContent) {
-        let firstNumber = expressionResult.textContent.replace(",", ".");
+        let firstNumber = expressionResult.textContent
+          .replace(".", "")
+          .replace(",", ".");
 
         if (isSameExpression && !isDeleting) {
           const diferenceBetweenExpressionNumbers = Number(
@@ -280,7 +280,7 @@ function calculateResult() {
         }
       }
 
-      result = String(result).replace(".", ",");
+      result = result.toLocaleString("pt-BR");
       showResult(result);
     }
   } else {
@@ -326,6 +326,7 @@ function deleteLastSymbol() {
   if (expressionInput.value) {
     let expression = expressionInput.value;
     let expressionArray = [];
+    currentExpressionNumber = "";
 
     for (let symbol in expression) {
       expressionArray.push(expression[symbol]);
@@ -334,6 +335,14 @@ function deleteLastSymbol() {
     expressionArray.pop();
     expression = expressionArray.join("");
     expressionInput.value = expression;
+
+    for (let symbol in expression) {
+      if (expression[symbol] !== ".") {
+        currentExpressionNumber += expression[symbol];
+      }
+    }
+
+    formatExpressionNumbers();
 
     isDeleting = true;
     triggerCalculation();
