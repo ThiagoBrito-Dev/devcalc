@@ -104,7 +104,6 @@ function addOperatorsOnDisplay(operator) {
   }
 
   currentExpressionNumber = "";
-  firstPosition = "";
   checkAndChangeFontSize();
 }
 
@@ -120,10 +119,9 @@ function checkAndChangeFontSize() {
   expressionInput.style.fontSize = expression.length >= 18 ? "16.5px" : "20px";
 }
 
-function formatExpressionNumbers(number) {
-  const numbersArray = [];
-  const expressionArray = [];
+function formatExpressionNumbers(number = "") {
   let expression = expressionInput.value;
+  const expressionArray = [];
 
   if (currentExpressionNumber == "") {
     firstPosition = expression.indexOf(number, expression.length - 1);
@@ -136,28 +134,21 @@ function formatExpressionNumbers(number) {
   currentExpressionNumber += number;
 
   if (!expression.includes(",")) {
-    if (
-      currentExpressionNumber.length >= 4 &&
-      currentExpressionNumber.length < 7
-    ) {
-      for (let number in currentExpressionNumber) {
-        numbersArray.push(currentExpressionNumber[number]);
-      }
-
-      numbersArray.reverse();
-      numbersArray.splice(3, 0, ".");
-      numbersArray.reverse();
+    if (currentExpressionNumber.length >= 4) {
+      const formattedExpressionNumber = Number(
+        currentExpressionNumber
+      ).toLocaleString("pt-BR");
 
       expressionArray.splice(
         firstPosition,
-        numbersArray.length,
-        numbersArray.join("")
+        formattedExpressionNumber.length,
+        formattedExpressionNumber
       );
     }
-
-    expression = expressionArray.join("");
-    expressionInput.value = expression;
   }
+
+  expression = expressionArray.join("");
+  expressionInput.value = expression;
 }
 
 function triggerCalculation() {
