@@ -117,7 +117,6 @@ function handleFontSize() {
   const fontSize = expressionInput.style.fontSize;
 
   if (expression.length >= 18 && fontSize != "16.5px") {
-    console.log("Chamou");
     expressionInput.style.fontSize = "16.5px";
   } else if (expression.length < 18 && fontSize != "20px" && fontSize != "") {
     expressionInput.style.fontSize = "20px";
@@ -155,8 +154,29 @@ function formatExpressionNumbers(number = "") {
 }
 
 function triggerCalculation() {
-  const expression = expressionInput.value.replace("x", "*").replace("÷", "/");
-  const splittedExpression = expression.split(expressionOperator);
+  let expression = "";
+  let expressionArray = [];
+  let char;
+
+  for (let symbol in expressionInput.value) {
+    char = expressionInput.value[symbol];
+
+    if (
+      expressionInput.value != "," &&
+      isNaN(Number(expressionInput.value[symbol]))
+    ) {
+      if (char == "x") {
+        char = "*";
+      } else if (char == "÷") {
+        char = "/";
+      }
+    }
+
+    expression += char;
+    expressionArray.push(char);
+  }
+
+  let splittedExpression = expression.split(expressionOperator);
 
   if (splittedExpression.length == 2 && !splittedExpression[1]) {
     isLastExpression = true;
@@ -168,11 +188,31 @@ function triggerCalculation() {
     lastNumber = splittedExpression[splittedExpression.length - 1];
     lastNumber = lastNumber.replace(",", ".");
 
+    if (isNaN(Number(lastNumber)) || isDeleting) {
+      let lastOperator;
+      expressionArray.reverse();
+
+      for (let symbol in expressionArray) {
+        if (!lastOperator) {
+          if (
+            expressionArray[symbol] != "," &&
+            isNaN(Number(expressionArray[symbol]))
+          ) {
+            lastOperator = expressionArray[symbol];
+          }
+        }
+      }
+
+      splittedExpression = expression.split(lastOperator);
+      lastNumber = splittedExpression[splittedExpression.length - 1];
+      lastNumber = lastNumber.replace(",", ".");
+    }
+
     if (lastDigit == "") {
       lastDigit = lastNumber;
     }
 
-    if (lastNumber.includes(".") || lastNumber.length >= 1) {
+    if (lastNumber.includes(".") || lastNumber.length > 1) {
       isSameExpression = true;
     }
 
@@ -342,14 +382,13 @@ function deleteLastSymbol() {
     expressionInput.value = expression;
 
     for (let symbol in expression) {
-      if (expression[symbol] !== ".") {
+      if (expression[symbol] !== "." && symbol >= firstPosition) {
         currentExpressionNumber += expression[symbol];
       }
     }
 
-    formatExpressionNumbers();
-
     isDeleting = true;
+    formatExpressionNumbers();
     triggerCalculation();
     isDeleting = false;
 
