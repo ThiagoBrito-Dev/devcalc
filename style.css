@@ -106,6 +106,8 @@ body main section {
 }
 
 body main section p {
+  display: none;
+
   background-color: var(--input-background);
   color: var(--p-text);
 

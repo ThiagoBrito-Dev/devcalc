@@ -23,7 +23,6 @@ function initializeInterface() {
   toggleImageSource(userTheme);
 
   calcContainer.style.opacity = 1;
-  expressionResult.style.display = "none";
 }
 
 function toggleTheme() {
@@ -65,7 +64,7 @@ function addNumbersOnDisplay(number) {
     }
   }
 
-  checkAndChangeFontSize();
+  handleFontSize();
   formatExpressionNumbers(number);
 }
 
@@ -104,7 +103,7 @@ function addOperatorsOnDisplay(operator) {
   }
 
   currentExpressionNumber = "";
-  checkAndChangeFontSize();
+  handleFontSize();
 }
 
 function focalizeResult() {
@@ -113,12 +112,14 @@ function focalizeResult() {
   expressionInput.value = expressionResult.textContent;
 }
 
-function checkAndChangeFontSize() {
+function handleFontSize() {
   const expression = expressionInput.value;
+  const fontSize = expressionInput.style.fontSize;
 
-  if (expression.length >= 18 && expressionInput.style.fontSize != "16.5px") {
+  if (expression.length >= 18 && fontSize != "16.5px") {
+    console.log("Chamou");
     expressionInput.style.fontSize = "16.5px";
-  } else if (expressionInput.style.fontSize == "16.5px") {
+  } else if (expression.length < 18 && fontSize != "20px" && fontSize != "") {
     expressionInput.style.fontSize = "20px";
   }
 }
@@ -352,6 +353,6 @@ function deleteLastSymbol() {
     triggerCalculation();
     isDeleting = false;
 
-    checkAndChangeFontSize();
+    handleFontSize();
   }
 }
