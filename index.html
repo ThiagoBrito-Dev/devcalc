@@ -17,7 +17,10 @@
     <link rel="stylesheet" href="style.css" />
   </head>
 
-  <body onload="initializeInterface()">
+  <body
+    onload="initializeInterface()"
+    onkeydown="handleKeyboardInteractions(event)"
+  >
     <main id="calc-container" style="opacity: 0">
       <header>
         <div>
@@ -42,9 +45,10 @@
         <input
           type="text"
           id="expression"
-          aria-label="Local de exibição da expressão/resultado"
+          aria-label="Expressão/resultado"
           style="height: 48px; border-radius: 2px; padding: 0 8px 0 0"
           placeholder="0"
+          readonly
         />
         <p id="result"></p>
         <div>

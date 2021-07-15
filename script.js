@@ -25,6 +25,51 @@ function initializeInterface() {
   calcContainer.style.opacity = 1;
 }
 
+function handleKeyboardInteractions(event) {
+  if (!isNaN(Number(event.key)) || event.key == ",") {
+    addNumbersOnDisplay(event.key);
+  } else {
+    let key;
+
+    switch (event.key) {
+      case "+":
+        key = event.key;
+        break;
+      case "-":
+        key = event.key;
+        break;
+      case "*":
+        key = event.key;
+        break;
+      case "/":
+        key = event.key;
+        break;
+    }
+
+    if (key) {
+      addOperatorsOnDisplay(key);
+    } else {
+      switch (event.key) {
+        case "m":
+          toggleResultMode();
+          break;
+        case "t":
+          toggleTheme();
+          break;
+        case "c":
+          clearExpressions(event.key);
+          break;
+        case "Backspace":
+          deleteLastSymbol(event.key);
+          break;
+        case "Enter":
+          focalizeResult(event.key);
+          break;
+      }
+    }
+  }
+}
+
 function toggleTheme() {
   document.body.classList.toggle("dark-theme");
 
@@ -49,7 +94,7 @@ function toggleImageSource(theme) {
 
 function toggleResultMode() {
   currentMode = resultMode.textContent;
-  resultMode.textContent = currentMode == "RAD" ? "GRAU" : "RAD";
+  resultMode.textContent = currentMode.includes("RAD") ? "GRAU" : "RAD";
 }
 
 function addNumbersOnDisplay(number) {
@@ -125,37 +170,42 @@ function handleFontSize() {
 
 function formatExpressionNumbers(number = "") {
   let expression = expressionInput.value;
-  const expressionArray = [];
 
-  if (currentExpressionNumber == "") {
-    firstPosition = expression.indexOf(number, expression.length - 1);
+  if (expression && expression != "-") {
+    const expressionArray = [];
+
+    if (currentExpressionNumber == "") {
+      firstPosition = expression.indexOf(number, expression.length - 1);
+    }
+
+    for (let symbol in expression) {
+      expressionArray.push(expression[symbol]);
+    }
+
+    currentExpressionNumber += number;
+
+    if (!expression.includes(",") && currentExpressionNumber) {
+      const formattedExpressionNumber = Number(
+        currentExpressionNumber
+      ).toLocaleString("pt-BR");
+
+      expressionArray.splice(
+        firstPosition,
+        formattedExpressionNumber.length + 1,
+        formattedExpressionNumber
+      );
+    }
+
+    expression = expressionArray.join("");
+    expressionInput.value = expression;
   }
-
-  for (let symbol in expression) {
-    expressionArray.push(expression[symbol]);
-  }
-
-  currentExpressionNumber += number;
-
-  if (!expression.includes(",") && currentExpressionNumber) {
-    const formattedExpressionNumber = Number(
-      currentExpressionNumber
-    ).toLocaleString("pt-BR");
-
-    expressionArray.splice(
-      firstPosition,
-      formattedExpressionNumber.length + 1,
-      formattedExpressionNumber
-    );
-  }
-
-  expression = expressionArray.join("");
-  expressionInput.value = expression;
 }
 
 function triggerCalculation() {
   let expression = "";
   let expressionArray = [];
+  let numbersArray = [];
+  let number = "";
   let char;
 
   for (let symbol in expressionInput.value) {
@@ -170,6 +220,11 @@ function triggerCalculation() {
       } else if (char == "÷") {
         char = "/";
       }
+
+      numbersArray.push(number);
+      number = "";
+    } else {
+      number += char;
     }
 
     expression += char;
@@ -178,7 +233,7 @@ function triggerCalculation() {
 
   let splittedExpression = expression.split(expressionOperator);
 
-  if (splittedExpression.length == 2 && !splittedExpression[1]) {
+  if (numbersArray.length == 1 && !splittedExpression[1]) {
     isLastExpression = true;
   } else {
     isLastExpression = false;
@@ -199,6 +254,7 @@ function triggerCalculation() {
             isNaN(Number(expressionArray[symbol]))
           ) {
             lastOperator = expressionArray[symbol];
+            expressionOperator = lastOperator;
           }
         }
       }
@@ -206,6 +262,12 @@ function triggerCalculation() {
       splittedExpression = expression.split(lastOperator);
       lastNumber = splittedExpression[splittedExpression.length - 1];
       lastNumber = lastNumber.replace(",", ".");
+
+      if (numbersArray.length == 1 && !splittedExpression[1]) {
+        isLastExpression = true;
+      } else {
+        isLastExpression = false;
+      }
     }
 
     if (lastDigit == "") {
@@ -316,10 +378,18 @@ function calculateResult() {
           break;
         }
         case "*": {
+          if (numbers[1] == 0 && lastNumber == "") {
+            numbers[1] = 1;
+          }
+
           result = numbers[0] * numbers[1];
           break;
         }
         case "/": {
+          if (numbers[1] == 0) {
+            numbers[1] = 1;
+          }
+
           result = numbers[0] / numbers[1];
           break;
         }
@@ -365,6 +435,7 @@ function clearExpressions() {
   firstPosition = "";
 
   setElementsToDefaultStyling();
+  handleFontSize();
 }
 
 function deleteLastSymbol() {
