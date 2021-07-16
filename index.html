@@ -25,6 +25,7 @@
       <header>
         <div>
           <button
+            type="button"
             id="result-mode"
             aria-label="Alterar modo de resultado"
             onclick="toggleResultMode()"
@@ -33,154 +34,205 @@
           </button>
         </div>
         <div>
-          <button aria-label="Trocar tema" onclick="toggleTheme()">
+          <button
+            type="button"
+            aria-label="Trocar tema"
+            onclick="toggleTheme()"
+          >
             <img src="" id="theme-icon" class="icon" alt="Trocar tema" />
           </button>
-          <button aria-label="Abrir barra de opções">
+          <button type="button" aria-label="Abrir barra de opções">
             <img src="" id="options-icon" class="icon" alt="Opções" />
           </button>
         </div>
       </header>
       <section>
-        <input
-          type="text"
-          id="expression"
-          aria-label="Expressão/resultado"
-          style="height: 48px; border-radius: 2px; padding: 0 8px 0 0"
-          placeholder="0"
-          readonly
-        />
-        <p id="result"></p>
         <div>
-          <button
-            class="colorized-button"
-            aria-label="Limpar expressão"
-            onclick="clearExpressions()"
-          >
-            C
-          </button>
-          <button
-            class="colorized-button colorized-icon-button"
-            aria-label="Apagar caractere anterior"
-            onclick="deleteLastSymbol()"
-          >
-            <img src="" id="delete-icon" class="icon" alt="Apagar" />
-          </button>
-          <button
-            class="colorized-button"
-            aria-label="Ativar/desativar modo desenvolvedor"
-          >
-            DEV
-          </button>
-          <button
-            class="colorized-button"
-            aria-label="Adicionar sinal de divisão à expressão"
-            onclick="addOperatorsOnDisplay('/')"
-          >
-            ÷
-          </button>
+          <input
+            type="text"
+            id="expression"
+            aria-label="Expressão/resultado"
+            placeholder="0"
+            readonly
+          />
+          <p id="result"></p>
         </div>
-        <div>
-          <button
-            onclick="addNumbersOnDisplay('7')"
-            aria-label="Adicionar número 7 à expressão"
-          >
-            7
-          </button>
-          <button
-            onclick="addNumbersOnDisplay('8')"
-            aria-label="Adicionar número 8 à expressão"
-          >
-            8
-          </button>
-          <button
-            onclick="addNumbersOnDisplay('9')"
-            aria-label="Adicionar número 9 à expressão"
-          >
-            9
-          </button>
-          <button
-            class="colorized-button"
-            aria-label="Adicionar sinal de multiplicação à expressão"
-            onclick="addOperatorsOnDisplay('*')"
-          >
-            x
-          </button>
-        </div>
-        <div>
-          <button
-            onclick="addNumbersOnDisplay('4')"
-            aria-label="Adicionar número 4 à expressão"
-          >
-            4
-          </button>
-          <button
-            onclick="addNumbersOnDisplay('5')"
-            aria-label="Adicionar número 5 à expressão"
-          >
-            5
-          </button>
-          <button
-            onclick="addNumbersOnDisplay('6')"
-            aria-label="Adicionar número 6 à expressão"
-          >
-            6
-          </button>
-          <button
-            class="colorized-button"
-            aria-label="Adicionar sinal de subtração à expressão"
-            onclick="addOperatorsOnDisplay('-')"
-          >
-            -
-          </button>
-        </div>
-        <div>
-          <button
-            onclick="addNumbersOnDisplay('1')"
-            aria-label="Adicionar número 1 à expressão"
-          >
-            1
-          </button>
-          <button
-            onclick="addNumbersOnDisplay('2')"
-            aria-label="Adicionar número 2 à expressão"
-          >
-            2
-          </button>
-          <button
-            onclick="addNumbersOnDisplay('3')"
-            aria-label="Adicionar número 3 à expressão"
-          >
-            3
-          </button>
-          <button
-            class="colorized-button"
-            aria-label="Adicionar sinal de adição à expressão"
-            onclick="addOperatorsOnDisplay('+')"
-          >
-            +
-          </button>
-        </div>
-        <div>
-          <button
-            onclick="addNumbersOnDisplay('0')"
-            aria-label="Adicionar número 0 à expressão"
-          >
-            0
-          </button>
-          <button
-            onclick="addNumbersOnDisplay(',')"
-            aria-label="Adicionar vírgula à expressão"
-          >
-            ,
-          </button>
-          <button
-            class="colorized-button"
-            aria-label="Ampliar resultado da expressão"
-            onclick="focalizeResult()"
-          >
-            =
-          </button>
+        <div class="buttons-container">
+          <div>
+            <div>
+              <button
+                type="button"
+                class="colorized-button"
+                aria-label="Limpar expressão"
+                onclick="clearExpressions()"
+              >
+                C
+              </button>
+              <button
+                type="button"
+                class="colorized-button colorized-icon-button"
+                aria-label="Apagar caractere anterior"
+                onclick="deleteLastSymbol()"
+              >
+                <img src="" id="delete-icon" class="icon" alt="Apagar" />
+              </button>
+              <button
+                type="button"
+                class="colorized-button"
+                aria-label="Ativar/desativar modo desenvolvedor"
+              >
+                DEV
+              </button>
+              <button
+                type="button"
+                class="colorized-button"
+                aria-label="Adicionar sinal de divisão à expressão"
+                onclick="addOperatorsOnDisplay('/')"
+              >
+                ÷
+              </button>
+            </div>
+            <div>
+              <button
+                type="button"
+                onclick="addNumbersOnDisplay('7')"
+                aria-label="Adicionar número 7 à expressão"
+              >
+                7
+              </button>
+              <button
+                type="button"
+                onclick="addNumbersOnDisplay('8')"
+                aria-label="Adicionar número 8 à expressão"
+              >
+                8
+              </button>
+              <button
+                type="button"
+                onclick="addNumbersOnDisplay('9')"
+                aria-label="Adicionar número 9 à expressão"
+              >
+                9
+              </button>
+              <button
+                type="button"
+                class="colorized-button"
+                aria-label="Adicionar sinal de multiplicação à expressão"
+                onclick="addOperatorsOnDisplay('*')"
+              >
+                x
+              </button>
+            </div>
+            <div>
+              <button
+                type="button"
+                onclick="addNumbersOnDisplay('4')"
+                aria-label="Adicionar número 4 à expressão"
+              >
+                4
+              </button>
+              <button
+                type="button"
+                onclick="addNumbersOnDisplay('5')"
+                aria-label="Adicionar número 5 à expressão"
+              >
+                5
+              </button>
+              <button
+                type="button"
+                onclick="addNumbersOnDisplay('6')"
+                aria-label="Adicionar número 6 à expressão"
+              >
+                6
+              </button>
+              <button
+                type="button"
+                class="colorized-button"
+                aria-label="Adicionar sinal de subtração à expressão"
+                onclick="addOperatorsOnDisplay('-')"
+              >
+                -
+              </button>
+            </div>
+            <div>
+              <button
+                type="button"
+                onclick="addNumbersOnDisplay('1')"
+                aria-label="Adicionar número 1 à expressão"
+              >
+                1
+              </button>
+              <button
+                type="button"
+                onclick="addNumbersOnDisplay('2')"
+                aria-label="Adicionar número 2 à expressão"
+              >
+                2
+              </button>
+              <button
+                type="button"
+                onclick="addNumbersOnDisplay('3')"
+                aria-label="Adicionar número 3 à expressão"
+              >
+                3
+              </button>
+              <button
+                type="button"
+                class="colorized-button"
+                aria-label="Adicionar sinal de adição à expressão"
+                onclick="addOperatorsOnDisplay('+')"
+              >
+                +
+              </button>
+            </div>
+            <div>
+              <button
+                type="button"
+                onclick="addNumbersOnDisplay('0')"
+                aria-label="Adicionar número 0 à expressão"
+              >
+                0
+              </button>
+              <button
+                type="button"
+                onclick="addNumbersOnDisplay(',')"
+                aria-label="Adicionar vírgula à expressão"
+              >
+                ,
+              </button>
+              <button
+                type="button"
+                class="colorized-button"
+                aria-label="Ampliar resultado da expressão"
+                onclick="focalizeResult()"
+              >
+                =
+              </button>
+            </div>
+          </div>
+          <!-- <div class="dev-mode-container">
+            <div>
+              <button type="button" class="colorized-button">(</button>
+              <button type="button" class="colorized-button">^</button>
+              <button type="button" class="colorized-button">%</button>
+              <button type="button" class="colorized-button">√</button>
+              <button type="button" class="colorized-button">π</button>
+            </div>
+            <div>
+              <button type="button" class="colorized-button">)</button>
+              <button type="button" class="colorized-button">sin</button>
+              <button type="button" class="colorized-button">cos</button>
+              <button type="button" class="colorized-button">tan</button>
+              <button type="button" class="colorized-button">!</button>
+            </div>
+            <div>
+              <button type="button" class="colorized-button">log</button>
+              <button type="button" class="colorized-button">ln</button>
+              <button type="button" class="colorized-button">tri</button>
+              <button type="button" class="colorized-button">fib</button>
+              <button type="button" class="colorized-button">e</button>
+            </div>
+          </div> -->
         </div>
       </section>
     </main>

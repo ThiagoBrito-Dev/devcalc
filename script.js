@@ -71,15 +71,14 @@ function handleKeyboardInteractions(event) {
 }
 
 function toggleTheme() {
+  applyNewStylingClasses();
+
   document.body.classList.toggle("dark-theme");
 
   const currentTheme = document.body.classList.value;
   toggleImageSource(currentTheme);
 
   localStorage.setItem("userTheme", currentTheme);
-
-  expressionInput.style.transitionDuration = "0.25s";
-  expressionResult.style.transitionDuration = "0.25s";
 }
 
 function toggleImageSource(theme) {
@@ -152,7 +151,7 @@ function addOperatorsOnDisplay(operator) {
 }
 
 function focalizeResult() {
-  setElementsToDefaultStyling();
+  setDefaultStylingClasses();
 
   expressionInput.value = expressionResult.textContent;
 }
@@ -400,32 +399,32 @@ function calculateResult() {
     }
   } else {
     expressionResult.textContent = "";
-    setElementsToDefaultStyling();
+    setDefaultStylingClasses();
   }
 }
 
-function applyNewStyles() {
-  expressionInput.style.height = "26.5px";
-  expressionInput.style.borderRadius = "2px 2px 0 0";
-  expressionInput.style.padding = "4px 8px 0 0";
+function applyNewStylingClasses(result) {
+  expressionInput.classList.add("has-transition");
+  expressionResult.classList.add("has-transition");
 
-  expressionResult.style.display = "block";
-  expressionResult.style.borderRadius = "0 0 2px 2px";
+  if (result) {
+    expressionInput.classList.add("has-result");
+    expressionResult.classList.add("is-visible");
+
+    expressionInput.classList.remove("has-transition");
+    expressionResult.classList.remove("has-transition");
+  }
 }
 
 function showResult(result) {
-  applyNewStyles();
+  applyNewStylingClasses(result);
 
   expressionResult.textContent = result;
 }
 
-function setElementsToDefaultStyling() {
-  expressionInput.style.height = "48px";
-  expressionInput.style.transitionDuration = "0s";
-  expressionInput.style.borderRadius = "2px";
-  expressionInput.style.padding = "0px 8px 0 0";
-
-  expressionResult.style.display = "none";
+function setDefaultStylingClasses() {
+  expressionInput.classList.remove("has-result", "has-transition");
+  expressionResult.classList.remove("is-visible", "has-transition");
 }
 
 function clearExpressions() {
@@ -434,7 +433,7 @@ function clearExpressions() {
   currentExpressionNumber = "";
   firstPosition = "";
 
-  setElementsToDefaultStyling();
+  setDefaultStylingClasses();
   handleFontSize();
 }
 

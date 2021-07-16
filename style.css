@@ -105,7 +105,7 @@ body main section {
   padding: 12px 16px;
 }
 
-body main section p {
+body main section div p {
   display: none;
 
   background-color: var(--input-background);
@@ -118,8 +118,15 @@ body main section p {
   cursor: default;
 }
 
-body main section input {
+.is-visible {
+  display: block;
+  border-radius: 0 0 2px 2px;
+}
+
+body main section div input {
   width: 210px;
+  height: 48px;
+  padding-right: 8px;
 
   text-align: right;
   font-size: 20px;
@@ -130,14 +137,25 @@ body main section input {
   cursor: default;
   outline: 0;
   border: 0;
-  border-radius: 2px 2px 0 0;
+  border-radius: 2px;
 }
 
 body main section input::placeholder {
   color: var(--input-text);
 }
 
-body main section div:first-of-type {
+.has-result {
+  height: 26.5px;
+  border-radius: 2px 2px 0 0;
+  padding: 4px 8px 0 0;
+}
+
+.has-transition {
+  transition-duration: 0.25s;
+}
+
+.buttons-container {
+  display: flex;
   margin-top: 20px;
 }
 
@@ -163,25 +181,40 @@ body main section button {
   font-size: 0;
 }
 
-body main section div button:hover {
+body main section div div div button:hover {
   filter: brightness(0.97);
   transform: scale(1.05);
 }
 
-body main section div button:active {
+body main section div div div button:active {
   transform: scale(0.95);
 }
 
-body main section div:last-child button:first-child {
+body main section div div:first-child div:last-child button:first-child {
   width: 49%;
   border-radius: 25px;
 }
 
-body main section div {
+body main section div div:first-child div {
   display: flex;
   gap: 6px;
 }
 
-body main section div + div {
+body main section div div:first-child div + div {
   margin-top: 6px;
 }
+
+/* .dev-mode-container {
+  display: flex;
+  gap: 6px;
+
+  margin-left: 10px;
+  padding-left: 10px;
+  border-left: 1px solid var(--header-line);
+}
+
+body main section div div:last-child div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+} */
