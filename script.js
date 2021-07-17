@@ -1,10 +1,13 @@
-const calcContainer = document.querySelector("#calc-container");
+const calcContainer = document.querySelector("main");
 const resultMode = document.querySelector("#result-mode");
+const conversionMode = document.querySelector("#conversion-mode");
 const themeIcon = document.querySelector("#theme-icon");
 const optionsIcon = document.querySelector("#options-icon");
-const expressionInput = document.querySelector("#expression");
-const expressionResult = document.querySelector("#result");
+const expressionInput = document.querySelector("input");
+const expressionResult = document.querySelector("p");
 const deleteIcon = document.querySelector("#delete-icon");
+const topContainer = document.querySelector(".dev-mode-top-container");
+const sideContainer = document.querySelector(".dev-mode-side-container");
 
 let currentMode;
 let expressionOperator;
@@ -22,7 +25,7 @@ function initializeInterface() {
   document.body.classList = userTheme;
   toggleImageSource(userTheme);
 
-  calcContainer.style.opacity = 1;
+  calcContainer.classList.add("visible");
 }
 
 function handleKeyboardInteractions(event) {
@@ -50,20 +53,29 @@ function handleKeyboardInteractions(event) {
       addOperatorsOnDisplay(key);
     } else {
       switch (event.key) {
-        case "m":
+        case "r":
           toggleResultMode();
           break;
         case "t":
           toggleTheme();
           break;
+        case "l":
+          clearExpressions();
+          break;
         case "c":
-          clearExpressions(event.key);
+          if (conversionMode.classList.value != "invisible") {
+            handleConversionMode();
+          }
+
+          break;
+        case "Control":
+          toggleDevMode();
           break;
         case "Backspace":
-          deleteLastSymbol(event.key);
+          deleteLastSymbol();
           break;
         case "Enter":
-          focalizeResult(event.key);
+          focalizeResult();
           break;
       }
     }
@@ -94,6 +106,34 @@ function toggleImageSource(theme) {
 function toggleResultMode() {
   currentMode = resultMode.textContent;
   resultMode.textContent = currentMode.includes("RAD") ? "GRAU" : "RAD";
+}
+
+function handleConversionMode() {
+  const modes = ["DECI", "BIN", "OCT", "HEX"];
+  const currentMode = conversionMode.textContent.trim();
+
+  for (let mode in modes) {
+    if (modes[mode] === currentMode) {
+      conversionMode.textContent = modes[++mode];
+
+      if (conversionMode.textContent === "") {
+        conversionMode.textContent = modes[0];
+      }
+    }
+  }
+}
+
+function toggleDevMode() {
+  if (conversionMode.classList.value !== "invisible") {
+    conversionMode.textContent = "DECI";
+  }
+
+  conversionMode.classList.toggle("invisible");
+  expressionInput.classList.toggle("stretch");
+  topContainer.classList.toggle("invisible");
+  sideContainer.classList.toggle("invisible");
+
+  expressionInput.classList.remove("has-transition");
 }
 
 function addNumbersOnDisplay(number) {
@@ -154,6 +194,7 @@ function focalizeResult() {
   setDefaultStylingClasses();
 
   expressionInput.value = expressionResult.textContent;
+  expressionResult.textContent = "";
 }
 
 function handleFontSize() {
@@ -409,9 +450,9 @@ function applyNewStylingClasses(result) {
 
   if (result) {
     expressionInput.classList.add("has-result");
-    expressionResult.classList.add("is-visible");
 
     expressionInput.classList.remove("has-transition");
+    expressionResult.classList.remove("invisible");
     expressionResult.classList.remove("has-transition");
   }
 }
@@ -423,8 +464,10 @@ function showResult(result) {
 }
 
 function setDefaultStylingClasses() {
+  expressionResult.classList.add("invisible");
+
   expressionInput.classList.remove("has-result", "has-transition");
-  expressionResult.classList.remove("is-visible", "has-transition");
+  expressionResult.classList.remove("has-transition");
 }
 
 function clearExpressions() {

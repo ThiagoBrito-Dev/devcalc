@@ -21,7 +21,7 @@
     onload="initializeInterface()"
     onkeydown="handleKeyboardInteractions(event)"
   >
-    <main id="calc-container" style="opacity: 0">
+    <main>
       <header>
         <div>
           <button
@@ -31,6 +31,15 @@
             onclick="toggleResultMode()"
           >
             RAD
+          </button>
+          <button
+            type="button"
+            id="conversion-mode"
+            class="invisible"
+            aria-label="Alterar modo de conversão"
+            onclick="handleConversionMode()"
+          >
+            DECI
           </button>
         </div>
         <div>
@@ -50,15 +59,38 @@
         <div>
           <input
             type="text"
-            id="expression"
             aria-label="Expressão/resultado"
             placeholder="0"
             readonly
           />
-          <p id="result"></p>
+          <p class="invisible"></p>
         </div>
-        <div class="buttons-container">
-          <div>
+        <div class="buttons-wrapper">
+          <div class="dev-mode-top-container invisible">
+            <div class="left-column-top-row">
+              <div>
+                <button type="button" class="colorized-button">sin</button>
+                <button type="button" class="colorized-button">cos</button>
+                <button type="button" class="colorized-button">tan</button>
+                <button type="button" class="colorized-button">hypot</button>
+              </div>
+              <div>
+                <button type="button" class="colorized-button">(</button>
+                <button type="button" class="colorized-button">)</button>
+                <button type="button" class="colorized-button">^</button>
+                <button type="button" class="colorized-button">%</button>
+              </div>
+            </div>
+            <div class="right-column-top-row">
+              <div>
+                <button type="button" class="colorized-button">!</button>
+              </div>
+              <div>
+                <button type="button" class="colorized-button">√</button>
+              </div>
+            </div>
+          </div>
+          <div class="main-container">
             <div>
               <button
                 type="button"
@@ -80,6 +112,7 @@
                 type="button"
                 class="colorized-button"
                 aria-label="Ativar/desativar modo desenvolvedor"
+                onclick="toggleDevMode()"
               >
                 DEV
               </button>
@@ -210,29 +243,15 @@
               </button>
             </div>
           </div>
-          <!-- <div class="dev-mode-container">
-            <div>
-              <button type="button" class="colorized-button">(</button>
-              <button type="button" class="colorized-button">^</button>
-              <button type="button" class="colorized-button">%</button>
-              <button type="button" class="colorized-button">√</button>
-              <button type="button" class="colorized-button">π</button>
-            </div>
-            <div>
-              <button type="button" class="colorized-button">)</button>
-              <button type="button" class="colorized-button">sin</button>
-              <button type="button" class="colorized-button">cos</button>
-              <button type="button" class="colorized-button">tan</button>
-              <button type="button" class="colorized-button">!</button>
-            </div>
+          <div class="dev-mode-side-container invisible">
             <div>
               <button type="button" class="colorized-button">log</button>
               <button type="button" class="colorized-button">ln</button>
-              <button type="button" class="colorized-button">tri</button>
               <button type="button" class="colorized-button">fib</button>
+              <button type="button" class="colorized-button">π</button>
               <button type="button" class="colorized-button">e</button>
             </div>
-          </div> -->
+          </div>
         </div>
       </section>
     </main>

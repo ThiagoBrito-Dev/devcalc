@@ -53,7 +53,12 @@ body main {
   border-radius: 6px;
   box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.5);
 
+  opacity: 0;
   transition: opacity 1s, background-color 0.25s;
+}
+
+.visible {
+  opacity: 1;
 }
 
 body main header {
@@ -62,6 +67,11 @@ body main header {
 
   padding: 12px 10px 10px 16px;
   border-bottom: 1px solid var(--header-line);
+}
+
+body main header div:first-child {
+  display: flex;
+  gap: 6px;
 }
 
 body main header div:first-child button {
@@ -106,8 +116,6 @@ body main section {
 }
 
 body main section div p {
-  display: none;
-
   background-color: var(--input-background);
   color: var(--p-text);
 
@@ -118,14 +126,9 @@ body main section div p {
   cursor: default;
 }
 
-.is-visible {
-  display: block;
-  border-radius: 0 0 2px 2px;
-}
-
 body main section div input {
   width: 210px;
-  height: 48px;
+  height: 52px;
   padding-right: 8px;
 
   text-align: right;
@@ -140,12 +143,16 @@ body main section div input {
   border-radius: 2px;
 }
 
+.stretch {
+  width: 100%;
+}
+
 body main section input::placeholder {
   color: var(--input-text);
 }
 
 .has-result {
-  height: 26.5px;
+  height: 30.675px;
   border-radius: 2px 2px 0 0;
   padding: 4px 8px 0 0;
 }
@@ -154,8 +161,14 @@ body main section input::placeholder {
   transition-duration: 0.25s;
 }
 
-.buttons-container {
-  display: flex;
+.buttons-wrapper {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "dev-mode-top-container dev-mode-top-container"
+    "default-container dev-mode-side-container";
+
   margin-top: 20px;
 }
 
@@ -190,31 +203,60 @@ body main section div div div button:active {
   transform: scale(0.95);
 }
 
-body main section div div:first-child div:last-child button:first-child {
+.dev-mode-top-container div,
+.main-container div,
+.dev-mode-side-container {
+  display: flex;
+  gap: 6px;
+}
+
+.dev-mode-top-container {
+  grid-area: dev-mode-top-container;
+  display: flex;
+
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--header-line);
+}
+
+.left-column-top-row {
+  flex-direction: column;
+}
+
+.right-column-top-row {
+  flex-direction: column;
+  margin-left: 6px;
+  padding-left: 6px;
+  border-left: 1px solid var(--header-line);
+}
+
+.main-container {
+  grid-area: default-container;
+}
+
+.main-container div:last-child button:first-child {
   width: 49%;
   border-radius: 25px;
 }
 
-body main section div div:first-child div {
-  display: flex;
-  gap: 6px;
-}
-
-body main section div div:first-child div + div {
+.main-container div + div {
   margin-top: 6px;
 }
 
-/* .dev-mode-container {
-  display: flex;
-  gap: 6px;
+.dev-mode-side-container {
+  grid-area: dev-mode-side-container;
 
-  margin-left: 10px;
-  padding-left: 10px;
+  margin-left: 6px;
+  padding-left: 6px;
   border-left: 1px solid var(--header-line);
 }
 
-body main section div div:last-child div {
+.dev-mode-side-container div {
   display: flex;
   flex-direction: column;
   gap: 6px;
-} */
+}
+
+.invisible {
+  display: none;
+}
