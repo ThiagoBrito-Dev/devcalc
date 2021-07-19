@@ -219,7 +219,8 @@ body main section div div div button:active {
   border-bottom: 1px solid var(--header-line);
 }
 
-.left-column-top-row {
+.left-column-top-row,
+.right-column-top-row div {
   flex-direction: column;
 }
 
