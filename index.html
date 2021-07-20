@@ -35,7 +35,6 @@
           <button
             type="button"
             id="conversion-mode"
-            class="invisible"
             aria-label="Alterar modo de conversão"
             onclick="handleConversionMode()"
           >
@@ -59,6 +58,7 @@
         <div>
           <input
             type="text"
+            class="stretch"
             aria-label="Expressão/resultado"
             placeholder="0"
             readonly
@@ -66,7 +66,7 @@
           <p class="invisible"></p>
         </div>
         <div class="buttons-wrapper">
-          <div class="dev-mode-top-container invisible">
+          <div class="dev-mode-top-container">
             <div class="left-column-top-row">
               <div>
                 <button type="button" class="colorized-button">sin</button>
@@ -144,21 +144,21 @@
             <div>
               <button
                 type="button"
-                onclick="addNumbersOnDisplay('7')"
+                onclick="handleAddingNumbersOrCharacters('7')"
                 aria-label="Adicionar número 7 à expressão"
               >
                 7
               </button>
               <button
                 type="button"
-                onclick="addNumbersOnDisplay('8')"
+                onclick="handleAddingNumbersOrCharacters('8')"
                 aria-label="Adicionar número 8 à expressão"
               >
                 8
               </button>
               <button
                 type="button"
-                onclick="addNumbersOnDisplay('9')"
+                onclick="handleAddingNumbersOrCharacters('9')"
                 aria-label="Adicionar número 9 à expressão"
               >
                 9
@@ -175,21 +175,21 @@
             <div>
               <button
                 type="button"
-                onclick="addNumbersOnDisplay('4')"
+                onclick="handleAddingNumbersOrCharacters('4')"
                 aria-label="Adicionar número 4 à expressão"
               >
                 4
               </button>
               <button
                 type="button"
-                onclick="addNumbersOnDisplay('5')"
+                onclick="handleAddingNumbersOrCharacters('5')"
                 aria-label="Adicionar número 5 à expressão"
               >
                 5
               </button>
               <button
                 type="button"
-                onclick="addNumbersOnDisplay('6')"
+                onclick="handleAddingNumbersOrCharacters('6')"
                 aria-label="Adicionar número 6 à expressão"
               >
                 6
@@ -206,21 +206,21 @@
             <div>
               <button
                 type="button"
-                onclick="addNumbersOnDisplay('1')"
+                onclick="handleAddingNumbersOrCharacters('1')"
                 aria-label="Adicionar número 1 à expressão"
               >
                 1
               </button>
               <button
                 type="button"
-                onclick="addNumbersOnDisplay('2')"
+                onclick="handleAddingNumbersOrCharacters('2')"
                 aria-label="Adicionar número 2 à expressão"
               >
                 2
               </button>
               <button
                 type="button"
-                onclick="addNumbersOnDisplay('3')"
+                onclick="handleAddingNumbersOrCharacters('3')"
                 aria-label="Adicionar número 3 à expressão"
               >
                 3
@@ -237,14 +237,14 @@
             <div>
               <button
                 type="button"
-                onclick="addNumbersOnDisplay('0')"
+                onclick="handleAddingNumbersOrCharacters('0')"
                 aria-label="Adicionar número 0 à expressão"
               >
                 0
               </button>
               <button
                 type="button"
-                onclick="addNumbersOnDisplay(',')"
+                onclick="handleAddingNumbersOrCharacters(',')"
                 aria-label="Adicionar vírgula à expressão"
               >
                 ,
@@ -259,7 +259,7 @@
               </button>
             </div>
           </div>
-          <div class="dev-mode-side-container invisible">
+          <div class="dev-mode-side-container">
             <div>
               <button type="button" class="colorized-button">log</button>
               <button type="button" class="colorized-button">ln</button>

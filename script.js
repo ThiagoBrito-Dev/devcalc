@@ -1,13 +1,6 @@
-const calcContainer = document.querySelector("main");
-const resultMode = document.querySelector("#result-mode");
 const conversionMode = document.querySelector("#conversion-mode");
-const themeIcon = document.querySelector("#theme-icon");
-const optionsIcon = document.querySelector("#options-icon");
 const expressionInput = document.querySelector("input");
 const expressionResult = document.querySelector("p");
-const deleteIcon = document.querySelector("#delete-icon");
-const topContainer = document.querySelector(".dev-mode-top-container");
-const sideContainer = document.querySelector(".dev-mode-side-container");
 
 let currentMode;
 let expressionOperator;
@@ -22,6 +15,7 @@ let firstPosition;
 let isInvalid = false;
 
 function initializeInterface() {
+  const calcContainer = document.querySelector("main");
   const userTheme = localStorage.getItem("userTheme");
 
   document.body.classList = userTheme;
@@ -31,7 +25,7 @@ function initializeInterface() {
 }
 
 function handleKeyboardInteractions(event) {
-  if (!isNaN(Number(event.key)) || event.key == ",") {
+  if (event.key == "," || !isNaN(Number(event.key))) {
     addNumbersOnDisplay(event.key);
   } else {
     let key;
@@ -46,7 +40,13 @@ function handleKeyboardInteractions(event) {
       case "*":
         key = event.key;
         break;
+      case "^":
+        key = event.key;
+        break;
       case "/":
+        key = event.key;
+        break;
+      case "%":
         key = event.key;
         break;
     }
@@ -86,7 +86,6 @@ function handleKeyboardInteractions(event) {
 
 function toggleTheme() {
   applyNewStylingClasses();
-
   document.body.classList.toggle("dark-theme");
 
   const currentTheme = document.body.classList.value;
@@ -96,6 +95,10 @@ function toggleTheme() {
 }
 
 function toggleImageSource(theme) {
+  const themeIcon = document.querySelector("#theme-icon");
+  const optionsIcon = document.querySelector("#options-icon");
+  const deleteIcon = document.querySelector("#delete-icon");
+
   const isDarkTheme = theme == "dark-theme";
 
   themeIcon.src = isDarkTheme ? "assets/sun.png" : "assets/moon.png";
@@ -106,6 +109,8 @@ function toggleImageSource(theme) {
 }
 
 function toggleResultMode() {
+  const resultMode = document.querySelector("#result-mode");
+
   currentMode = resultMode.textContent;
   resultMode.textContent = currentMode.includes("RAD") ? "GRAU" : "RAD";
 }
@@ -114,10 +119,10 @@ function handleConversionMode() {
   const modes = ["DECI", "BIN", "OCT", "HEX"];
 
   if (!conversionMode.textContent.includes(" ")) {
-    const currentMode = conversionMode.textContent.trim();
+    const currentMode = conversionMode.textContent;
 
     for (let mode in modes) {
-      if (modes[mode] === currentMode) {
+      if (modes[mode] == currentMode) {
         conversionMode.textContent = modes[++mode];
 
         if (conversionMode.textContent === "") {
@@ -129,11 +134,16 @@ function handleConversionMode() {
     conversionMode.textContent = "DECI";
   }
 
-  addCharactersOnDisplay(`${conversionMode.textContent}(`.toLowerCase());
+  handleAddingNumbersOrCharacters(
+    `${conversionMode.textContent}(`.toLowerCase()
+  );
 }
 
 function toggleDevMode() {
-  if (conversionMode.classList.value !== "invisible") {
+  const topContainer = document.querySelector(".dev-mode-top-container");
+  const sideContainer = document.querySelector(".dev-mode-side-container");
+
+  if (conversionMode.classList.value != "invisible") {
     conversionMode.textContent = "DECI";
   }
 
@@ -145,40 +155,66 @@ function toggleDevMode() {
   expressionInput.classList.remove("has-transition");
 }
 
+function handleAddingNumbersOrCharacters(char) {
+  if (char == "," || !isNaN(Number(char))) {
+    addNumbersOnDisplay(char);
+  } else {
+    addCharactersOnDisplay(char);
+  }
+}
+
 function addNumbersOnDisplay(number) {
-  const expression = expressionInput.value;
+  let expression = expressionInput.value;
   const lastSymbol = Number(expression[expression.length - 1]);
 
   if (number != "," || (expression.length >= 1 && !isNaN(lastSymbol))) {
-    console.log("Último número: " + lastNumber);
-    if (!expressionResult.textContent) {
-      if (expression.includes(",") && number == ",") {
-        return;
-      }
-    } else if (lastNumber) {
-      if (lastNumber.includes(".") && number == ",") {
-        return;
-      }
-    }
+    const cantHave = checkIfCurrentNumberCantHaveComma(expression, number);
 
-    expressionInput.value += number;
+    if (!cantHave) {
+      expressionInput.value += number;
+      expression = expressionInput.value;
 
-    if (isNaN(Number(expressionInput.value))) {
-      if (
-        expressionOperator == "/" &&
-        (Number(number) == "0" || number == ",")
-      ) {
-        setDefaultStylingClasses();
-        isInvalid = true;
-      } else {
-        isInvalid = false;
-        triggerCalculation(number);
+      if (isNaN(Number(expression))) {
+        handleValidExpressions(expression, number);
       }
     }
   }
 
-  handleFontSize();
   formatExpressionNumbers(number);
+  handleFontSize();
+}
+
+function checkIfCurrentNumberCantHaveComma(expression, number) {
+  const expResult = expressionResult.textContent;
+
+  if (!expResult) {
+    if (expression.includes(",") && number == ",") {
+      return true;
+    }
+  } else if (lastNumber) {
+    if (lastNumber.includes(".") && number == ",") {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function handleValidExpressions(expression, number) {
+  const currentFullNumber = expression.slice(firstPosition);
+  const currentNumberIndex = currentFullNumber.indexOf(number);
+
+  if (
+    expressionOperator == "/" &&
+    (number == "0" ||
+      (currentFullNumber[currentNumberIndex - 1] == "0" && number == ","))
+  ) {
+    setDefaultStylingClasses();
+    isInvalid = true;
+  } else {
+    isInvalid = false;
+    triggerCalculation(number);
+  }
 }
 
 function formatExpressionNumbers(number = "") {
@@ -212,6 +248,10 @@ function formatExpressionNumbers(number = "") {
     expression = expressionArray.join("");
     expressionInput.value = expression;
   }
+}
+
+function addCharactersOnDisplay(char) {
+  expressionInput.value = char;
 }
 
 function addOperatorsOnDisplay(operator) {
@@ -253,10 +293,6 @@ function addOperatorsOnDisplay(operator) {
 
   currentExpressionNumber = "";
   handleFontSize();
-}
-
-function addCharactersOnDisplay(char) {
-  expressionInput.value = char;
 }
 
 function focalizeResult() {
@@ -407,6 +443,7 @@ function calculateResult() {
           ) {
             firstNumber = firstValue;
           }
+          console.log("Primeiro valor: " + firstValue);
 
           switch (expressionOperator) {
             case "+":
@@ -423,7 +460,7 @@ function calculateResult() {
               firstNumber = firstNumber / diferenceBetweenExpressionNumbers;
               break;
             case "**":
-              firstNumber = Math.sqrt(firstNumber);
+              firstNumber = firstValue;
               break;
             case "/":
               if (!diferenceBetweenExpressionNumbers) {
@@ -431,6 +468,9 @@ function calculateResult() {
               }
 
               firstNumber = firstNumber * diferenceBetweenExpressionNumbers;
+              break;
+            case "%":
+              firstNumber = firstValue;
               break;
           }
         }
@@ -453,14 +493,13 @@ function calculateResult() {
                 firstNumber = firstNumber / lastDigit;
                 break;
               case "**":
-                console.log("Último dígito: " + lastDigit);
-                console.log("Primeiro número antes: " + firstNumber);
-                // firstNumber = firstNumber - (firstNumber - 3);
-                firstNumber = Math.floor(Math.sqrt(firstNumber));
-                console.log("Primeiro número depois: " + firstNumber);
+                firstNumber = firstValue;
                 break;
               case "/":
                 firstNumber = firstNumber * lastDigit;
+                break;
+              case "%":
+                firstNumber = firstValue;
                 break;
             }
           }
@@ -472,7 +511,7 @@ function calculateResult() {
       let numbers = shortExpression.split(expressionOperator);
       console.log("Números: ", numbers);
 
-      if (numbers[1] == 0) {
+      if (numbers[1] >= 0) {
         firstValue = numbers[0];
       }
 
@@ -499,6 +538,10 @@ function calculateResult() {
           result = numbers[0] * numbers[1];
           break;
         case "**":
+          if (lastNumber === "" && numbers[1] === 0) {
+            numbers[1] = 1;
+          }
+
           result = numbers[0] ** numbers[1];
           break;
         case "/":
@@ -509,12 +552,17 @@ function calculateResult() {
           result = numbers[0] / numbers[1];
           break;
         case "%":
-          result = numbers[0] % numbers[1];
+          result = (numbers[1] * numbers[0]) / 100;
           break;
       }
 
       if (expressionOperator == "**" && String(result).includes(".")) {
         result = String(result).replace(".", ",");
+
+        const splittedResult = result.split(",");
+        splittedResult[0] = Number(splittedResult[0]).toLocaleString("pt-BR");
+
+        result = splittedResult.join(",");
       } else {
         result = result.toLocaleString("pt-BR");
       }
@@ -557,6 +605,7 @@ function clearExpressions() {
   expressionResult.textContent = "";
   currentExpressionNumber = "";
   firstPosition = "";
+  lastNumber = "";
   isInvalid = false;
 
   setDefaultStylingClasses();
