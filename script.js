@@ -10,9 +10,9 @@ let isSameExpression = false;
 let isDeleting = false;
 let lastDigit;
 let isLastExpression = false;
-let currentExpressionNumber = "";
+let currentNumber = "";
 let firstPosition;
-let isInvalid = false;
+let isNotCalculable = false;
 
 function initializeInterface() {
   const calcContainer = document.querySelector("main");
@@ -168,9 +168,9 @@ function addNumbersOnDisplay(number) {
   const lastSymbol = Number(expression[expression.length - 1]);
 
   if (number != "," || (expression.length >= 1 && !isNaN(lastSymbol))) {
-    const cantHave = checkIfCurrentNumberCantHaveComma(expression, number);
+    const canBe = checkIfCommaCanBeAdded(expression, number);
 
-    if (!cantHave) {
+    if (canBe) {
       expressionInput.value += number;
       expression = expressionInput.value;
 
@@ -180,24 +180,24 @@ function addNumbersOnDisplay(number) {
     }
   }
 
-  formatExpressionNumbers(number);
-  handleFontSize();
+  formatNumbers(expression, number);
+  handleFontSize(expression);
 }
 
-function checkIfCurrentNumberCantHaveComma(expression, number) {
+function checkIfCommaCanBeAdded(expression, number) {
   const expResult = expressionResult.textContent;
 
   if (!expResult) {
     if (expression.includes(",") && number == ",") {
-      return true;
+      return false;
     }
   } else if (lastNumber) {
     if (lastNumber.includes(".") && number == ",") {
-      return true;
+      return false;
     }
   }
 
-  return false;
+  return true;
 }
 
 function handleValidExpressions(expression, number) {
@@ -210,44 +210,35 @@ function handleValidExpressions(expression, number) {
       (currentFullNumber[currentNumberIndex - 1] == "0" && number == ","))
   ) {
     setDefaultStylingClasses();
-    isInvalid = true;
+    isNotCalculable = true;
   } else {
-    isInvalid = false;
+    isNotCalculable = false;
     triggerCalculation(number);
   }
 }
 
-function formatExpressionNumbers(number = "") {
-  let expression = expressionInput.value;
-
+function formatNumbers(expression, number = "") {
   if (expression && expression != "-") {
-    const expressionArray = [];
+    const expressionArray = getExpressionArray(expression);
 
-    if (currentExpressionNumber == "") {
+    if (currentNumber == "") {
       firstPosition = expression.indexOf(number, expression.length - 1);
     }
 
-    for (let symbol in expression) {
-      expressionArray.push(expression[symbol]);
+    currentNumber += number;
+
+    if (!expression.includes(",") && currentNumber) {
+      const formattedNumber = Number(currentNumber).toLocaleString("pt-BR");
+
+      addFormattedNumbersOnDisplay(expressionArray, formattedNumber);
     }
-
-    currentExpressionNumber += number;
-
-    if (!expression.includes(",") && currentExpressionNumber) {
-      const formattedExpressionNumber = Number(
-        currentExpressionNumber
-      ).toLocaleString("pt-BR");
-
-      expressionArray.splice(
-        firstPosition,
-        formattedExpressionNumber.length + 1,
-        formattedExpressionNumber
-      );
-    }
-
-    expression = expressionArray.join("");
-    expressionInput.value = expression;
   }
+}
+
+function addFormattedNumbersOnDisplay(expressionArray, formattedNumber) {
+  const lastPosition = formattedNumber.length + 1;
+  expressionArray.splice(firstPosition, lastPosition, formattedNumber);
+  expressionInput.value = expressionArray.join("");
 }
 
 function addCharactersOnDisplay(char) {
@@ -256,13 +247,8 @@ function addCharactersOnDisplay(char) {
 
 function addOperatorsOnDisplay(operator) {
   let expression = expressionInput.value;
-  let expressionArray = [];
-
-  for (let symbol in expression) {
-    expressionArray.push(expression[symbol]);
-  }
-
-  const lastSymbol = expressionArray[expressionArray.length - 1];
+  const expressionArray = getExpressionArray(expression);
+  const lastSymbol = expression[expression.length - 1];
 
   if (!expression) {
     if (operator == "-" || operator == "√") {
@@ -270,16 +256,7 @@ function addOperatorsOnDisplay(operator) {
     }
   } else {
     if (expression.length > 1 || !isNaN(Number(lastSymbol))) {
-      if (isNaN(Number(lastSymbol))) {
-        expressionArray.pop();
-
-        if (lastSymbol == "-" && operator == "-") {
-          operator = "+";
-        } else if (lastSymbol == "-" && operator == "+") {
-          operator = "-";
-        }
-      }
-
+      operator = handleSignRule(lastSymbol, expressionArray, operator);
       expressionOperator = operator;
 
       expression = expressionArray.join("");
@@ -291,23 +268,40 @@ function addOperatorsOnDisplay(operator) {
     }
   }
 
-  currentExpressionNumber = "";
-  handleFontSize();
+  currentNumber = "";
+  handleFontSize(expression);
+}
+
+function handleSignRule(lastSymbol, expressionArray, operator) {
+  if (isNaN(Number(lastSymbol))) {
+    expressionArray.pop();
+
+    if (lastSymbol == "-" && operator == "-") {
+      operator = "+";
+    } else if (lastSymbol == "-" && operator == "+") {
+      operator = "-";
+    }
+  }
+
+  return operator;
 }
 
 function focalizeResult() {
   expressionInput.value = "Expressão inválida";
 
-  if (!isInvalid) {
+  if (!isNotCalculable) {
     setDefaultStylingClasses();
     expressionInput.value = expressionResult.textContent;
     expressionResult.textContent = "";
-    currentExpressionNumber = "";
+    currentNumber = "";
   }
 }
 
-function handleFontSize() {
-  const expression = expressionInput.value;
+function handleFontSize(expression) {
+  if (!expression) {
+    expression = expressionInput.value;
+  }
+
   const fontSize = expressionInput.style.fontSize;
 
   if (expression.length >= 18 && fontSize != "16.5px") {
@@ -603,10 +597,10 @@ function setDefaultStylingClasses() {
 function clearExpressions() {
   expressionInput.value = "";
   expressionResult.textContent = "";
-  currentExpressionNumber = "";
+  currentNumber = "";
   firstPosition = "";
   lastNumber = "";
-  isInvalid = false;
+  isNotCalculable = false;
 
   setDefaultStylingClasses();
   handleFontSize();
@@ -615,29 +609,40 @@ function clearExpressions() {
 function deleteLastSymbol() {
   if (expressionInput.value) {
     let expression = expressionInput.value;
-    let expressionArray = [];
-    currentExpressionNumber = "";
-
-    for (let symbol in expression) {
-      expressionArray.push(expression[symbol]);
-    }
+    const expressionArray = getExpressionArray(expression);
 
     expressionArray.pop();
     expression = expressionArray.join("");
     expressionInput.value = expression;
 
-    for (let symbol in expression) {
-      if (expression[symbol] !== "." && symbol >= firstPosition) {
-        currentExpressionNumber += expression[symbol];
-      }
-    }
+    getNewCurrentNumberValue(expression);
 
     isDeleting = true;
-    formatExpressionNumbers();
+    formatNumbers(expression);
     triggerCalculation();
     isDeleting = false;
-    isInvalid = false;
+    isNotCalculable = false;
 
-    handleFontSize();
+    handleFontSize(expression);
+  }
+}
+
+function getExpressionArray(expression) {
+  const expressionArray = [];
+
+  for (let symbol in expression) {
+    expressionArray.push(expression[symbol]);
+  }
+
+  return expressionArray;
+}
+
+function getNewCurrentNumberValue(expression) {
+  currentNumber = "";
+
+  for (let symbol in expression) {
+    if (expression[symbol] !== "." && symbol >= firstPosition) {
+      currentNumber += expression[symbol];
+    }
   }
 }
