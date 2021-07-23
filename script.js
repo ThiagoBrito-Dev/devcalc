@@ -2,16 +2,16 @@ const conversionMode = document.querySelector("#conversion-mode");
 const expressionInput = document.querySelector("input");
 const expressionResult = document.querySelector("p");
 
-let currentMode;
-let expressionOperator;
-let lastExpNumber;
-let firstValue;
+let expressionOperators = [];
+let currentNumber = "";
 let isSameNumber = false;
 let isDeleting = false;
-let previousLastExpNumber;
-let currentNumber = "";
-let firstPosition;
 let isNotCalculable = false;
+let currentMode;
+let lastExpNumber;
+let firstValue;
+let previousLastExpNumber;
+let firstPosition;
 
 function initializeInterface() {
   const calcContainer = document.querySelector("main");
@@ -163,7 +163,7 @@ function handleAddingNumbersOrCharacters(char) {
 }
 
 function addNumbersOnDisplay(number) {
-  let expression = getUnformattedInputValue();
+  let expression = unformatNumbers(expressionInput.value);
   const lastSymbol = Number(expression[expression.length - 1]);
 
   if (number != "," || (expression.length >= 1 && !isNaN(lastSymbol))) {
@@ -171,7 +171,7 @@ function addNumbersOnDisplay(number) {
 
     if (canBe) {
       expressionInput.value += number;
-      expression = getUnformattedInputValue();
+      expression = unformatNumbers(expressionInput.value);
 
       if (isNaN(Number(expression))) {
         handleValidExpressions(expression, number);
@@ -181,19 +181,6 @@ function addNumbersOnDisplay(number) {
 
   formatNumbers(expression, number);
   handleFontSize(expression);
-}
-
-function getUnformattedInputValue() {
-  let formattedExpression = expressionInput.value;
-  let unformattedExpression = "";
-
-  for (symbol in formattedExpression) {
-    if (formattedExpression[symbol] != ".") {
-      unformattedExpression += formattedExpression[symbol];
-    }
-  }
-
-  return unformattedExpression;
 }
 
 function checkIfCommaCanBeAdded(expression, number) {
@@ -215,10 +202,9 @@ function checkIfCommaCanBeAdded(expression, number) {
 function handleValidExpressions(expression, number) {
   const currentFullNumber = expression.slice(firstPosition);
   const currentNumberIndex = currentFullNumber.indexOf(number);
-  console.log("Expressão: " + expression);
 
   if (
-    expressionOperator == "/" &&
+    expressionOperators[expressionOperators.length - 1] == "/" &&
     (number == "0" ||
       (currentFullNumber[currentNumberIndex - 1] == "0" && number == ","))
   ) {
@@ -232,7 +218,8 @@ function handleValidExpressions(expression, number) {
 
 function formatNumbers(expression, number = "") {
   if (expression && expression != "-") {
-    const expressionArray = getArrays(expression, false);
+    const expressionArray = getExpressionArray(expression);
+    console.log();
 
     if (currentNumber == "") {
       firstPosition = expression.indexOf(number, expression.length - 1);
@@ -255,13 +242,25 @@ function addFormattedNumbersOnDisplay(expressionArray, formattedNumber) {
   expressionInput.value = expressionArray.join("");
 }
 
+function unformatNumbers(formattedNumber) {
+  let unformattedNumber = "";
+
+  for (symbol in formattedNumber) {
+    if (formattedNumber[symbol] != ".") {
+      unformattedNumber += formattedNumber[symbol];
+    }
+  }
+
+  return unformattedNumber;
+}
+
 function addCharactersOnDisplay(char) {
   expressionInput.value = char;
 }
 
 function addOperatorsOnDisplay(operator) {
   let expression = expressionInput.value;
-  const expressionArray = getArrays(expression, false);
+  const expressionArray = getExpressionArray(expression);
   const lastSymbol = expression[expression.length - 1];
 
   if (!expression) {
@@ -271,7 +270,7 @@ function addOperatorsOnDisplay(operator) {
   } else {
     if (expression.length > 1 || !isNaN(Number(lastSymbol))) {
       operator = handleSignRule(lastSymbol, expressionArray, operator);
-      expressionOperator = operator;
+      expressionOperators.push(operator);
 
       expression = expressionArray.join("");
       expression += operator;
@@ -327,7 +326,8 @@ function handleFontSize(expression) {
 
 function triggerCalculation(expression) {
   const expResult = expressionResult.textContent;
-  const [expressionArray, numbersArray] = getArrays(expression, true);
+  const expressionArray = getExpressionArray(expression);
+  const numbersArray = getNumbersArray(expression);
   let isInvalidExpression;
 
   expression = expressionArray.join("");
@@ -390,14 +390,16 @@ function handleLastOperator(reversedExpressionArray) {
         isNaN(Number(reversedExpressionArray[symbol]))
       ) {
         lastOperator = reversedExpressionArray[symbol];
-        expressionOperator = lastOperator;
+        expressionOperators[expressionOperators.length - 1] = lastOperator;
       }
     }
   }
 }
 
 function checkIfIsInvalidExpression(expression, numbersArray) {
-  let splittedExpression = expression.split(expressionOperator);
+  let splittedExpression = expression.split(
+    expressionOperators[expressionOperators.length - 1]
+  );
 
   lastExpNumber = getLastExpressionNumber(splittedExpression);
 
@@ -409,13 +411,8 @@ function checkIfIsInvalidExpression(expression, numbersArray) {
 }
 
 function getLastExpressionNumber(splittedExpression) {
-  console.log(
-    "Splittada: " + splittedExpression[splittedExpression.length - 1]
-  );
   lastExpNumber = splittedExpression[splittedExpression.length - 1];
-  console.log("Último número antes: " + lastExpNumber);
   lastExpNumber = lastExpNumber.replace(",", ".");
-  console.log("Último número depois: " + lastExpNumber);
 
   return lastExpNumber;
 }
@@ -433,31 +430,92 @@ function calculateResult(isInvalidExpression) {
   }
 
   if (!isInvalidExpression) {
-    if (completeExpression.indexOf(expressionOperator) != -1) {
-      const expResult = expressionResult.textContent;
+    if (
+      completeExpression.indexOf(
+        expressionOperators[expressionOperators.length - 1]
+      ) != -1
+    ) {
+      const expResult = unformatNumbers(expressionResult.textContent);
       const firstSymbol = completeExpression[0];
       let shortExpression = completeExpression;
       let result = "";
 
       if (expResult) {
-        let firstExpNumber = expResult.replace(".", "").replace(",", ".");
+        // const expression = unformatNumbers(expressionInput.value)
+        //   .replace("x", "*")
+        //   .replace("÷", "/")
+        //   .replace("^", "**");
+        // let splittedExpression = expression;
 
-        console.log("Primeiro número antes: " + firstExpNumber);
+        // for (let operator in expressionOperators) {
+        //   splittedExpression = splittedExpression.split(
+        //     expressionOperators[operator]
+        //   );
+        //   splittedExpression = splittedExpression.join(" ");
+        // }
 
-        if (isSameNumber && !isDeleting) {
-          firstExpNumber =
-            handleFirstExpressionNumberWhenAdding(firstExpNumber);
+        // const numbersArray = splittedExpression.split(" ");
+
+        const expression = getExpressionArray(expressionInput.value, true).join(
+          ""
+        );
+        const numbersArray = getNumbersArray(expression);
+
+        for (number in numbersArray) {
+          if (number != 0) {
+            console.log("Acumulador antes: " + result);
+            console.log("Operador: " + expressionOperators[number - 1]);
+            console.log("Número: " + numbersArray[number]);
+
+            const currentOperator = expressionOperators[number - 1];
+
+            const currentNumber = Number(
+              numbersArray[number].replace(",", ".")
+            );
+            result = Number(result);
+
+            switch (currentOperator) {
+              case "+":
+                result = result + currentNumber;
+                break;
+              case "-":
+                result = result - currentNumber;
+                break;
+              case "*":
+                result = result * currentNumber;
+                break;
+              case "/":
+                result = result / currentNumber;
+                break;
+              case "**":
+                result = result ** currentNumber;
+                break;
+            }
+
+            console.log("Acumulador depois: " + result);
+          } else {
+            result = numbersArray[number];
+          }
         }
 
-        if (isDeleting && previousLastExpNumber) {
-          firstExpNumber =
-            handleFirstExpressionNumberWhenDeleting(firstExpNumber);
-        }
+        console.log("Array de números: ", numbersArray);
+        console.log("Array de operadores: ", expressionOperators);
 
-        shortExpression = firstExpNumber + expressionOperator + lastExpNumber;
+        // let firstExpNumber = expResult.replace(",", ".");
+        // if (isSameNumber && !isDeleting) {
+        //   firstExpNumber =
+        //     handleFirstExpressionNumberWhenAdding(firstExpNumber);
+        // }
+        // if (isDeleting && previousLastExpNumber) {
+        //   firstExpNumber =
+        //     handleFirstExpressionNumberWhenDeleting(firstExpNumber);
+        // }
+        // shortExpression = firstExpNumber + expressionOperators + lastExpNumber;
       }
 
-      let numbers = shortExpression.split(expressionOperator);
+      let numbers = shortExpression.split(
+        expressionOperators[expressionOperators.length - 1]
+      );
       console.log("Números: ", numbers);
 
       if (numbers[1] >= 0) {
@@ -466,43 +524,47 @@ function calculateResult(isInvalidExpression) {
 
       if (isNaN(firstSymbol)) {
         shortExpression = completeExpression.slice(1);
-        numbers = shortExpression.split(expressionOperator);
+        numbers = shortExpression.split(
+          expressionOperators[expressionOperators.length - 1]
+        );
         numbers[0] = firstSymbol + numbers[0];
       }
 
       numbers = [Number(numbers[0]), Number(numbers[1])];
 
-      switch (expressionOperator) {
-        case "+":
-          result = numbers[0] + numbers[1];
-          break;
-        case "-":
-          result = numbers[0] - numbers[1];
-          break;
-        case "*":
-          if (numbers[1] == 0 && lastExpNumber == "") {
-            numbers[1] = 1;
-          }
+      if (!expResult) {
+        switch (expressionOperators[expressionOperators.length - 1]) {
+          case "+":
+            result = numbers[0] + numbers[1];
+            break;
+          case "-":
+            result = numbers[0] - numbers[1];
+            break;
+          case "*":
+            if (numbers[1] == 0 && lastExpNumber == "") {
+              numbers[1] = 1;
+            }
 
-          result = numbers[0] * numbers[1];
-          break;
-        case "**":
-          if (lastExpNumber === "" && numbers[1] === 0) {
-            numbers[1] = 1;
-          }
+            result = numbers[0] * numbers[1];
+            break;
+          case "**":
+            if (lastExpNumber === "" && numbers[1] === 0) {
+              numbers[1] = 1;
+            }
 
-          result = numbers[0] ** numbers[1];
-          break;
-        case "/":
-          if (numbers[1] == 0) {
-            numbers[1] = 1;
-          }
+            result = numbers[0] ** numbers[1];
+            break;
+          case "/":
+            if (numbers[1] == 0) {
+              numbers[1] = 1;
+            }
 
-          result = numbers[0] / numbers[1];
-          break;
-        case "%":
-          result = (numbers[1] * numbers[0]) / 100;
-          break;
+            result = numbers[0] / numbers[1];
+            break;
+          case "%":
+            result = (numbers[0] * numbers[1]) / 100;
+            break;
+        }
       }
 
       result = formatExpressionResult(result);
@@ -515,21 +577,22 @@ function calculateResult(isInvalidExpression) {
 }
 
 function handleFirstExpressionNumberWhenAdding(firstNumber) {
-  console.log("Primeiro número dentro: " + firstNumber);
   isSameNumber = false;
 
-  console.log("Último número: " + lastExpNumber);
   let diferenceBetweenExpressionNumbers = Number(
     lastExpNumber.slice(0, -1).replace(",", ".")
   );
-  console.log("Diferença: " + diferenceBetweenExpressionNumbers);
   firstNumber = Number(firstNumber);
 
-  if (firstValue != 0 && expressionOperator == "*" && firstNumber == 0) {
+  if (
+    firstValue != 0 &&
+    expressionOperators[expressionOperators.length - 1] == "*" &&
+    firstNumber == 0
+  ) {
     firstNumber = firstValue;
   }
 
-  switch (expressionOperator) {
+  switch (expressionOperators[expressionOperators.length - 1]) {
     case "+":
       firstNumber = firstNumber - diferenceBetweenExpressionNumbers;
       break;
@@ -565,7 +628,7 @@ function handleFirstExpressionNumberWhenDeleting(firstNumber) {
   firstNumber = Number(firstNumber);
   previousLastExpNumber = Number(previousLastExpNumber);
 
-  switch (expressionOperator) {
+  switch (expressionOperators[expressionOperators.length - 1]) {
     case "+":
       firstNumber = firstNumber - previousLastExpNumber;
       break;
@@ -590,7 +653,10 @@ function handleFirstExpressionNumberWhenDeleting(firstNumber) {
 }
 
 function formatExpressionResult(result) {
-  if (expressionOperator == "**" && String(result).includes(".")) {
+  if (
+    expressionOperators[expressionOperators.length - 1] == "**" &&
+    String(result).includes(".")
+  ) {
     result = String(result).replace(".", ",");
 
     const splittedResult = result.split(",");
@@ -645,7 +711,7 @@ function clearExpressions() {
 function deleteLastSymbol() {
   if (expressionInput.value) {
     let expression = expressionInput.value;
-    const expressionArray = getArrays(expression, false);
+    const expressionArray = getExpressionArray(expression);
 
     expressionArray.pop();
     expression = expressionArray.join("");
@@ -663,41 +729,43 @@ function deleteLastSymbol() {
   }
 }
 
-function getArrays(expression, returnsMultipleArrays = false) {
+function getExpressionArray(expression, formatOperators = false) {
   const expressionArray = [];
-  const numbersArray = [];
-  let number = "";
   let char;
 
-  if (returnsMultipleArrays) {
-    for (let symbol in expression) {
-      char = expression[symbol];
+  for (let symbol in expression) {
+    char = expression[symbol];
 
+    if (formatOperators) {
       if (
         expression[symbol] != "," &&
         expression[symbol] != "." &&
         isNaN(Number(expression[symbol]))
       ) {
         char = handleOperators(char);
-
-        numbersArray.push(number);
-        number = "";
-      } else {
-        number += char;
       }
-
-      expressionArray.push(char);
     }
 
-    return [expressionArray, numbersArray];
-  } else {
-    for (let symbol in expression) {
-      char = expression[symbol];
-      expressionArray.push(char);
-    }
-
-    return expressionArray;
+    expressionArray.push(char);
   }
+
+  return expressionArray;
+}
+
+function getNumbersArray(expression) {
+  let splittedExpression = expression;
+  let numbersArray = [];
+
+  for (let operator in expressionOperators) {
+    splittedExpression = splittedExpression.split(
+      expressionOperators[operator]
+    );
+
+    splittedExpression = splittedExpression.join(" ");
+  }
+
+  numbersArray = splittedExpression.split(" ");
+  return numbersArray;
 }
 
 function handleOperators(char) {
