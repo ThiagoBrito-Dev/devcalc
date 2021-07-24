@@ -163,7 +163,6 @@ function handleAddingNumbersOrCharacters(char) {
 }
 
 function addNumbersOnDisplay(number) {
-  console.log("Operadores: ", expressionOperators);
   let expression = unformatNumbers(expressionInput.value);
   const lastSymbol = Number(expression[expression.length - 1]);
 
@@ -201,13 +200,24 @@ function checkIfCommaCanBeAdded(expression, number) {
 }
 
 function handleValidExpressions(expression, number) {
-  const currentFullNumber = expression.slice(firstPosition);
-  const currentNumberIndex = currentFullNumber.indexOf(number);
+  const lastPosition = expressionOperators.length - 1;
+  const currentOperator = expressionOperators[lastPosition];
+  let previousChar = expression[expression.length - 2];
+
+  if (previousChar) {
+    previousChar = previousChar
+      .replace("x", "*")
+      .replace("^", "**")
+      .replace("÷", "/");
+  }
 
   if (
-    expressionOperators[expressionOperators.length - 1] == "/" &&
-    (number == "0" ||
-      (currentFullNumber[currentNumberIndex - 1] == "0" && number == ","))
+    (currentOperator == "/" &&
+      number == "0" &&
+      expressionOperators.indexOf(previousChar) != -1) ||
+    (previousChar == "0" && number == ",") ||
+    (previousChar == "," && number == "0") ||
+    (previousChar == "0" && number == "0")
   ) {
     setDefaultStylingClasses();
     isNotCalculable = true;
@@ -220,7 +230,6 @@ function handleValidExpressions(expression, number) {
 function formatNumbers(expression, number = "") {
   if (expression && expression != "-") {
     const expressionArray = getExpressionArray(expression);
-    console.log();
 
     if (currentNumber == "") {
       firstPosition = expression.indexOf(number, expression.length - 1);
@@ -346,8 +355,10 @@ function triggerCalculation(expression) {
       numbersArray
     );
 
+    console.log("É inválida? " + isInvalidExpression);
     calculateResult(isInvalidExpression);
   } else {
+    console.log("É inválida? " + isInvalidExpression);
     calculateResult(isInvalidExpression);
   }
 
@@ -408,7 +419,7 @@ function checkIfIsInvalidExpression(expression, numbersArray) {
 
   lastExpNumber = getLastExpressionNumber(splittedExpression);
 
-  if (numbersArray.length == 1 && !splittedExpression[1]) {
+  if (numbersArray.length == 2 && !splittedExpression[1]) {
     return [true, lastExpNumber];
   }
 
@@ -440,27 +451,7 @@ function calculateResult(isInvalidExpression) {
         expressionOperators[expressionOperators.length - 1]
       ) != -1
     ) {
-      // const expResult = unformatNumbers(expressionResult.textContent);
-      // const firstSymbol = completeExpression[0];
-      // let shortExpression = completeExpression;
       let result = "";
-
-      // if (expResult) {
-      // const expression = unformatNumbers(expressionInput.value)
-      //   .replace("x", "*")
-      //   .replace("÷", "/")
-      //   .replace("^", "**");
-      // let splittedExpression = expression;
-
-      // for (let operator in expressionOperators) {
-      //   splittedExpression = splittedExpression.split(
-      //     expressionOperators[operator]
-      //   );
-      //   splittedExpression = splittedExpression.join(" ");
-      // }
-
-      // const numbersArray = splittedExpression.split(" ");
-
       const expression = getExpressionArray(expressionInput.value).join("");
       const numbersArray = getNumbersArray(expression);
 
@@ -507,75 +498,6 @@ function calculateResult(isInvalidExpression) {
           result = numbersArray[number];
         }
       }
-
-      // console.log("Array de números: ", numbersArray);
-      // console.log("Array de operadores: ", expressionOperators);
-
-      // let firstExpNumber = expResult.replace(",", ".");
-      // if (isSameNumber && !isDeleting) {
-      //   firstExpNumber =
-      //     handleFirstExpressionNumberWhenAdding(firstExpNumber);
-      // }
-      // if (isDeleting && previousLastExpNumber) {
-      //   firstExpNumber =
-      //     handleFirstExpressionNumberWhenDeleting(firstExpNumber);
-      // }
-      // shortExpression = firstExpNumber + expressionOperators + lastExpNumber;
-      // }
-
-      // let numbers = shortExpression.split(
-      //   expressionOperators[expressionOperators.length - 1]
-      // );
-      // console.log("Números: ", numbers);
-
-      // if (numbers[1] >= 0) {
-      //   firstValue = numbers[0];
-      // }
-
-      // if (isNaN(firstSymbol)) {
-      //   shortExpression = completeExpression.slice(1);
-      //   numbers = shortExpression.split(
-      //     expressionOperators[expressionOperators.length - 1]
-      //   );
-      //   numbers[0] = firstSymbol + numbers[0];
-      // }
-
-      // numbers = [Number(numbers[0]), Number(numbers[1])];
-
-      // if (!expResult) {
-      //   switch (expressionOperators[expressionOperators.length - 1]) {
-      //     case "+":
-      //       result = numbers[0] + numbers[1];
-      //       break;
-      //     case "-":
-      //       result = numbers[0] - numbers[1];
-      //       break;
-      //     case "*":
-      //       if (numbers[1] == 0 && lastExpNumber == "") {
-      //         numbers[1] = 1;
-      //       }
-
-      //       result = numbers[0] * numbers[1];
-      //       break;
-      //     case "**":
-      //       if (lastExpNumber === "" && numbers[1] === 0) {
-      //         numbers[1] = 1;
-      //       }
-
-      //       result = numbers[0] ** numbers[1];
-      //       break;
-      //     case "/":
-      //       if (numbers[1] == 0) {
-      //         numbers[1] = 1;
-      //       }
-
-      //       result = numbers[0] / numbers[1];
-      //       break;
-      //     case "%":
-      //       result = (numbers[0] * numbers[1]) / 100;
-      //       break;
-      //   }
-      // }
 
       result = formatExpressionResult(result);
       showResult(result);
@@ -738,12 +660,13 @@ function deleteLastSymbol() {
     expressionArray.pop();
     expression = expressionArray.join("");
     expressionInput.value = expression;
+    const lastChar = expression[expression.length - 1];
 
     getNewCurrentNumberValue(expression);
 
     isDeleting = true;
     formatNumbers(expression);
-    triggerCalculation(expression);
+    handleValidExpressions(expression, lastChar);
     isDeleting = false;
     isNotCalculable = false;
 
