@@ -163,6 +163,7 @@ function handleAddingNumbersOrCharacters(char) {
 }
 
 function addNumbersOnDisplay(number) {
+  console.log("Operadores: ", expressionOperators);
   let expression = unformatNumbers(expressionInput.value);
   const lastSymbol = Number(expression[expression.length - 1]);
 
@@ -390,6 +391,10 @@ function handleLastOperator(reversedExpressionArray) {
         isNaN(Number(reversedExpressionArray[symbol]))
       ) {
         lastOperator = reversedExpressionArray[symbol];
+        lastOperator = lastOperator
+          .replace("^", "**")
+          .replace("x", "*")
+          .replace("÷", "/");
         expressionOperators[expressionOperators.length - 1] = lastOperator;
       }
     }
@@ -435,137 +440,142 @@ function calculateResult(isInvalidExpression) {
         expressionOperators[expressionOperators.length - 1]
       ) != -1
     ) {
-      const expResult = unformatNumbers(expressionResult.textContent);
-      const firstSymbol = completeExpression[0];
-      let shortExpression = completeExpression;
+      // const expResult = unformatNumbers(expressionResult.textContent);
+      // const firstSymbol = completeExpression[0];
+      // let shortExpression = completeExpression;
       let result = "";
 
-      if (expResult) {
-        // const expression = unformatNumbers(expressionInput.value)
-        //   .replace("x", "*")
-        //   .replace("÷", "/")
-        //   .replace("^", "**");
-        // let splittedExpression = expression;
+      // if (expResult) {
+      // const expression = unformatNumbers(expressionInput.value)
+      //   .replace("x", "*")
+      //   .replace("÷", "/")
+      //   .replace("^", "**");
+      // let splittedExpression = expression;
 
-        // for (let operator in expressionOperators) {
-        //   splittedExpression = splittedExpression.split(
-        //     expressionOperators[operator]
-        //   );
-        //   splittedExpression = splittedExpression.join(" ");
-        // }
+      // for (let operator in expressionOperators) {
+      //   splittedExpression = splittedExpression.split(
+      //     expressionOperators[operator]
+      //   );
+      //   splittedExpression = splittedExpression.join(" ");
+      // }
 
-        // const numbersArray = splittedExpression.split(" ");
+      // const numbersArray = splittedExpression.split(" ");
 
-        const expression = getExpressionArray(expressionInput.value, true).join(
-          ""
-        );
-        const numbersArray = getNumbersArray(expression);
+      const expression = getExpressionArray(expressionInput.value).join("");
+      const numbersArray = getNumbersArray(expression);
 
-        for (number in numbersArray) {
-          if (number != 0) {
-            console.log("Acumulador antes: " + result);
-            console.log("Operador: " + expressionOperators[number - 1]);
-            console.log("Número: " + numbersArray[number]);
+      for (number in numbersArray) {
+        if (number != 0) {
+          const currentOperator = expressionOperators[number - 1];
+          let currentNumber = Number(numbersArray[number].replace(",", "."));
+          result = Number(result);
 
-            const currentOperator = expressionOperators[number - 1];
+          switch (currentOperator) {
+            case "+":
+              result = result + currentNumber;
+              break;
+            case "-":
+              result = result - currentNumber;
+              break;
+            case "*":
+              if (numbersArray[number] === "") {
+                currentNumber = 1;
+              }
 
-            const currentNumber = Number(
-              numbersArray[number].replace(",", ".")
-            );
-            result = Number(result);
+              result = result * currentNumber;
+              break;
+            case "**":
+              if (numbersArray[number] === "") {
+                currentNumber = 1;
+              }
 
-            switch (currentOperator) {
-              case "+":
-                result = result + currentNumber;
-                break;
-              case "-":
-                result = result - currentNumber;
-                break;
-              case "*":
-                result = result * currentNumber;
-                break;
-              case "/":
-                result = result / currentNumber;
-                break;
-              case "**":
-                result = result ** currentNumber;
-                break;
-            }
+              result = result ** currentNumber;
+              break;
+            case "/":
+              console.log("Número atual" + currentNumber);
+              if (currentNumber === 0 || numbersArray[number] == "") {
+                currentNumber = 1;
+              }
 
-            console.log("Acumulador depois: " + result);
-          } else {
-            result = numbersArray[number];
+              result = result / currentNumber;
+              break;
+            case "%":
+              result = (result * currentNumber) / 100;
+              break;
           }
-        }
-
-        console.log("Array de números: ", numbersArray);
-        console.log("Array de operadores: ", expressionOperators);
-
-        // let firstExpNumber = expResult.replace(",", ".");
-        // if (isSameNumber && !isDeleting) {
-        //   firstExpNumber =
-        //     handleFirstExpressionNumberWhenAdding(firstExpNumber);
-        // }
-        // if (isDeleting && previousLastExpNumber) {
-        //   firstExpNumber =
-        //     handleFirstExpressionNumberWhenDeleting(firstExpNumber);
-        // }
-        // shortExpression = firstExpNumber + expressionOperators + lastExpNumber;
-      }
-
-      let numbers = shortExpression.split(
-        expressionOperators[expressionOperators.length - 1]
-      );
-      console.log("Números: ", numbers);
-
-      if (numbers[1] >= 0) {
-        firstValue = numbers[0];
-      }
-
-      if (isNaN(firstSymbol)) {
-        shortExpression = completeExpression.slice(1);
-        numbers = shortExpression.split(
-          expressionOperators[expressionOperators.length - 1]
-        );
-        numbers[0] = firstSymbol + numbers[0];
-      }
-
-      numbers = [Number(numbers[0]), Number(numbers[1])];
-
-      if (!expResult) {
-        switch (expressionOperators[expressionOperators.length - 1]) {
-          case "+":
-            result = numbers[0] + numbers[1];
-            break;
-          case "-":
-            result = numbers[0] - numbers[1];
-            break;
-          case "*":
-            if (numbers[1] == 0 && lastExpNumber == "") {
-              numbers[1] = 1;
-            }
-
-            result = numbers[0] * numbers[1];
-            break;
-          case "**":
-            if (lastExpNumber === "" && numbers[1] === 0) {
-              numbers[1] = 1;
-            }
-
-            result = numbers[0] ** numbers[1];
-            break;
-          case "/":
-            if (numbers[1] == 0) {
-              numbers[1] = 1;
-            }
-
-            result = numbers[0] / numbers[1];
-            break;
-          case "%":
-            result = (numbers[0] * numbers[1]) / 100;
-            break;
+        } else {
+          result = numbersArray[number];
         }
       }
+
+      // console.log("Array de números: ", numbersArray);
+      // console.log("Array de operadores: ", expressionOperators);
+
+      // let firstExpNumber = expResult.replace(",", ".");
+      // if (isSameNumber && !isDeleting) {
+      //   firstExpNumber =
+      //     handleFirstExpressionNumberWhenAdding(firstExpNumber);
+      // }
+      // if (isDeleting && previousLastExpNumber) {
+      //   firstExpNumber =
+      //     handleFirstExpressionNumberWhenDeleting(firstExpNumber);
+      // }
+      // shortExpression = firstExpNumber + expressionOperators + lastExpNumber;
+      // }
+
+      // let numbers = shortExpression.split(
+      //   expressionOperators[expressionOperators.length - 1]
+      // );
+      // console.log("Números: ", numbers);
+
+      // if (numbers[1] >= 0) {
+      //   firstValue = numbers[0];
+      // }
+
+      // if (isNaN(firstSymbol)) {
+      //   shortExpression = completeExpression.slice(1);
+      //   numbers = shortExpression.split(
+      //     expressionOperators[expressionOperators.length - 1]
+      //   );
+      //   numbers[0] = firstSymbol + numbers[0];
+      // }
+
+      // numbers = [Number(numbers[0]), Number(numbers[1])];
+
+      // if (!expResult) {
+      //   switch (expressionOperators[expressionOperators.length - 1]) {
+      //     case "+":
+      //       result = numbers[0] + numbers[1];
+      //       break;
+      //     case "-":
+      //       result = numbers[0] - numbers[1];
+      //       break;
+      //     case "*":
+      //       if (numbers[1] == 0 && lastExpNumber == "") {
+      //         numbers[1] = 1;
+      //       }
+
+      //       result = numbers[0] * numbers[1];
+      //       break;
+      //     case "**":
+      //       if (lastExpNumber === "" && numbers[1] === 0) {
+      //         numbers[1] = 1;
+      //       }
+
+      //       result = numbers[0] ** numbers[1];
+      //       break;
+      //     case "/":
+      //       if (numbers[1] == 0) {
+      //         numbers[1] = 1;
+      //       }
+
+      //       result = numbers[0] / numbers[1];
+      //       break;
+      //     case "%":
+      //       result = (numbers[0] * numbers[1]) / 100;
+      //       break;
+      //   }
+      // }
 
       result = formatExpressionResult(result);
       showResult(result);
@@ -703,6 +713,7 @@ function clearExpressions() {
   firstPosition = "";
   lastExpNumber = "";
   isNotCalculable = false;
+  expressionOperators = [];
 
   setDefaultStylingClasses();
   handleFontSize();
@@ -712,6 +723,17 @@ function deleteLastSymbol() {
   if (expressionInput.value) {
     let expression = expressionInput.value;
     const expressionArray = getExpressionArray(expression);
+    const lastPositions = [
+      expressionArray.length - 1,
+      expressionOperators.length - 1,
+    ];
+
+    if (
+      expressionArray[lastPositions[0]] ===
+      expressionOperators[lastPositions[1]]
+    ) {
+      expressionOperators.pop();
+    }
 
     expressionArray.pop();
     expression = expressionArray.join("");
@@ -757,10 +779,12 @@ function getNumbersArray(expression) {
   let numbersArray = [];
 
   for (let operator in expressionOperators) {
-    splittedExpression = splittedExpression.split(
-      expressionOperators[operator]
-    );
+    const currentOperator = expressionOperators[operator]
+      .replace("**", "^")
+      .replace("*", "x")
+      .replace("/", "÷");
 
+    splittedExpression = splittedExpression.split(currentOperator);
     splittedExpression = splittedExpression.join(" ");
   }
 
