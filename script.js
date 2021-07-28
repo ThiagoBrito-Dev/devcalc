@@ -574,9 +574,6 @@ function getNumbersArray(expression) {
 
   numbersArray = splittedExpression.split(" ");
 
-  // console.log("Expressão separada depois: " + splittedExpression);
-  // console.log("Array de números: ", numbersArray);
-
   if (firstCharIsAnOperator) {
     numbersArray[0] = firstChar + numbersArray[0];
   }
