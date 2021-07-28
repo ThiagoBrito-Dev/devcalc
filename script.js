@@ -5,6 +5,7 @@ const expressionResult = document.querySelector("p");
 let expressionOperators = [];
 let currentNumber = "";
 let isNotCalculable = false;
+let haveSeparateCalculations = false;
 let currentMode;
 let firstPosition;
 
@@ -159,23 +160,25 @@ function handleAddingNumbersOrCharacters(char) {
 
 function addNumbersOnDisplay(number) {
   let expression = unformatNumbers(expressionInput.value);
-  const lastChar = Number(expression[expression.length - 1]);
+  const lastChar = expression[expression.length - 1];
 
-  if (number != "," || (expression.length >= 1 && !isNaN(lastChar))) {
-    const canBe = checkIfCommaCanBeAdded(expression, number);
+  if (lastChar != ")") {
+    if (number != "," || (expression.length >= 1 && !isNaN(Number(lastChar)))) {
+      const canBe = checkIfCommaCanBeAdded(expression, number);
 
-    if (canBe) {
-      expressionInput.value += number;
-      expression = unformatNumbers(expressionInput.value);
+      if (canBe) {
+        expressionInput.value += number;
+        expression = unformatNumbers(expressionInput.value);
 
-      if (isNaN(Number(expression))) {
-        handleValidExpressions(expression, number);
+        if (isNaN(Number(expression))) {
+          handleValidExpressions(expression, number);
+        }
       }
     }
-  }
 
-  formatNumbers(expression, number);
-  handleFontSize(expressionInput.value);
+    formatNumbers(expression, number);
+    handleFontSize(expressionInput.value);
+  }
 }
 
 function checkIfCommaCanBeAdded(expression, number) {
@@ -260,7 +263,13 @@ function unformatNumbers(formattedNumber) {
 }
 
 function addCharactersOnDisplay(char) {
-  expressionInput.value = char;
+  expressionInput.value += char;
+
+  if (!haveSeparateCalculations) {
+    haveSeparateCalculations = true;
+  }
+
+  currentNumber = "";
 }
 
 function addOperatorsOnDisplay(operator) {
@@ -292,7 +301,7 @@ function addOperatorsOnDisplay(operator) {
 }
 
 function handleSignRule(lastChar, expressionArray, operator) {
-  if (isNaN(Number(lastChar))) {
+  if (isNaN(Number(lastChar)) && lastChar != ")") {
     expressionArray.pop();
     expressionOperators.pop();
 
@@ -535,6 +544,13 @@ function getExpressionArray(expression, formatOperators = false) {
 
 function getNumbersArray(expression) {
   let splittedExpression = expression;
+
+  if (haveSeparateCalculations) {
+    splittedExpression = calculatePartsOfExpression(splittedExpression);
+  }
+
+  console.log("Expressão separada: " + splittedExpression);
+
   let firstCharIsAnOperator = false;
   let firstChar;
 
@@ -558,11 +574,54 @@ function getNumbersArray(expression) {
 
   numbersArray = splittedExpression.split(" ");
 
+  // console.log("Expressão separada depois: " + splittedExpression);
+  // console.log("Array de números: ", numbersArray);
+
   if (firstCharIsAnOperator) {
     numbersArray[0] = firstChar + numbersArray[0];
   }
 
   return numbersArray;
+}
+
+function calculatePartsOfExpression(expression) {
+  const expressionArray = getExpressionArray(expression);
+  const currentOperator = expressionOperators[expressionOperators.length - 1];
+  const openParenthesisIndex = expression.indexOf("(");
+  let partOfExpression = expression.slice(openParenthesisIndex + 1);
+  let closeParenthesisIndex;
+
+  if (expression.indexOf(")") != -1) {
+    closeParenthesisIndex = expression.indexOf(")");
+    partOfExpression = expression.slice(
+      openParenthesisIndex + 1,
+      closeParenthesisIndex
+    );
+  }
+
+  partOfExpression = partOfExpression.replace("x", "*");
+  let result = partOfExpression;
+
+  if (isNaN(Number(partOfExpression))) {
+    const numbers = partOfExpression.split(currentOperator);
+    const firstNumber = Number(numbers[0]);
+    const secondNumber = Number(numbers[1]);
+
+    switch (currentOperator) {
+      case "*":
+        result = firstNumber * secondNumber;
+        break;
+    }
+  }
+
+  expressionArray.splice(
+    openParenthesisIndex,
+    partOfExpression.length + 2,
+    result
+  );
+  expression = expressionArray.join("");
+
+  return expression;
 }
 
 function handleOperators(char) {
