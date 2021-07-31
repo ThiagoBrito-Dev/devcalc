@@ -579,127 +579,167 @@ function getNumbersArray(expression) {
 }
 
 function calculatePartsOfExpression(expression) {
-  const currentOperators = [];
-  const expressionArray = getExpressionArray(expression);
-
-  const firstOpeningParenthesisIndex = expression.indexOf("(");
+  let newExpression;
+  let resultNumberIndex;
+  let firstOpeningParenthesisIndex;
   let lastClosingParenthesisIndex;
-
-  let partOfExpression = expression.slice(firstOpeningParenthesisIndex);
-  let parenthesesContent = expression.slice(firstOpeningParenthesisIndex + 1);
-
   let openingParenthesisCount = 0;
   let closingParenthesisCount = 0;
 
-  for (let char in partOfExpression) {
-    if (partOfExpression[char] == "(") {
+  for (let char in expression) {
+    if (expression[char] == "(") {
       openingParenthesisCount++;
-    } else if (partOfExpression[char] == ")") {
+
+      if (!firstOpeningParenthesisIndex) {
+        firstOpeningParenthesisIndex = char;
+      }
+    } else if (expression[char] == ")") {
       closingParenthesisCount++;
     }
-  }
 
-  if (openingParenthesisCount === closingParenthesisCount) {
-    let currentIndex;
+    if (openingParenthesisCount === closingParenthesisCount) {
+      firstOpeningParenthesisIndex = "";
+    }
 
-    while (currentIndex != -1) {
-      let nextIndex = currentIndex + 1;
+    if (firstOpeningParenthesisIndex) {
+      const nextIndex = Number(firstOpeningParenthesisIndex) + 1;
+      let partOfExpression = expression.slice(nextIndex);
+      let openCount = 0;
+      let closeCount = 0;
+      let closeIndex;
 
-      if (currentIndex) {
-        lastClosingParenthesisIndex = currentIndex;
-        currentIndex = expression.indexOf(")", nextIndex);
-      } else {
-        currentIndex = expression.indexOf(")");
+      for (let char in partOfExpression) {
+        if (partOfExpression[char] == "(") {
+          openCount++;
+        } else if (partOfExpression[char] == ")") {
+          if (!closeIndex) {
+            closeIndex = char;
+          }
+
+          closeCount++;
+        }
       }
-    }
 
-    partOfExpression = expression.slice(
-      firstOpeningParenthesisIndex,
-      lastClosingParenthesisIndex + 1
-    );
-
-    parenthesesContent = expression.slice(
-      firstOpeningParenthesisIndex + 1,
-      lastClosingParenthesisIndex
-    );
-  }
-
-  let result = parenthesesContent;
-
-  if (isNaN(Number(result))) {
-    for (let char in result) {
-      if (
-        result[char] != "," &&
-        result[char] != "(" &&
-        result[char] != ")" &&
-        isNaN(Number(result[char]))
-      ) {
-        currentOperators.push(result[char]);
+      if (closeCount - openCount === 1 || closeCount === openCount) {
+        lastClosingParenthesisIndex = closeIndex;
+        partOfExpression = partOfExpression.slice(
+          0,
+          lastClosingParenthesisIndex
+        );
       }
-    }
 
-    let splittedExpression = parenthesesContent;
+      const currentOperators = [];
 
-    for (let operator in currentOperators) {
-      const currentOperator = currentOperators[operator];
+      for (let char in partOfExpression) {
+        const currentChar = partOfExpression[char]
+          .replace("x", "*")
+          .replace("^", "**")
+          .replace("÷", "/");
 
-      splittedExpression = splittedExpression.split(currentOperator);
-      splittedExpression = splittedExpression.join(" ");
-    }
+        if (expressionOperators.indexOf(currentChar) != -1) {
+          currentOperators.push(currentChar);
+        }
+      }
 
-    let numbersArray = splittedExpression.split(" ");
+      let numbersArray;
+      let splittedExpression = partOfExpression;
 
-    for (let number in numbersArray) {
-      if (number > 0) {
-        const currentOperator = currentOperators[number - 1];
-        let currentNumber = Number(numbersArray[number]);
+      for (let operator in currentOperators) {
+        const currentOperator = currentOperators[operator]
+          .replace("**", "^")
+          .replace("*", "x")
+          .replace("/", "÷");
 
-        switch (currentOperator) {
-          case "+":
-            result = result + currentNumber;
-            break;
-          case "-":
-            result = result - currentNumber;
-            break;
-          case "x":
-            if (numbersArray[number] === "") {
-              currentNumber = 1;
+        splittedExpression = splittedExpression.split(currentOperator);
+        splittedExpression = splittedExpression.join(" ");
+      }
+
+      numbersArray = splittedExpression.split(" ");
+
+      if (numbersArray.length > 1) {
+        let result;
+
+        for (let number in numbersArray) {
+          if (number > 0) {
+            const currentOperator = currentOperators[number - 1];
+            let currentNumber = Number(numbersArray[number]);
+
+            switch (currentOperator) {
+              case "+":
+                result = result + currentNumber;
+                break;
+              case "-":
+                result = result - currentNumber;
+                break;
+              case "*":
+                if (numbersArray[number] === "") {
+                  currentNumber = 1;
+                }
+
+                result = result * currentNumber;
+                break;
+              case "**":
+                if (numbersArray[number] === "") {
+                  currentNumber = 1;
+                }
+
+                result = result ** currentNumber;
+                break;
+              case "/":
+                if (numbersArray[number] === "") {
+                  currentNumber = 1;
+                }
+
+                result = result / currentNumber;
+                break;
+              case "%":
+                result = (currentNumber * result) / 100;
+                break;
+            }
+          } else {
+            result = Number(numbersArray[number]);
+          }
+
+          if (openingParenthesisCount < 2) {
+            let expressionArray = getExpressionArray(expression);
+
+            expressionArray.splice(
+              firstOpeningParenthesisIndex,
+              partOfExpression.length + 2,
+              result
+            );
+
+            newExpression = expressionArray.join("");
+          } else {
+            let expressionArray = getExpressionArray(newExpression);
+            newFirstOpeningParenthesisIndex = expressionArray.indexOf("(");
+
+            if (newFirstOpeningParenthesisIndex === -1) {
+              expressionArray.splice(resultNumberIndex, 1, result);
+            } else {
+              expressionArray.splice(
+                newFirstOpeningParenthesisIndex,
+                partOfExpression.length + 2,
+                result
+              );
+
+              resultNumberIndex = newFirstOpeningParenthesisIndex;
             }
 
-            result = result * currentNumber;
-            break;
-          case "^":
-            if (numbersArray[number] === "") {
-              currentNumber = 1;
-            }
-
-            result = result ** currentNumber;
-            break;
-          case "÷":
-            if (numbersArray[number] === "") {
-              currentNumber = 1;
-            }
-
-            result = result / currentNumber;
-            break;
-          case "%":
-            result = (currentNumber * result) / 100;
-            break;
+            newExpression = expressionArray.join("");
+          }
         }
       } else {
-        result = Number(numbersArray[number]);
+        if (newExpression) {
+          return newExpression.split("(").join("");
+        } else {
+          return expression.split("(").join("");
+        }
       }
     }
   }
 
-  expressionArray.splice(
-    firstOpeningParenthesisIndex,
-    partOfExpression.length,
-    result
-  );
-  expression = expressionArray.join("");
-
-  return expression;
+  return newExpression;
 }
 
 function handleOperators(char) {
