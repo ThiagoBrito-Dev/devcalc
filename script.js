@@ -111,22 +111,26 @@ function toggleResultMode() {
 }
 
 function handleConversionMode() {
+  const expression = unformatNumbers(expressionInput.value);
+  const lastChar = expression[expression.length - 1];
   const modes = ["DECI", "BIN", "OCT", "HEX"];
 
-  if (!conversionMode.textContent.includes(" ")) {
-    const currentMode = conversionMode.textContent;
+  if (lastChar != ")") {
+    if (!conversionMode.textContent.includes(" ")) {
+      const currentMode = conversionMode.textContent;
 
-    for (let mode in modes) {
-      if (modes[mode] == currentMode) {
-        conversionMode.textContent = modes[++mode];
+      for (let mode in modes) {
+        if (modes[mode] == currentMode) {
+          conversionMode.textContent = modes[++mode];
 
-        if (conversionMode.textContent === "") {
-          conversionMode.textContent = modes[0];
+          if (conversionMode.textContent === "") {
+            conversionMode.textContent = modes[0];
+          }
         }
       }
+    } else {
+      conversionMode.textContent = "DECI";
     }
-  } else {
-    conversionMode.textContent = "DECI";
   }
 
   handleAddingNumbersOrCharacters(
@@ -151,15 +155,16 @@ function toggleDevMode() {
 }
 
 function handleAddingNumbersOrCharacters(char) {
+  let expression = unformatNumbers(expressionInput.value);
+
   if (char == "," || !isNaN(Number(char))) {
-    addNumbersOnDisplay(char);
+    addNumbersOnDisplay(expression, char);
   } else {
-    addCharactersOnDisplay(char);
+    addCharactersOnDisplay(expression, char);
   }
 }
 
-function addNumbersOnDisplay(number) {
-  let expression = unformatNumbers(expressionInput.value);
+function addNumbersOnDisplay(expression, number) {
   const lastChar = expression[expression.length - 1];
 
   if (lastChar != ")") {
@@ -197,7 +202,10 @@ function checkIfCommaCanBeAdded(expression, number) {
 }
 
 function handleValidExpressions(expression, number) {
+  const numbersArray = getNumbersArray(expression);
+  const lastNumberPosition = numbersArray.length - 1;
   const lastOperatorPosition = expressionOperators.length - 1;
+  const lastNumber = numbersArray[lastNumberPosition].replace(",", ".");
   const currentOperator = expressionOperators[lastOperatorPosition];
   let previousChar = expression[expression.length - 2];
 
@@ -212,16 +220,13 @@ function handleValidExpressions(expression, number) {
     (currentOperator == "/" &&
       number == "0" &&
       expressionOperators.indexOf(previousChar) != -1) ||
-    (currentOperator == "/" &&
-      ((previousChar == "0" && number == ",") ||
-        (previousChar == "," && number == "0") ||
-        (previousChar == "0" && number == "0")))
+    Number(lastNumber) == "0"
   ) {
     setDefaultStylingClasses();
     isNotCalculable = true;
   } else {
     isNotCalculable = false;
-    triggerCalculation(expression);
+    triggerCalculation(expression, numbersArray);
   }
 }
 
@@ -262,8 +267,25 @@ function unformatNumbers(formattedNumber) {
   return unformattedNumber;
 }
 
-function addCharactersOnDisplay(char) {
-  expressionInput.value += char;
+function addCharactersOnDisplay(expression, inputChar) {
+  const lastChar = expression[expression.length - 1];
+  let openingParenthesisCount = 0;
+  let closingParenthesisCount = 0;
+
+  for (let char in expression) {
+    if (expression[char] == "(") {
+      openingParenthesisCount++;
+    } else if (expression[char] == ")") {
+      closingParenthesisCount++;
+    }
+  }
+
+  if (
+    openingParenthesisCount > closingParenthesisCount ||
+    (isNaN(Number(lastChar)) && lastChar != ")")
+  ) {
+    expressionInput.value += inputChar;
+  }
 
   if (!haveSeparateCalculations) {
     haveSeparateCalculations = true;
@@ -332,17 +354,21 @@ function handleFontSize(expression) {
   }
 
   const fontSize = expressionInput.style.fontSize;
+  const breakpoint = conversionMode.classList.value ? 18 : 25;
 
-  if (expression.length >= 18 && fontSize != "16.5px") {
+  if (expression.length >= breakpoint && fontSize != "16.5px") {
     expressionInput.style.fontSize = "16.5px";
-  } else if (expression.length < 18 && fontSize != "20px" && fontSize != "") {
+  } else if (
+    expression.length < breakpoint &&
+    fontSize != "20px" &&
+    fontSize != ""
+  ) {
     expressionInput.style.fontSize = "20px";
   }
 }
 
-function triggerCalculation(expression) {
+function triggerCalculation(expression, numbersArray) {
   const expressionArray = getExpressionArray(expression);
-  const numbersArray = getNumbersArray(expression);
 
   expression = expressionArray.join("");
   const isInvalidExpression = checkIfIsInvalidExpression(
@@ -479,6 +505,7 @@ function clearExpressions() {
   currentNumber = "";
   firstPosition = "";
   isNotCalculable = false;
+  haveSeparateCalculations = false;
   expressionOperators = [];
 
   setDefaultStylingClasses();
@@ -507,6 +534,11 @@ function deleteLastCharacter() {
     expressionArray.pop();
     expression = expressionArray.join("");
     expressionInput.value = expression;
+
+    if (expression.indexOf("(") == -1) {
+      haveSeparateCalculations = false;
+    }
+
     const lastChar = expression[expression.length - 1];
 
     getNewCurrentNumberValue(expression);
@@ -546,6 +578,12 @@ function getNumbersArray(expression) {
 
   if (haveSeparateCalculations) {
     splittedExpression = calculatePartsOfExpression(splittedExpression);
+
+    if (!splittedExpression) {
+      splittedExpression = expression;
+    }
+
+    console.log("NOVA EXPRESSÃO FORA: " + splittedExpression);
   }
 
   let firstCharIsAnOperator = false;
@@ -582,11 +620,15 @@ function calculatePartsOfExpression(expression) {
   let newExpression;
   let resultNumberIndex;
   let firstOpeningParenthesisIndex;
+  let newFirstOpeningParenthesisIndex;
   let lastClosingParenthesisIndex;
   let openingParenthesisCount = 0;
   let closingParenthesisCount = 0;
 
   for (let char in expression) {
+    console.log("NÚMERO DO CARACTERE: " + char);
+    console.log("Caractere atual da expressão: " + expression[char]);
+
     if (expression[char] == "(") {
       openingParenthesisCount++;
 
@@ -599,11 +641,19 @@ function calculatePartsOfExpression(expression) {
 
     if (openingParenthesisCount === closingParenthesisCount) {
       firstOpeningParenthesisIndex = "";
+      newFirstOpeningParenthesisIndex = "";
     }
 
     if (firstOpeningParenthesisIndex) {
+      console.log("Índice de abertura: " + firstOpeningParenthesisIndex);
+      console.log("Contagem de abertura: " + openingParenthesisCount);
+      console.log("Contagem de fechamento: " + closingParenthesisCount);
+
       const nextIndex = Number(firstOpeningParenthesisIndex) + 1;
       let partOfExpression = expression.slice(nextIndex);
+
+      console.log("PARTE DA EXPRESSÃO ANTES: " + partOfExpression);
+
       let openCount = 0;
       let closeCount = 0;
       let closeIndex;
@@ -622,11 +672,20 @@ function calculatePartsOfExpression(expression) {
 
       if (closeCount - openCount === 1 || closeCount === openCount) {
         lastClosingParenthesisIndex = closeIndex;
+        console.log(
+          "Índice de fechamento DENTRO: " + lastClosingParenthesisIndex
+        );
+
         partOfExpression = partOfExpression.slice(
           0,
           lastClosingParenthesisIndex
         );
       }
+
+      console.log("Contagem de abertura DENTRO: " + openCount);
+      console.log("Contagem de fechamento DENTRO: " + closeCount);
+
+      console.log("PARTE DA EXPRESSÃO DEPOIS: " + partOfExpression);
 
       const currentOperators = [];
 
@@ -641,6 +700,8 @@ function calculatePartsOfExpression(expression) {
         }
       }
 
+      console.log("Operadores atuais: ", currentOperators);
+
       let numbersArray;
       let splittedExpression = partOfExpression;
 
@@ -654,15 +715,24 @@ function calculatePartsOfExpression(expression) {
         splittedExpression = splittedExpression.join(" ");
       }
 
+      console.log("Expressão separada: " + splittedExpression);
+
       numbersArray = splittedExpression.split(" ");
 
       if (numbersArray.length > 1) {
+        console.log("ARRAY DE NÚMEROS", numbersArray);
         let result;
 
         for (let number in numbersArray) {
           if (number > 0) {
             const currentOperator = currentOperators[number - 1];
+
+            console.log("Operador atual: " + currentOperator);
+
             let currentNumber = Number(numbersArray[number]);
+
+            console.log("Número atual: " + currentNumber);
+            console.log("Número anterior: " + result);
 
             switch (currentOperator) {
               case "+":
@@ -700,8 +770,12 @@ function calculatePartsOfExpression(expression) {
             result = Number(numbersArray[number]);
           }
 
+          console.log("RESULTADO: " + result);
+
           if (openingParenthesisCount < 2) {
             let expressionArray = getExpressionArray(expression);
+
+            console.log("1° Array da expressão ANTES: ", expressionArray);
 
             expressionArray.splice(
               firstOpeningParenthesisIndex,
@@ -710,11 +784,26 @@ function calculatePartsOfExpression(expression) {
             );
 
             newExpression = expressionArray.join("");
+            console.log("1° NOVA EXPRESSÃO: " + newExpression);
+            console.log("1° Array de expressão DEPOIS: ", expressionArray);
           } else {
             let expressionArray = getExpressionArray(newExpression);
-            newFirstOpeningParenthesisIndex = expressionArray.indexOf("(");
 
-            if (newFirstOpeningParenthesisIndex === -1) {
+            console.log("2° Array da expressão ANTES: ", expressionArray);
+
+            if (!newFirstOpeningParenthesisIndex) {
+              newFirstOpeningParenthesisIndex = expressionArray.indexOf("(");
+            }
+
+            console.log(
+              "2° NOVO ÍNDICE DE ABERTURA: " + newFirstOpeningParenthesisIndex
+            );
+
+            if (
+              expressionArray.indexOf("(") != newFirstOpeningParenthesisIndex
+            ) {
+              console.log("Índice do resultado: " + resultNumberIndex);
+
               expressionArray.splice(resultNumberIndex, 1, result);
             } else {
               expressionArray.splice(
@@ -727,13 +816,16 @@ function calculatePartsOfExpression(expression) {
             }
 
             newExpression = expressionArray.join("");
+            console.log("2° NOVA EXPRESSÃO: " + newExpression);
+            console.log("2° Array de expressão DEPOIS: ", expressionArray);
           }
         }
       } else {
         if (newExpression) {
-          return newExpression.split("(").join("");
+          console.log("2° NOVA EXPRESSÃO RETORNO: " + newExpression);
+          return newExpression.split("(").join("").split(")").join("");
         } else {
-          return expression.split("(").join("");
+          return expression.split("(").join("").split(")").join("");
         }
       }
     }
