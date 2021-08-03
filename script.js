@@ -281,8 +281,9 @@ function addCharactersOnDisplay(expression, inputChar) {
   }
 
   if (
-    openingParenthesisCount > closingParenthesisCount ||
-    (isNaN(Number(lastChar)) && lastChar != ")")
+    (!isNaN(Number(lastChar)) &&
+      openingParenthesisCount > closingParenthesisCount) ||
+    (isNaN(Number(lastChar)) && lastChar != ")" && inputChar != ")")
   ) {
     expressionInput.value += inputChar;
   }
@@ -651,8 +652,16 @@ function calculatePartsOfExpression(expression) {
 
       const nextIndex = Number(firstOpeningParenthesisIndex) + 1;
       let partOfExpression = expression.slice(nextIndex);
+      let lengthOfPartOfExpression;
 
       console.log("PARTE DA EXPRESSÃO ANTES: " + partOfExpression);
+
+      if (partOfExpression.indexOf("(") !== -1) {
+        lengthOfPartOfExpression = partOfExpression.length;
+        console.log("CHAMOU--------------------------------------------------");
+        partOfExpression = calculatePartsOfExpression(partOfExpression);
+        console.log("TERMINOU------------------------------------------------");
+      }
 
       let openCount = 0;
       let closeCount = 0;
@@ -670,7 +679,7 @@ function calculatePartsOfExpression(expression) {
         }
       }
 
-      if (closeCount - openCount === 1 || closeCount === openCount) {
+      if (closeCount > openCount || closeCount === openCount) {
         lastClosingParenthesisIndex = closeIndex;
         console.log(
           "Índice de fechamento DENTRO: " + lastClosingParenthesisIndex
@@ -682,6 +691,7 @@ function calculatePartsOfExpression(expression) {
         );
       }
 
+      console.log("CUMPRIMENTO: " + lengthOfPartOfExpression);
       console.log("Contagem de abertura DENTRO: " + openCount);
       console.log("Contagem de fechamento DENTRO: " + closeCount);
 
@@ -777,11 +787,19 @@ function calculatePartsOfExpression(expression) {
 
             console.log("1° Array da expressão ANTES: ", expressionArray);
 
-            expressionArray.splice(
-              firstOpeningParenthesisIndex,
-              partOfExpression.length + 2,
-              result
-            );
+            if (lengthOfPartOfExpression) {
+              expressionArray.splice(
+                firstOpeningParenthesisIndex,
+                lengthOfPartOfExpression + 2,
+                result
+              );
+            } else {
+              expressionArray.splice(
+                firstOpeningParenthesisIndex,
+                partOfExpression.length + 2,
+                result
+              );
+            }
 
             newExpression = expressionArray.join("");
             console.log("1° NOVA EXPRESSÃO: " + newExpression);
@@ -825,7 +843,9 @@ function calculatePartsOfExpression(expression) {
           console.log("2° NOVA EXPRESSÃO RETORNO: " + newExpression);
           return newExpression.split("(").join("").split(")").join("");
         } else {
-          return expression.split("(").join("").split(")").join("");
+          expression = expression.slice(0, firstOpeningParenthesisIndex);
+
+          return expression + partOfExpression;
         }
       }
     }
