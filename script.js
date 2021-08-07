@@ -281,8 +281,9 @@ function addCharactersOnDisplay(expression, inputChar) {
   }
 
   if (
-    (!isNaN(Number(lastChar)) &&
-      openingParenthesisCount > closingParenthesisCount) ||
+    (openingParenthesisCount > closingParenthesisCount &&
+      isNaN(Number(lastChar))) ||
+    (!isNaN(Number(lastChar)) && inputChar != "(") ||
     (isNaN(Number(lastChar)) && lastChar != ")" && inputChar != ")")
   ) {
     expressionInput.value += inputChar;
@@ -306,8 +307,22 @@ function addOperatorsOnDisplay(operator) {
     }
   } else {
     if (expression.length > 1 || !isNaN(Number(lastChar))) {
+      let openingParenthesisCount = 0;
+      let closingParenthesisCount = 0;
+
+      for (let char in expression) {
+        if (expression[char] == "(") {
+          openingParenthesisCount++;
+        } else if (expression[char] == ")") {
+          closingParenthesisCount++;
+        }
+      }
+
       operator = handleSignRule(lastChar, expressionArray, operator);
-      expressionOperators.push(operator);
+
+      if (openingParenthesisCount === closingParenthesisCount) {
+        expressionOperators.push(operator);
+      }
 
       expression = expressionArray.join("");
       expression += operator
@@ -584,7 +599,7 @@ function getNumbersArray(expression) {
       splittedExpression = expression;
     }
 
-    console.log("NOVA EXPRESSÃO FORA: " + splittedExpression);
+    console.log("Nova expressão separada: " + splittedExpression);
   }
 
   let firstCharIsAnOperator = false;
@@ -627,9 +642,6 @@ function calculatePartsOfExpression(expression) {
   let closingParenthesisCount = 0;
 
   for (let char in expression) {
-    console.log("NÚMERO DO CARACTERE: " + char);
-    console.log("Caractere atual da expressão: " + expression[char]);
-
     if (expression[char] == "(") {
       openingParenthesisCount++;
 
@@ -646,23 +658,8 @@ function calculatePartsOfExpression(expression) {
     }
 
     if (firstOpeningParenthesisIndex) {
-      console.log("Índice de abertura: " + firstOpeningParenthesisIndex);
-      console.log("Contagem de abertura: " + openingParenthesisCount);
-      console.log("Contagem de fechamento: " + closingParenthesisCount);
-
       const nextIndex = Number(firstOpeningParenthesisIndex) + 1;
-      let partOfExpression = expression.slice(nextIndex);
-      let lengthOfPartOfExpression;
-
-      console.log("PARTE DA EXPRESSÃO ANTES: " + partOfExpression);
-
-      if (partOfExpression.indexOf("(") !== -1) {
-        lengthOfPartOfExpression = partOfExpression.length;
-        console.log("CHAMOU--------------------------------------------------");
-        partOfExpression = calculatePartsOfExpression(partOfExpression);
-        console.log("TERMINOU------------------------------------------------");
-      }
-
+      let partOfExpression = expression.slice(nextIndex).replace(/\,/g, ".");
       let openCount = 0;
       let closeCount = 0;
       let closeIndex;
@@ -671,31 +668,27 @@ function calculatePartsOfExpression(expression) {
         if (partOfExpression[char] == "(") {
           openCount++;
         } else if (partOfExpression[char] == ")") {
-          if (!closeIndex) {
+          closeCount++;
+
+          if (!closeIndex && closeCount > openCount) {
             closeIndex = char;
           }
-
-          closeCount++;
         }
       }
 
-      if (closeCount > openCount || closeCount === openCount) {
+      if (closeIndex || closeCount === openCount) {
         lastClosingParenthesisIndex = closeIndex;
-        console.log(
-          "Índice de fechamento DENTRO: " + lastClosingParenthesisIndex
-        );
-
         partOfExpression = partOfExpression.slice(
           0,
           lastClosingParenthesisIndex
         );
       }
 
-      console.log("CUMPRIMENTO: " + lengthOfPartOfExpression);
-      console.log("Contagem de abertura DENTRO: " + openCount);
-      console.log("Contagem de fechamento DENTRO: " + closeCount);
+      const lengthOfPartOfExpression = partOfExpression.length;
 
-      console.log("PARTE DA EXPRESSÃO DEPOIS: " + partOfExpression);
+      if (partOfExpression.indexOf("(") !== -1) {
+        partOfExpression = calculatePartsOfExpression(partOfExpression);
+      }
 
       const currentOperators = [];
 
@@ -705,14 +698,16 @@ function calculatePartsOfExpression(expression) {
           .replace("^", "**")
           .replace("÷", "/");
 
-        if (expressionOperators.indexOf(currentChar) != -1) {
+        if (
+          isNaN(Number(currentChar)) &&
+          currentChar != "(" &&
+          currentChar != ")" &&
+          currentChar != "."
+        ) {
           currentOperators.push(currentChar);
         }
       }
 
-      console.log("Operadores atuais: ", currentOperators);
-
-      let numbersArray;
       let splittedExpression = partOfExpression;
 
       for (let operator in currentOperators) {
@@ -725,24 +720,15 @@ function calculatePartsOfExpression(expression) {
         splittedExpression = splittedExpression.join(" ");
       }
 
-      console.log("Expressão separada: " + splittedExpression);
-
-      numbersArray = splittedExpression.split(" ");
+      let numbersArray = splittedExpression.split(" ");
 
       if (numbersArray.length > 1) {
-        console.log("ARRAY DE NÚMEROS", numbersArray);
         let result;
 
         for (let number in numbersArray) {
           if (number > 0) {
             const currentOperator = currentOperators[number - 1];
-
-            console.log("Operador atual: " + currentOperator);
-
             let currentNumber = Number(numbersArray[number]);
-
-            console.log("Número atual: " + currentNumber);
-            console.log("Número anterior: " + result);
 
             switch (currentOperator) {
               case "+":
@@ -780,71 +766,78 @@ function calculatePartsOfExpression(expression) {
             result = Number(numbersArray[number]);
           }
 
-          console.log("RESULTADO: " + result);
-
           if (openingParenthesisCount < 2) {
             let expressionArray = getExpressionArray(expression);
 
-            console.log("1° Array da expressão ANTES: ", expressionArray);
-
-            if (lengthOfPartOfExpression) {
-              expressionArray.splice(
-                firstOpeningParenthesisIndex,
-                lengthOfPartOfExpression + 2,
-                result
-              );
-            } else {
-              expressionArray.splice(
-                firstOpeningParenthesisIndex,
-                partOfExpression.length + 2,
-                result
-              );
-            }
+            expressionArray.splice(
+              firstOpeningParenthesisIndex,
+              lengthOfPartOfExpression + 2,
+              result
+            );
 
             newExpression = expressionArray.join("");
-            console.log("1° NOVA EXPRESSÃO: " + newExpression);
-            console.log("1° Array de expressão DEPOIS: ", expressionArray);
           } else {
             let expressionArray = getExpressionArray(newExpression);
-
-            console.log("2° Array da expressão ANTES: ", expressionArray);
 
             if (!newFirstOpeningParenthesisIndex) {
               newFirstOpeningParenthesisIndex = expressionArray.indexOf("(");
             }
 
-            console.log(
-              "2° NOVO ÍNDICE DE ABERTURA: " + newFirstOpeningParenthesisIndex
-            );
-
             if (
               expressionArray.indexOf("(") != newFirstOpeningParenthesisIndex
             ) {
-              console.log("Índice do resultado: " + resultNumberIndex);
+              const nextNumberIndex = resultNumberIndex + 1;
 
-              expressionArray.splice(resultNumberIndex, 1, result);
+              if (
+                !isNaN(Number(expressionArray[resultNumberIndex])) &&
+                !isNaN(Number(expressionArray[nextNumberIndex]))
+              ) {
+                expressionArray.splice(
+                  resultNumberIndex,
+                  String(result).length,
+                  result
+                );
+              } else {
+                expressionArray.splice(resultNumberIndex, 1, result);
+              }
             } else {
-              expressionArray.splice(
-                newFirstOpeningParenthesisIndex,
-                partOfExpression.length + 2,
-                result
-              );
+              if (
+                newFirstOpeningParenthesisIndex !== -1 &&
+                firstOpeningParenthesisIndex > newFirstOpeningParenthesisIndex
+              ) {
+                expressionArray.splice(
+                  newFirstOpeningParenthesisIndex,
+                  lengthOfPartOfExpression + 2,
+                  result
+                );
 
-              resultNumberIndex = newFirstOpeningParenthesisIndex;
+                resultNumberIndex = newFirstOpeningParenthesisIndex;
+              }
             }
 
             newExpression = expressionArray.join("");
-            console.log("2° NOVA EXPRESSÃO: " + newExpression);
-            console.log("2° Array de expressão DEPOIS: ", expressionArray);
           }
         }
       } else {
         if (newExpression) {
-          console.log("2° NOVA EXPRESSÃO RETORNO: " + newExpression);
-          return newExpression.split("(").join("").split(")").join("");
+          if (partOfExpression) {
+            const expressionArray = getExpressionArray(newExpression);
+            const parenthesisPosition = expressionArray.indexOf("(");
+            const deleteAmount = expressionArray.length - parenthesisPosition;
+
+            expressionArray.splice(
+              parenthesisPosition,
+              deleteAmount,
+              partOfExpression
+            );
+
+            newExpression = expressionArray.join("");
+            return newExpression;
+          } else {
+            return newExpression.split("(").join("").split(")").join("");
+          }
         } else {
           expression = expression.slice(0, firstOpeningParenthesisIndex);
-
           return expression + partOfExpression;
         }
       }
