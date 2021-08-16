@@ -644,115 +644,26 @@ function handleSeparateCalculations(expression) {
   let openingParenthesisCount = 0;
   let closingParenthesisCount = 0;
 
+  if (expression.indexOf("(") === -1) {
+    return calculateUnaryMathOperators(expression);
+  }
+
   for (let char in expression) {
-    if (expression[char] == "(") {
+    const currentChar = expression[char];
+
+    if (currentChar == "(") {
       openingParenthesisCount++;
 
       if (!firstOpeningParenthesisIndex) {
         firstOpeningParenthesisIndex = char;
       }
-    } else if (expression[char] == ")") {
+    } else if (currentChar == ")") {
       closingParenthesisCount++;
     }
 
     if (openingParenthesisCount === closingParenthesisCount) {
       firstOpeningParenthesisIndex = "";
       newFirstOpeningParenthesisIndex = "";
-    }
-
-    if (
-      (expression[char] == "√" || expression[char] == "!") &&
-      !firstOpeningParenthesisIndex
-    ) {
-      switch (expression[char]) {
-        case "√":
-          const nextIndex = Number(char) + 1;
-          const slicedExpression = expression.slice(nextIndex);
-
-          if (slicedExpression) {
-            let partOfExpression = "";
-
-            for (let char in slicedExpression) {
-              if (expressionOperators.indexOf(slicedExpression[char]) !== -1) {
-                break;
-              }
-
-              partOfExpression += slicedExpression[char];
-            }
-
-            const expressionArray = getExpressionArray(expression);
-            const result = Math.sqrt(Number(partOfExpression));
-
-            expressionArray.splice(
-              char,
-              String(partOfExpression).length + 1,
-              result
-            );
-
-            return expressionArray.join("");
-          }
-
-          break;
-        case "!":
-          const reversedExpression = [...expression].reverse();
-          const factorialNumbers = [];
-          let currentNumber = "";
-          let exclamationIndex;
-
-          for (let char in reversedExpression) {
-            if (reversedExpression[char] == "!") {
-              exclamationIndex = char;
-            } else if (exclamationIndex) {
-              if (
-                reversedExpression[char] != "." &&
-                isNaN(Number(reversedExpression[char]))
-              ) {
-                exclamationIndex = "";
-                factorialNumbers.push(Number(currentNumber));
-                currentNumber = "";
-              } else {
-                currentNumber += reversedExpression[char];
-              }
-            }
-          }
-
-          if (currentNumber) {
-            factorialNumbers.push(currentNumber);
-          }
-
-          const results = [];
-
-          for (let number in factorialNumbers) {
-            let result = factorialNumbers[number];
-
-            for (let index = factorialNumbers[number] - 1; index > 0; index--) {
-              result *= index;
-            }
-
-            results.push(result);
-          }
-
-          const expressionArray = getExpressionArray(expression);
-          let position = 0;
-
-          for (let char in expression) {
-            if (expression[char] == "!") {
-              const firstDigitIndex =
-                char - String(factorialNumbers[position]).length;
-              const deleteAmount = char - firstDigitIndex + 1;
-
-              expressionArray.splice(
-                firstDigitIndex,
-                deleteAmount,
-                results[position]
-              );
-
-              position++;
-            }
-          }
-
-          return expressionArray.join("");
-      }
     }
 
     if (firstOpeningParenthesisIndex) {
@@ -777,6 +688,8 @@ function handleSeparateCalculations(expression) {
       if (partOfExpression.indexOf("(") !== -1) {
         partOfExpression = handleSeparateCalculations(partOfExpression);
       }
+
+      partOfExpression = calculateUnaryMathOperators(partOfExpression);
 
       const operators = getOperatorsArray(partOfExpression);
       const numbersArray = getNumbersArray(partOfExpression, operators);
@@ -868,6 +781,110 @@ function handleSeparateCalculations(expression) {
   return newExpression;
 }
 
+function calculateUnaryMathOperators(expression) {
+  const expressionArray = getExpressionArray(expression);
+
+  for (let char in expression) {
+    const currentChar = expression[char];
+
+    if (currentChar == "√" || currentChar == "!") {
+      switch (currentChar) {
+        case "√":
+          const startIndex = expressionArray.indexOf("√");
+          const nextIndex = Number(char) + 1;
+          let slicedExpression = expression.slice(nextIndex);
+
+          if (slicedExpression) {
+            let partOfExpression = "";
+
+            for (let char in slicedExpression) {
+              const currentChar = slicedExpression[char];
+
+              if (isNaN(Number(currentChar))) {
+                break;
+              }
+
+              partOfExpression += slicedExpression[char];
+            }
+
+            const result = Math.sqrt(Number(partOfExpression));
+
+            expressionArray.splice(
+              startIndex,
+              String(partOfExpression).length + 1,
+              result
+            );
+          }
+
+          break;
+        case "!":
+          const reversedExpression = [...expression].reverse();
+          const factorialNumbers = [];
+          let currentNumber = "";
+          let exclamationIndex;
+
+          for (let char in reversedExpression) {
+            const currentChar = reversedExpression[char];
+
+            if (currentChar == "!") {
+              exclamationIndex = char;
+            } else if (exclamationIndex) {
+              if (currentChar != "." && isNaN(Number(currentChar))) {
+                exclamationIndex = "";
+                factorialNumbers.push(Number(currentNumber));
+                currentNumber = "";
+              } else {
+                currentNumber += currentChar;
+              }
+            }
+          }
+
+          if (currentNumber) {
+            factorialNumbers.push(currentNumber);
+          }
+
+          let results = [];
+
+          for (let number in factorialNumbers) {
+            const currentFactorialNumber = factorialNumbers[number];
+            let result = currentFactorialNumber;
+
+            for (let index = currentFactorialNumber - 1; index > 0; index--) {
+              result *= index;
+            }
+
+            results.push(result);
+          }
+
+          results = results.reverse();
+          let position = 0;
+
+          for (let char in expressionArray) {
+            const currentChar = expressionArray[char];
+
+            if (currentChar == "!") {
+              const firstDigitIndex =
+                char - String(factorialNumbers[position]).length;
+              let deleteAmount = char - firstDigitIndex + 1;
+
+              expressionArray.splice(
+                firstDigitIndex,
+                deleteAmount,
+                results[position]
+              );
+
+              position++;
+            }
+          }
+
+          break;
+      }
+    }
+  }
+
+  return expressionArray.join("");
+}
+
 function countParentheses(expression, getClosingIndex = false) {
   let openingCount = 0;
   let closingCount = 0;
@@ -881,8 +898,6 @@ function countParentheses(expression, getClosingIndex = false) {
 
       if (getClosingIndex && !closingIndex && closingCount > openingCount) {
         closingIndex = char;
-        console.log("Caractere: " + char);
-        console.log("Índice de fechamento DENTRO: " + closingIndex);
 
         return [openingCount, closingCount, closingIndex];
       }
@@ -905,7 +920,9 @@ function getOperatorsArray(expression) {
       isNaN(Number(currentChar)) &&
       currentChar != "(" &&
       currentChar != ")" &&
-      currentChar != "."
+      currentChar != "." &&
+      currentChar != "√" &&
+      currentChar != "!"
     ) {
       operators.push(currentChar);
     }
