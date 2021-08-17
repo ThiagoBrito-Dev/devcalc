@@ -27,9 +27,7 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
 
-  font-family: Roboto, sans-serif;
   font-size: 16px;
-
   padding: 12px 0;
 }
 
@@ -45,6 +43,11 @@ body {
   --button-background: #e9e9e9;
   --colorized-button-background: #b9d1e0;
   --button-border: rgba(103, 58, 182, 0.1);
+}
+
+button,
+p {
+  font-family: "Roboto", sans-serif;
 }
 
 body main {
@@ -69,12 +72,12 @@ body main header {
   border-bottom: 1px solid var(--header-line);
 }
 
-body main header div:first-child {
+header div.expression-actions-container,
+.conversion-container {
   display: flex;
-  gap: 6px;
 }
 
-body main header div:first-child button {
+div.expression-actions-container div button {
   background-color: var(--mode-button-background);
   color: var(--mode-button-text);
 
@@ -82,27 +85,41 @@ body main header div:first-child button {
   border-radius: 2px;
 
   padding: 4px 8px;
-  font-size: 13px;
+  font-size: 14.35px;
 }
 
-body main header div:first-child button:hover {
+div.expression-actions-container div button:hover {
   filter: brightness(0.95);
 }
 
-body main header div:last-child {
+.conversion-container {
+  align-items: center;
+  gap: 8px;
+
+  margin-left: 6px;
+  padding-left: 6px;
+  border-left: 0.5px solid var(--header-line);
+}
+
+.conversion-container img {
+  width: 10px;
+  height: 10px;
+}
+
+div.interface-actions-container {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-body main header div:last-child button {
+div.interface-actions-container button {
   font-size: 0;
   background-color: transparent;
   border: 0;
   transition-duration: 0.15s;
 }
 
-body main header div:last-child button:active {
+div.interface-actions-container button:active {
   transform: scale(0.97);
 }
 
@@ -178,9 +195,7 @@ body main section button {
   border-radius: 50%;
   border: 1.5px solid var(--button-border);
 
-  font-family: Roboto, sans-serif;
   font-size: 16px;
-
   color: var(--button-text);
   background-color: var(--button-background);
   transition-duration: 0.25s;

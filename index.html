@@ -23,26 +23,38 @@
   >
     <main>
       <header>
-        <div>
-          <button
-            type="button"
-            id="result-mode"
-            aria-label="Alterar modo de resultado"
-            onclick="toggleResultMode()"
-          >
-            RAD
-          </button>
-          <button
-            type="button"
-            id="conversion-mode"
-            class=""
-            aria-label="Alterar modo de conversão"
-            onclick="handleConversionMode()"
-          >
-            DECI
-          </button>
+        <div class="expression-actions-container">
+          <div>
+            <button
+              type="button"
+              id="result-mode"
+              aria-label="Alterar modo de resultado"
+              onclick="toggleResultMode()"
+            >
+              RAD
+            </button>
+          </div>
+          <div class="conversion-container">
+            <button
+              type="button"
+              id="conversion-mode"
+              aria-label="Alterar tipo de conversão"
+              onclick="changeConversionMode()"
+            >
+              DECI
+            </button>
+            <img src="" id="arrow-left" alt="Seta para a direita" />
+            <button
+              type="button"
+              id="insert-conversion-mode"
+              aria-label="Inserir tipo de conversão à expressão"
+              onclick="addConversionModesOnInput()"
+            >
+              INSERT
+            </button>
+          </div>
         </div>
-        <div>
+        <div class="interface-actions-container">
           <button
             type="button"
             aria-label="Trocar tema"
@@ -61,6 +73,7 @@
             type="text"
             class="stretch"
             aria-label="Expressão/resultado"
+            tabindex="-1"
             placeholder="0"
             readonly
           />
@@ -70,10 +83,34 @@
           <div class="dev-mode-top-container">
             <div class="left-column-top-row">
               <div>
-                <button type="button" class="colorized-button">sin</button>
-                <button type="button" class="colorized-button">cos</button>
-                <button type="button" class="colorized-button">tan</button>
-                <button type="button" class="colorized-button">hypot</button>
+                <button
+                  type="button"
+                  class="colorized-button"
+                  onclick="handleAddingNumbersOrCharacters('sin(')"
+                >
+                  sin
+                </button>
+                <button
+                  type="button"
+                  class="colorized-button"
+                  onclick="handleAddingNumbersOrCharacters('cos(')"
+                >
+                  cos
+                </button>
+                <button
+                  type="button"
+                  class="colorized-button"
+                  onclick="handleAddingNumbersOrCharacters('tan(')"
+                >
+                  tan
+                </button>
+                <button
+                  type="button"
+                  class="colorized-button"
+                  onclick="handleAddingNumbersOrCharacters('hypot(')"
+                >
+                  hypot
+                </button>
               </div>
               <div>
                 <button
@@ -280,11 +317,41 @@
           </div>
           <div class="dev-mode-side-container">
             <div>
-              <button type="button" class="colorized-button">log</button>
-              <button type="button" class="colorized-button">ln</button>
-              <button type="button" class="colorized-button">fib</button>
-              <button type="button" class="colorized-button">π</button>
-              <button type="button" class="colorized-button">e</button>
+              <button
+                type="button"
+                class="colorized-button"
+                onclick="handleAddingNumbersOrCharacters('log(')"
+              >
+                log
+              </button>
+              <button
+                type="button"
+                class="colorized-button"
+                onclick="handleAddingNumbersOrCharacters('ln(')"
+              >
+                ln
+              </button>
+              <button
+                type="button"
+                class="colorized-button"
+                onclick="handleAddingNumbersOrCharacters('fib(')"
+              >
+                fib
+              </button>
+              <button
+                type="button"
+                class="colorized-button"
+                onclick="handleAddingNumbersOrCharacters('π')"
+              >
+                π
+              </button>
+              <button
+                type="button"
+                class="colorized-button"
+                onclick="handleAddingNumbersOrCharacters('e')"
+              >
+                e
+              </button>
             </div>
           </div>
         </div>

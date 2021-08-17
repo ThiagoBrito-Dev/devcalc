@@ -94,12 +94,16 @@ function toggleTheme() {
 }
 
 function toggleImageSource(theme) {
+  const arrowLeft = document.querySelector("#arrow-left");
   const themeIcon = document.querySelector("#theme-icon");
   const optionsIcon = document.querySelector("#options-icon");
   const deleteIcon = document.querySelector("#delete-icon");
 
   const isDarkTheme = theme == "dark-theme";
 
+  arrowLeft.src = isDarkTheme
+    ? "assets/arrow-right-white.png"
+    : "assets/arrow-right.png";
   themeIcon.src = isDarkTheme ? "assets/sun.png" : "assets/moon.png";
   optionsIcon.src = isDarkTheme
     ? "assets/options-white.png"
@@ -114,45 +118,38 @@ function toggleResultMode() {
   resultMode.textContent = currentMode.includes("RAD") ? "GRAU" : "RAD";
 }
 
-function handleConversionMode() {
-  const expression = unformatNumbers(expressionInput.value);
-  const lastChar = expression[expression.length - 1];
+function changeConversionMode() {
   const modes = ["DECI", "BIN", "OCT", "HEX"];
+  const currentMode = conversionMode.textContent.trim();
 
-  if (lastChar != ")") {
-    if (!conversionMode.textContent.includes(" ")) {
-      const currentMode = conversionMode.textContent;
+  for (let mode in modes) {
+    if (modes[mode] == currentMode) {
+      conversionMode.textContent = modes[++mode];
 
-      for (let mode in modes) {
-        if (modes[mode] == currentMode) {
-          conversionMode.textContent = modes[++mode];
-
-          if (conversionMode.textContent === "") {
-            conversionMode.textContent = modes[0];
-          }
-        }
+      if (conversionMode.textContent === "") {
+        conversionMode.textContent = modes[0];
       }
-    } else {
-      conversionMode.textContent = "DECI";
     }
   }
+}
 
-  handleAddingNumbersOrCharacters(
-    `${conversionMode.textContent}(`.toLowerCase()
-  );
+function addConversionModesOnInput() {
+  const currentMode = conversionMode.textContent.trim();
+  handleAddingNumbersOrCharacters(`${currentMode}(`.toLowerCase());
 }
 
 function toggleDevMode() {
   const topContainer = document.querySelector(".dev-mode-top-container");
+  const conversionContainer = document.querySelector(".conversion-container");
   const sideContainer = document.querySelector(".dev-mode-side-container");
 
-  if (conversionMode.classList.value != "invisible") {
+  if (conversionContainer.classList.value != "invisible") {
     conversionMode.textContent = "DECI";
   }
 
-  conversionMode.classList.toggle("invisible");
-  expressionInput.classList.toggle("stretch");
   topContainer.classList.toggle("invisible");
+  conversionContainer.classList.toggle("invisible");
+  expressionInput.classList.toggle("stretch");
   sideContainer.classList.toggle("invisible");
 
   expressionInput.classList.remove("has-transition");
@@ -403,7 +400,7 @@ function handleCalculationResult(isInvalidExpression) {
   let expression = getExpressionArray(expressionInput.value, true).join("");
 
   if (!isInvalidExpression) {
-    if (expression.indexOf(currentOperator) != -1) {
+    if (expression.indexOf(currentOperator) !== -1) {
       expression = getExpressionArray(expressionInput.value).join("");
       expression = unformatNumbers(expression).replace(",", ".");
 
@@ -614,6 +611,7 @@ function handleNumbersArray(expression) {
 }
 
 function getNumbersArray(splittedExpression, operators) {
+  splittedExpression = String(splittedExpression);
   let numbersArray;
 
   if (splittedExpression) {
@@ -633,7 +631,7 @@ function getNumbersArray(splittedExpression, operators) {
   return numbersArray;
 }
 
-function handleSeparateCalculations(expression) {
+function handleSeparateCalculations(expression, hasOperations = false) {
   expression = expression.replace(/\,/g, ".");
 
   let newExpression;
@@ -667,6 +665,23 @@ function handleSeparateCalculations(expression) {
     }
 
     if (firstOpeningParenthesisIndex) {
+      const previousIndex = firstOpeningParenthesisIndex - 1;
+      const previousChar = expression[previousIndex];
+      let currentMode = "";
+
+      if (
+        previousChar != "(" &&
+        expressionOperators.indexOf(previousChar) === -1
+      ) {
+        // currentMode = conversionMode.textContent;
+
+        for (let index = previousIndex; index > -1; index--) {
+          currentMode += expression[index];
+        }
+
+        currentMode = [...currentMode].reverse().join("");
+      }
+
       const nextIndex = Number(firstOpeningParenthesisIndex) + 1;
       let partOfExpression = expression.slice(nextIndex);
 
@@ -686,15 +701,37 @@ function handleSeparateCalculations(expression) {
       const lengthOfPartOfExpression = partOfExpression.length;
 
       if (partOfExpression.indexOf("(") !== -1) {
-        partOfExpression = handleSeparateCalculations(partOfExpression);
+        const operators = getOperatorsArray(partOfExpression);
+
+        if (operators.length) {
+          partOfExpression = handleSeparateCalculations(partOfExpression, true);
+        } else {
+          partOfExpression = handleSeparateCalculations(partOfExpression);
+        }
       }
 
       partOfExpression = calculateUnaryMathOperators(partOfExpression);
-
       const operators = getOperatorsArray(partOfExpression);
+
+      if (currentMode && !operators.length) {
+        // let conversionResult;
+
+        switch (currentMode) {
+          case "bin":
+            partOfExpression = (partOfExpression >>> 0).toString(2);
+            break;
+          case "oct":
+            partOfExpression = Number(partOfExpression).toString(8);
+            break;
+          case "hex":
+            partOfExpression = Number(partOfExpression).toString(16);
+            break;
+        }
+      }
+
       const numbersArray = getNumbersArray(partOfExpression, operators);
 
-      if (numbersArray && numbersArray.length > 1) {
+      if ((numbersArray && numbersArray.length > 1) || hasOperations) {
         let result;
 
         for (let number in numbersArray) {
@@ -771,8 +808,23 @@ function handleSeparateCalculations(expression) {
             return newExpression.split("(").join("").split(")").join("");
           }
         } else {
-          expression = expression.slice(0, firstOpeningParenthesisIndex);
-          return expression + partOfExpression;
+          const expressionArray = getExpressionArray(expression);
+
+          if (currentMode) {
+            expressionArray.splice(
+              firstOpeningParenthesisIndex - currentMode.length,
+              currentMode.length + lengthOfPartOfExpression + 2,
+              partOfExpression
+            );
+          } else {
+            expressionArray.splice(
+              firstOpeningParenthesisIndex,
+              lengthOfPartOfExpression + 2,
+              partOfExpression
+            );
+          }
+
+          return expressionArray.join("");
         }
       }
     }
