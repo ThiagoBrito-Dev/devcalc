@@ -2,6 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Roboto", sans-serif;
 }
 
 body {
@@ -43,11 +44,6 @@ body {
   --button-background: #e9e9e9;
   --colorized-button-background: #b9d1e0;
   --button-border: rgba(103, 58, 182, 0.1);
-}
-
-button,
-p {
-  font-family: "Roboto", sans-serif;
 }
 
 body main {

@@ -119,7 +119,7 @@ function toggleResultMode() {
 }
 
 function changeConversionMode() {
-  const modes = ["DECI", "BIN", "OCT", "HEX"];
+  const modes = ["BIN", "OCT", "HEX"];
   const currentMode = conversionMode.textContent.trim();
 
   for (let mode in modes) {
@@ -144,7 +144,7 @@ function toggleDevMode() {
   const sideContainer = document.querySelector(".dev-mode-side-container");
 
   if (conversionContainer.classList.value != "invisible") {
-    conversionMode.textContent = "DECI";
+    conversionMode.textContent = "BIN";
   }
 
   topContainer.classList.toggle("invisible");
@@ -280,9 +280,17 @@ function addCharactersOnDisplay(expression, inputChar) {
 
   if (
     (openingCount > closingCount && isNaN(Number(lastChar))) ||
-    (!isNaN(Number(lastChar)) && inputChar != "(") ||
+    (openingCount > closingCount &&
+      !isNaN(Number(lastChar)) &&
+      inputChar != "(") ||
     (isNaN(Number(lastChar)) && lastChar != ")" && inputChar != ")")
   ) {
+    if (inputChar == "bin(" || inputChar == "oct(" || inputChar == "hex(") {
+      if (expression) {
+        return;
+      }
+    }
+
     expressionInput.value += inputChar;
   }
 
@@ -295,34 +303,42 @@ function addCharactersOnDisplay(expression, inputChar) {
 
 function addOperatorsOnDisplay(operator) {
   let expression = expressionInput.value;
-  let expressionArray = getExpressionArray(expression);
-  const lastChar = expression[expression.length - 1];
+  const [openingCount, closingCount] = countParentheses(expression);
 
-  if (!expression) {
-    if (operator == "-") {
-      expressionInput.value += operator;
-    }
-  } else {
-    if (expression.length > 1 || !isNaN(Number(lastChar))) {
-      const [openingCount, closingCount] = countParentheses(expression);
-      operator = handleSignRule(lastChar, expressionArray, operator);
+  if (
+    openingCount > closingCount ||
+    (expression.indexOf("bin(") === -1 &&
+      expression.indexOf("oct(") === -1 &&
+      expression.indexOf("hex(") === -1)
+  ) {
+    let expressionArray = getExpressionArray(expression);
+    const lastChar = expression[expression.length - 1];
 
-      if (openingCount === closingCount) {
-        expressionOperators.push(operator);
+    if (!expression) {
+      if (operator == "-") {
+        expressionInput.value += operator;
       }
+    } else {
+      if (expression.length > 1 || !isNaN(Number(lastChar))) {
+        operator = handleSignRule(lastChar, expressionArray, operator);
 
-      expression = expressionArray.join("");
-      expression += operator
-        .replace("**", "^")
-        .replace("*", "x")
-        .replace("/", "÷");
+        if (openingCount === closingCount) {
+          expressionOperators.push(operator);
+        }
 
-      expressionInput.value = expression;
+        expression = expressionArray.join("");
+        expression += operator
+          .replace("**", "^")
+          .replace("*", "x")
+          .replace("/", "÷");
+
+        expressionInput.value = expression;
+      }
     }
-  }
 
-  currentNumber = "";
-  handleFontSize(expression);
+    currentNumber = "";
+    handleFontSize(expression);
+  }
 }
 
 function handleSignRule(lastChar, expressionArray, operator) {
@@ -590,6 +606,7 @@ function getExpressionArray(expression, formatOperators = false) {
 function handleNumbersArray(expression) {
   if (haveSeparateCalculations) {
     expression = handleSeparateCalculations(expression);
+    console.log("Expressão retornada: " + expression);
   }
 
   let firstCharIsAnOperator = false;
@@ -666,15 +683,16 @@ function handleSeparateCalculations(expression, hasOperations = false) {
 
     if (firstOpeningParenthesisIndex) {
       const previousIndex = firstOpeningParenthesisIndex - 1;
-      const previousChar = expression[previousIndex];
+      const previousChar = expression[previousIndex]
+        .replace("^", "**")
+        .replace("x", "*")
+        .replace("÷", "/");
       let currentMode = "";
 
       if (
         previousChar != "(" &&
         expressionOperators.indexOf(previousChar) === -1
       ) {
-        // currentMode = conversionMode.textContent;
-
         for (let index = previousIndex; index > -1; index--) {
           currentMode += expression[index];
         }
@@ -711,25 +729,42 @@ function handleSeparateCalculations(expression, hasOperations = false) {
       }
 
       partOfExpression = calculateUnaryMathOperators(partOfExpression);
+      console.log("Parte da expressão: " + partOfExpression);
       const operators = getOperatorsArray(partOfExpression);
+      console.log("Operadores atuais: ", operators);
 
-      if (currentMode && !operators.length) {
-        // let conversionResult;
+      if (currentMode) {
+        if (!operators.length) {
+          let conversionResult;
 
-        switch (currentMode) {
-          case "bin":
-            partOfExpression = (partOfExpression >>> 0).toString(2);
-            break;
-          case "oct":
-            partOfExpression = Number(partOfExpression).toString(8);
-            break;
-          case "hex":
-            partOfExpression = Number(partOfExpression).toString(16);
-            break;
+          switch (currentMode) {
+            case "bin":
+              conversionResult = (partOfExpression >>> 0).toString(2);
+              break;
+            case "oct":
+              conversionResult = Number(partOfExpression).toString(8);
+              break;
+            case "hex":
+              conversionResult = Number(partOfExpression).toString(16);
+              break;
+            case "sin":
+              conversionResult = Math.sin(partOfExpression);
+              break;
+            case "cos":
+              conversionResult = Math.cos(partOfExpression);
+              break;
+            case "tan":
+              conversionResult = Math.tan(partOfExpression);
+              break;
+          }
+
+          console.log("Resultado da conversão: " + conversionResult);
+          partOfExpression = conversionResult;
         }
       }
 
       const numbersArray = getNumbersArray(partOfExpression, operators);
+      console.log("Array de números: ", numbersArray);
 
       if ((numbersArray && numbersArray.length > 1) || hasOperations) {
         let result;
@@ -740,12 +775,44 @@ function handleSeparateCalculations(expression, hasOperations = false) {
           if (openingParenthesisCount < 2) {
             let expressionArray = getExpressionArray(expression);
 
-            expressionArray.splice(
-              firstOpeningParenthesisIndex,
-              lengthOfPartOfExpression + 2,
-              result
-            );
+            if (currentMode) {
+              let conversionResult;
 
+              switch (currentMode) {
+                case "bin":
+                  conversionResult = (result >>> 0).toString(2);
+                  break;
+                case "oct":
+                  conversionResult = Number(result).toString(8);
+                  break;
+                case "hex":
+                  conversionResult = Number(result).toString(16);
+                  break;
+                case "sin":
+                  conversionResult = Math.sin(result);
+                  break;
+                case "cos":
+                  conversionResult = Math.cos(result);
+                  break;
+                case "tan":
+                  conversionResult = Math.tan(result);
+                  break;
+              }
+
+              expressionArray.splice(
+                firstOpeningParenthesisIndex - currentMode.length,
+                lengthOfPartOfExpression + currentMode.length + 2,
+                conversionResult
+              );
+            } else {
+              expressionArray.splice(
+                firstOpeningParenthesisIndex,
+                lengthOfPartOfExpression + 2,
+                result
+              );
+            }
+
+            console.log("Array de expressão DEPOIS: ", expressionArray);
             newExpression = expressionArray.join("");
           } else {
             let expressionArray = getExpressionArray(newExpression);
