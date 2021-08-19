@@ -694,6 +694,15 @@ function handleSeparateCalculations(expression, hasOperations = false) {
         expressionOperators.indexOf(previousChar) === -1
       ) {
         for (let index = previousIndex; index > -1; index--) {
+          const currentChar = expression[index]
+            .replace("x", "*")
+            .replace("^", "**")
+            .replace("÷", "/");
+
+          if (expressionOperators.indexOf(currentChar) !== -1) {
+            break;
+          }
+
           currentMode += expression[index];
         }
 
@@ -729,11 +738,25 @@ function handleSeparateCalculations(expression, hasOperations = false) {
       }
 
       partOfExpression = calculateUnaryMathOperators(partOfExpression);
-      console.log("Parte da expressão: " + partOfExpression);
       const operators = getOperatorsArray(partOfExpression);
-      console.log("Operadores atuais: ", operators);
+      let modesCount = 0;
 
       if (currentMode) {
+        for (let char in expression) {
+          const currentChar = expression[char];
+
+          if (currentChar == "(") {
+            const previousChar = expression[char - 1];
+
+            if (
+              previousChar != "(" &&
+              expressionOperators.indexOf(previousChar) === -1
+            ) {
+              modesCount++;
+            }
+          }
+        }
+
         if (!operators.length) {
           let conversionResult;
 
@@ -758,13 +781,11 @@ function handleSeparateCalculations(expression, hasOperations = false) {
               break;
           }
 
-          console.log("Resultado da conversão: " + conversionResult);
           partOfExpression = conversionResult;
         }
       }
 
       const numbersArray = getNumbersArray(partOfExpression, operators);
-      console.log("Array de números: ", numbersArray);
 
       if ((numbersArray && numbersArray.length > 1) || hasOperations) {
         let result;
@@ -812,7 +833,6 @@ function handleSeparateCalculations(expression, hasOperations = false) {
               );
             }
 
-            console.log("Array de expressão DEPOIS: ", expressionArray);
             newExpression = expressionArray.join("");
           } else {
             let expressionArray = getExpressionArray(newExpression);
@@ -859,18 +879,32 @@ function handleSeparateCalculations(expression, hasOperations = false) {
       } else {
         if (newExpression) {
           if (partOfExpression) {
-            const expressionArray = getExpressionArray(newExpression);
-            const parenthesisPosition = expressionArray.indexOf("(");
-            const deleteAmount = expressionArray.length - parenthesisPosition;
+            if (currentMode) {
+              const lastOperatorPosition = expressionOperators.length - 1;
+              const lastOperator = expressionOperators[lastOperatorPosition]
+                .replace("**", "^")
+                .replace("*", "x")
+                .replace("/", "÷");
 
-            expressionArray.splice(
-              parenthesisPosition,
-              deleteAmount,
-              partOfExpression
-            );
+              const splittedExpression = newExpression.split(lastOperator);
+              splittedExpression[openingParenthesisCount - 1] =
+                partOfExpression;
 
-            newExpression = expressionArray.join("");
-            return newExpression;
+              newExpression = splittedExpression.join(lastOperator);
+            } else {
+              const expressionArray = getExpressionArray(newExpression);
+              let parenthesisPosition = expressionArray.indexOf("(");
+              let deleteAmount = expressionArray.length - parenthesisPosition;
+
+              expressionArray.splice(
+                parenthesisPosition,
+                deleteAmount,
+                partOfExpression
+              );
+
+              newExpression = expressionArray.join("");
+              return newExpression;
+            }
           } else {
             return newExpression.split("(").join("").split(")").join("");
           }
@@ -883,6 +917,11 @@ function handleSeparateCalculations(expression, hasOperations = false) {
               currentMode.length + lengthOfPartOfExpression + 2,
               partOfExpression
             );
+
+            if (modesCount > 1) {
+              newExpression = expressionArray.join("");
+              continue;
+            }
           } else {
             expressionArray.splice(
               firstOpeningParenthesisIndex,
