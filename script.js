@@ -606,7 +606,6 @@ function getExpressionArray(expression, formatOperators = false) {
 function handleNumbersArray(expression) {
   if (haveSeparateCalculations) {
     expression = handleSeparateCalculations(expression);
-    console.log("Expressão retornada: " + expression);
   }
 
   let firstCharIsAnOperator = false;
@@ -655,6 +654,7 @@ function handleSeparateCalculations(expression, hasOperations = false) {
   let resultNumberIndex;
   let firstOpeningParenthesisIndex;
   let newFirstOpeningParenthesisIndex;
+  let newOpeningParenthesisPosition;
   let lastClosingParenthesisIndex;
   let openingParenthesisCount = 0;
   let closingParenthesisCount = 0;
@@ -858,19 +858,26 @@ function handleSeparateCalculations(expression, hasOperations = false) {
               } else {
                 expressionArray.splice(resultNumberIndex, 1, result);
               }
-            } else {
-              if (
-                newFirstOpeningParenthesisIndex !== -1 &&
-                firstOpeningParenthesisIndex > newFirstOpeningParenthesisIndex
-              ) {
-                expressionArray.splice(
-                  newFirstOpeningParenthesisIndex,
-                  lengthOfPartOfExpression + 2,
-                  result
-                );
+            } else if (
+              newFirstOpeningParenthesisIndex !== -1 &&
+              firstOpeningParenthesisIndex > newFirstOpeningParenthesisIndex
+            ) {
+              expressionArray.splice(
+                newFirstOpeningParenthesisIndex,
+                lengthOfPartOfExpression + 2,
+                result
+              );
 
-                resultNumberIndex = newFirstOpeningParenthesisIndex;
-              }
+              resultNumberIndex = newFirstOpeningParenthesisIndex;
+            } else {
+              let openingParenthesisPosition = newExpression.indexOf("(");
+              resultNumberIndex = openingParenthesisPosition;
+
+              expressionArray.splice(
+                openingParenthesisPosition,
+                partOfExpression.length + 2,
+                result
+              );
             }
 
             newExpression = expressionArray.join("");
@@ -879,25 +886,45 @@ function handleSeparateCalculations(expression, hasOperations = false) {
       } else {
         if (newExpression) {
           if (partOfExpression) {
+            const expressionArray = getExpressionArray(newExpression);
+            let openingParenthesisPosition = expressionArray.indexOf("(");
+            let deleteAmount =
+              expressionArray.length - openingParenthesisPosition;
+
             if (currentMode) {
-              const lastOperatorPosition = expressionOperators.length - 1;
-              const lastOperator = expressionOperators[lastOperatorPosition]
-                .replace("**", "^")
-                .replace("*", "x")
-                .replace("/", "÷");
+              const closingParenthesisPosition = newExpression.indexOf(")");
 
-              const splittedExpression = newExpression.split(lastOperator);
-              splittedExpression[openingParenthesisCount - 1] =
-                partOfExpression;
+              if (newExpression.indexOf(partOfExpression) === -1) {
+                if (closingParenthesisPosition !== -1) {
+                  expressionArray.splice(
+                    openingParenthesisPosition - currentMode.length,
+                    closingParenthesisPosition -
+                      openingParenthesisPosition +
+                      1 +
+                      currentMode.length,
+                    partOfExpression
+                  );
+                } else {
+                  if (openingParenthesisPosition === -1) {
+                    openingParenthesisPosition = newOpeningParenthesisPosition;
+                    deleteAmount =
+                      expressionArray.length - openingParenthesisPosition;
+                  }
 
-              newExpression = splittedExpression.join(lastOperator);
+                  newOpeningParenthesisPosition = openingParenthesisPosition;
+
+                  expressionArray.splice(
+                    openingParenthesisPosition - currentMode.length,
+                    deleteAmount + currentMode.length,
+                    partOfExpression
+                  );
+                }
+              }
+
+              newExpression = expressionArray.join("");
             } else {
-              const expressionArray = getExpressionArray(newExpression);
-              let parenthesisPosition = expressionArray.indexOf("(");
-              let deleteAmount = expressionArray.length - parenthesisPosition;
-
               expressionArray.splice(
-                parenthesisPosition,
+                openingParenthesisPosition,
                 deleteAmount,
                 partOfExpression
               );
