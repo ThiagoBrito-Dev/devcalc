@@ -650,14 +650,15 @@ function getNumbersArray(splittedExpression, operators) {
 function handleSeparateCalculations(expression, hasOperations = false) {
   expression = expression.replace(/\,/g, ".");
 
+  let openingParenthesisCount = 0;
+  let closingParenthesisCount = 0;
+
   let newExpression;
   let resultNumberIndex;
   let firstOpeningParenthesisIndex;
   let newFirstOpeningParenthesisIndex;
   let newOpeningParenthesisPosition;
   let lastClosingParenthesisIndex;
-  let openingParenthesisCount = 0;
-  let closingParenthesisCount = 0;
 
   if (expression.indexOf("(") === -1) {
     return calculateUnaryMathOperators(expression);
@@ -799,32 +800,40 @@ function handleSeparateCalculations(expression, hasOperations = false) {
             if (currentMode) {
               let conversionResult;
 
-              switch (currentMode) {
-                case "bin":
-                  conversionResult = (result >>> 0).toString(2);
-                  break;
-                case "oct":
-                  conversionResult = Number(result).toString(8);
-                  break;
-                case "hex":
-                  conversionResult = Number(result).toString(16);
-                  break;
-                case "sin":
-                  conversionResult = Math.sin(result);
-                  break;
-                case "cos":
-                  conversionResult = Math.cos(result);
-                  break;
-                case "tan":
-                  conversionResult = Math.tan(result);
-                  break;
-              }
+              if (!operators.length) {
+                expressionArray.splice(
+                  firstOpeningParenthesisIndex - currentMode.length,
+                  lengthOfPartOfExpression + 2 + currentMode.length,
+                  result
+                );
+              } else {
+                switch (currentMode) {
+                  case "bin":
+                    conversionResult = (result >>> 0).toString(2);
+                    break;
+                  case "oct":
+                    conversionResult = Number(result).toString(8);
+                    break;
+                  case "hex":
+                    conversionResult = Number(result).toString(16);
+                    break;
+                  case "sin":
+                    conversionResult = Math.sin(result);
+                    break;
+                  case "cos":
+                    conversionResult = Math.cos(result);
+                    break;
+                  case "tan":
+                    conversionResult = Math.tan(result);
+                    break;
+                }
 
-              expressionArray.splice(
-                firstOpeningParenthesisIndex - currentMode.length,
-                lengthOfPartOfExpression + currentMode.length + 2,
-                conversionResult
-              );
+                expressionArray.splice(
+                  firstOpeningParenthesisIndex - currentMode.length,
+                  lengthOfPartOfExpression + currentMode.length + 2,
+                  conversionResult
+                );
+              }
             } else {
               expressionArray.splice(
                 firstOpeningParenthesisIndex,
@@ -869,6 +878,20 @@ function handleSeparateCalculations(expression, hasOperations = false) {
               );
 
               resultNumberIndex = newFirstOpeningParenthesisIndex;
+            } else if (currentMode) {
+              // if (newFirstOpeningParenthesisIndex) {
+              //   expressionArray.splice(
+              //     firstOpeningParenthesisIndex + 1,
+              //     partOfExpression.length,
+              //     result
+              //   );
+              // }
+
+              expressionArray.splice(
+                firstOpeningParenthesisIndex - currentMode.length,
+                String(result).length,
+                result
+              );
             } else {
               let openingParenthesisPosition = newExpression.indexOf("(");
               resultNumberIndex = openingParenthesisPosition;
@@ -1100,14 +1123,16 @@ function getOperatorsArray(expression) {
       .replace("x", "*")
       .replace("^", "**")
       .replace("÷", "/");
+    const previousChar = expression[char - 1];
 
     if (
-      isNaN(Number(currentChar)) &&
-      currentChar != "(" &&
-      currentChar != ")" &&
-      currentChar != "." &&
-      currentChar != "√" &&
-      currentChar != "!"
+      !isNaN(Number(previousChar)) &&
+      (currentChar == "+" ||
+        currentChar == "-" ||
+        currentChar == "*" ||
+        currentChar == "**" ||
+        currentChar == "/" ||
+        currentChar == "%")
     ) {
       operators.push(currentChar);
     }
