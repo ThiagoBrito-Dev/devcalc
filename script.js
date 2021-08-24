@@ -653,6 +653,7 @@ function handleSeparateCalculations(expression, hasOperations = false) {
   let openingParenthesisCount = 0;
   let closingParenthesisCount = 0;
 
+  let previousConversionResult;
   let newExpression;
   let resultNumberIndex;
   let firstOpeningParenthesisIndex;
@@ -865,7 +866,62 @@ function handleSeparateCalculations(expression, hasOperations = false) {
                   result
                 );
               } else {
-                expressionArray.splice(resultNumberIndex, 1, result);
+                if (currentMode && newFirstOpeningParenthesisIndex) {
+                  let conversionResult;
+
+                  switch (currentMode) {
+                    case "bin":
+                      conversionResult = (result >>> 0).toString(2);
+                      break;
+                    case "oct":
+                      conversionResult = Number(result).toString(8);
+                      break;
+                    case "hex":
+                      conversionResult = Number(result).toString(16);
+                      break;
+                    case "sin":
+                      conversionResult = Math.sin(result);
+                      break;
+                    case "cos":
+                      conversionResult = Math.cos(result);
+                      break;
+                    case "tan":
+                      conversionResult = Math.tan(result);
+                      break;
+                  }
+
+                  conversionResult = String(conversionResult);
+                  let deleteAmount = conversionResult.length;
+
+                  if (previousConversionResult) {
+                    let highestValue = conversionResult.length;
+                    let lowestValue = previousConversionResult.length;
+
+                    if (lowestValue > highestValue) {
+                      highestValue = previousConversionResult.length;
+                      lowestValue = conversionResult.length;
+                    }
+
+                    let differenceBetweenConversionResults =
+                      highestValue - lowestValue;
+
+                    deleteAmount =
+                      conversionResult.length > previousConversionResult.length
+                        ? deleteAmount - differenceBetweenConversionResults
+                        : deleteAmount + differenceBetweenConversionResults;
+                  } else {
+                    deleteAmount--;
+                  }
+
+                  previousConversionResult = conversionResult;
+                  expressionArray.splice(
+                    newFirstOpeningParenthesisIndex - currentMode.length,
+                    deleteAmount,
+                    conversionResult
+                  );
+                } else {
+                  expressionArray.splice(resultNumberIndex, 1, result);
+                }
               }
             } else if (
               newFirstOpeningParenthesisIndex !== -1 &&
@@ -878,29 +934,67 @@ function handleSeparateCalculations(expression, hasOperations = false) {
               );
 
               resultNumberIndex = newFirstOpeningParenthesisIndex;
-            } else if (currentMode) {
-              // if (newFirstOpeningParenthesisIndex) {
-              //   expressionArray.splice(
-              //     firstOpeningParenthesisIndex + 1,
-              //     partOfExpression.length,
-              //     result
-              //   );
-              // }
-
-              expressionArray.splice(
-                firstOpeningParenthesisIndex - currentMode.length,
-                String(result).length,
-                result
-              );
             } else {
-              let openingParenthesisPosition = newExpression.indexOf("(");
-              resultNumberIndex = openingParenthesisPosition;
+              let conversionResult;
 
-              expressionArray.splice(
-                openingParenthesisPosition,
-                partOfExpression.length + 2,
-                result
-              );
+              switch (currentMode) {
+                case "bin":
+                  conversionResult = (result >>> 0).toString(2);
+                  break;
+                case "oct":
+                  conversionResult = Number(result).toString(8);
+                  break;
+                case "hex":
+                  conversionResult = Number(result).toString(16);
+                  break;
+                case "sin":
+                  conversionResult = Math.sin(result);
+                  break;
+                case "cos":
+                  conversionResult = Math.cos(result);
+                  break;
+                case "tan":
+                  conversionResult = Math.tan(result);
+                  break;
+              }
+
+              if (newFirstOpeningParenthesisIndex !== -1) {
+                expressionArray.splice(
+                  newFirstOpeningParenthesisIndex - currentMode.length,
+                  currentMode.length + partOfExpression.length + 2,
+                  conversionResult
+                );
+              } else {
+                let deleteAmount = String(result).length;
+                conversionResult = String(conversionResult);
+
+                if (previousConversionResult) {
+                  let highestValue = conversionResult.length;
+                  let lowestValue = previousConversionResult.length;
+
+                  if (lowestValue > highestValue) {
+                    highestValue = previousConversionResult.length;
+                    lowestValue = conversionResult.length;
+                  }
+
+                  let diferenceBetweenConversionResults =
+                    highestValue - lowestValue;
+
+                  deleteAmount =
+                    conversionResult.length > previousConversionResult.length
+                      ? deleteAmount - diferenceBetweenConversionResults
+                      : deleteAmount + diferenceBetweenConversionResults;
+                } else {
+                  deleteAmount--;
+                }
+
+                previousConversionResult = conversionResult;
+                expressionArray.splice(
+                  firstOpeningParenthesisIndex - currentMode.length,
+                  deleteAmount,
+                  conversionResult
+                );
+              }
             }
 
             newExpression = expressionArray.join("");
