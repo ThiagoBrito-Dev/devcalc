@@ -606,6 +606,7 @@ function getExpressionArray(expression, formatOperators = false) {
 function handleNumbersArray(expression) {
   if (haveSeparateCalculations) {
     expression = handleSeparateCalculations(expression);
+    console.log("Expressão retornada: " + expression);
   }
 
   let firstCharIsAnOperator = false;
@@ -653,6 +654,7 @@ function handleSeparateCalculations(expression, hasOperations = false) {
   let openingParenthesisCount = 0;
   let closingParenthesisCount = 0;
 
+  let isARecursiveCall;
   let previousConversionResult;
   let newExpression;
   let resultNumberIndex;
@@ -730,6 +732,8 @@ function handleSeparateCalculations(expression, hasOperations = false) {
       const lengthOfPartOfExpression = partOfExpression.length;
 
       if (partOfExpression.indexOf("(") !== -1) {
+        console.log("CHAMOU--------------------------------");
+        isARecursiveCall = true;
         const operators = getOperatorsArray(partOfExpression);
 
         if (operators.length) {
@@ -737,6 +741,7 @@ function handleSeparateCalculations(expression, hasOperations = false) {
         } else {
           partOfExpression = handleSeparateCalculations(partOfExpression);
         }
+        console.log("TERMINOU------------------------------");
       }
 
       partOfExpression = calculateUnaryMathOperators(partOfExpression);
@@ -780,6 +785,9 @@ function handleSeparateCalculations(expression, hasOperations = false) {
               break;
             case "tan":
               conversionResult = Math.tan(partOfExpression);
+              break;
+            case "log":
+              conversionResult = Math.log10(partOfExpression);
               break;
           }
 
@@ -827,6 +835,9 @@ function handleSeparateCalculations(expression, hasOperations = false) {
                   case "tan":
                     conversionResult = Math.tan(result);
                     break;
+                  case "log":
+                    conversionResult = Math.log10(result);
+                    break;
                 }
 
                 expressionArray.splice(
@@ -858,7 +869,8 @@ function handleSeparateCalculations(expression, hasOperations = false) {
 
               if (
                 !isNaN(Number(expressionArray[resultNumberIndex])) &&
-                !isNaN(Number(expressionArray[nextNumberIndex]))
+                !isNaN(Number(expressionArray[nextNumberIndex])) &&
+                !currentMode
               ) {
                 expressionArray.splice(
                   resultNumberIndex,
@@ -888,9 +900,14 @@ function handleSeparateCalculations(expression, hasOperations = false) {
                     case "tan":
                       conversionResult = Math.tan(result);
                       break;
+                    case "log":
+                      conversionResult = Math.log10(result);
+                      break;
                   }
 
                   conversionResult = String(conversionResult);
+                  const startPosition =
+                    newFirstOpeningParenthesisIndex - currentMode.length;
                   let deleteAmount = conversionResult.length;
 
                   if (previousConversionResult) {
@@ -913,9 +930,34 @@ function handleSeparateCalculations(expression, hasOperations = false) {
                     deleteAmount--;
                   }
 
+                  let replaceNumber = "";
+
+                  for (
+                    let index = startPosition;
+                    index < newExpression.length;
+                    index++
+                  ) {
+                    if (isNaN(Number(newExpression[index]))) {
+                      break;
+                    }
+
+                    replaceNumber += newExpression[index];
+                  }
+
+                  if (deleteAmount < partOfExpression.length) {
+                    deleteAmount = partOfExpression.length - 1;
+                  }
+
+                  if (
+                    replaceNumber &&
+                    conversionResult.length > replaceNumber.length
+                  ) {
+                    deleteAmount = replaceNumber.length;
+                  }
+
                   previousConversionResult = conversionResult;
                   expressionArray.splice(
-                    newFirstOpeningParenthesisIndex - currentMode.length,
+                    startPosition,
                     deleteAmount,
                     conversionResult
                   );
@@ -927,12 +969,16 @@ function handleSeparateCalculations(expression, hasOperations = false) {
               newFirstOpeningParenthesisIndex !== -1 &&
               firstOpeningParenthesisIndex > newFirstOpeningParenthesisIndex
             ) {
-              expressionArray.splice(
-                newFirstOpeningParenthesisIndex,
-                lengthOfPartOfExpression + 2,
-                result
-              );
+              let startPosition = newFirstOpeningParenthesisIndex;
+              let deleteAmount = lengthOfPartOfExpression + 2;
 
+              if (currentMode) {
+                startPosition =
+                  newFirstOpeningParenthesisIndex - currentMode.length;
+                deleteAmount += currentMode.length;
+              }
+
+              expressionArray.splice(startPosition, deleteAmount, result);
               resultNumberIndex = newFirstOpeningParenthesisIndex;
             } else {
               let conversionResult;
@@ -955,6 +1001,9 @@ function handleSeparateCalculations(expression, hasOperations = false) {
                   break;
                 case "tan":
                   conversionResult = Math.tan(result);
+                  break;
+                case "log":
+                  conversionResult = Math.log10(result);
                   break;
               }
 
@@ -1002,7 +1051,7 @@ function handleSeparateCalculations(expression, hasOperations = false) {
         }
       } else {
         if (newExpression) {
-          if (partOfExpression) {
+          if (partOfExpression !== null || partOfExpression !== undefined) {
             const expressionArray = getExpressionArray(newExpression);
             let openingParenthesisPosition = expressionArray.indexOf("(");
             let deleteAmount =
@@ -1011,7 +1060,11 @@ function handleSeparateCalculations(expression, hasOperations = false) {
             if (currentMode) {
               const closingParenthesisPosition = newExpression.indexOf(")");
 
-              if (newExpression.indexOf(partOfExpression) === -1) {
+              if (openingParenthesisPosition !== -1) {
+                startPosition = openingParenthesisPosition - currentMode.length;
+              }
+
+              if (!isARecursiveCall) {
                 if (closingParenthesisPosition !== -1) {
                   expressionArray.splice(
                     openingParenthesisPosition - currentMode.length,
@@ -1021,7 +1074,10 @@ function handleSeparateCalculations(expression, hasOperations = false) {
                       currentMode.length,
                     partOfExpression
                   );
-                } else {
+                } else if (
+                  openingParenthesisPosition !== -1 &&
+                  newOpeningParenthesisPosition !== -1
+                ) {
                   if (openingParenthesisPosition === -1) {
                     openingParenthesisPosition = newOpeningParenthesisPosition;
                     deleteAmount =
