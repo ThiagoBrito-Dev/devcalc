@@ -10,7 +10,6 @@ let currentMode;
 let firstPosition;
 
 function initializeInterface() {
-  const calcContainer = document.querySelector("main");
   let userTheme = localStorage.getItem("userTheme");
 
   if (userTheme === null) {
@@ -19,13 +18,11 @@ function initializeInterface() {
 
   document.body.classList = userTheme;
   toggleImageSource(userTheme);
-
-  calcContainer.classList.add("visible");
 }
 
 function handleKeyboardInteractions(event) {
-  if (event.key == "," || !isNaN(Number(event.key))) {
-    addNumbersOnDisplay(event.key);
+  if (event.key !== " " && (event.key == "," || !isNaN(Number(event.key)))) {
+    addNumbersOnDisplay(expressionInput.value, event.key);
   } else {
     let key;
 
@@ -65,7 +62,7 @@ function handleKeyboardInteractions(event) {
           break;
         case "c":
           if (conversionMode.classList.value != "invisible") {
-            handleConversionMode();
+            changeConversionMode();
           }
 
           break;
@@ -134,8 +131,11 @@ function changeConversionMode() {
 }
 
 function addConversionModesOnInput() {
-  const currentMode = conversionMode.textContent.trim();
-  handleAddingNumbersOrCharacters(`${currentMode}(`.toLowerCase());
+  let currentMode = [...conversionMode.textContent.trim().toLowerCase()];
+  currentMode[0] = currentMode[0].toUpperCase();
+  currentMode = currentMode.join("");
+
+  handleAddingNumbersOrCharacters(`${currentMode}(`);
 }
 
 function toggleDevMode() {
@@ -156,7 +156,7 @@ function toggleDevMode() {
 }
 
 function handleAddingNumbersOrCharacters(char) {
-  let expression = unformatNumbers(expressionInput.value);
+  let expression = expressionInput.value.replace(/\./g, "");
 
   if (char == "," || !isNaN(Number(char))) {
     addNumbersOnDisplay(expression, char);
@@ -168,13 +168,18 @@ function handleAddingNumbersOrCharacters(char) {
 function addNumbersOnDisplay(expression, number) {
   const lastChar = expression[expression.length - 1];
 
-  if (lastChar != ")") {
+  if (
+    lastChar != ")" &&
+    lastChar != "!" &&
+    lastChar != "π" &&
+    lastChar != "e"
+  ) {
     if (number != "," || (expression.length >= 1 && !isNaN(Number(lastChar)))) {
       const canBe = checkIfCommaCanBeAdded(expression, number);
 
       if (canBe) {
         expressionInput.value += number;
-        expression = unformatNumbers(expressionInput.value);
+        expression = expressionInput.value.replace(/\./g, "");
 
         if (isNaN(Number(expression))) {
           handleValidExpressions(expression, number);
@@ -188,15 +193,27 @@ function addNumbersOnDisplay(expression, number) {
 }
 
 function checkIfCommaCanBeAdded(expression, number) {
-  const numbersArray = handleNumbersArray(expression);
+  const numbersArray = getNumbersArray(expression);
 
   if (numbersArray) {
     const lastNumberPosition = numbersArray.length - 1;
     const lastNumber = numbersArray[lastNumberPosition];
+    console.log("Último número: " + lastNumber);
+    let commaCount = 0;
+
+    if (lastNumber.indexOf("Hypot(") !== -1) {
+      for (let char in lastNumber) {
+        if (lastNumber[char] == ",") {
+          commaCount++;
+        }
+      }
+    }
 
     if (
-      (expression.includes(",") && number == ",") ||
-      (lastNumber.includes(",") && number == ",")
+      (commaCount === 3 && number == ",") ||
+      (lastNumber.indexOf("Hypot(") === -1 &&
+        lastNumber.includes(",") &&
+        number == ",")
     ) {
       return false;
     }
@@ -206,7 +223,7 @@ function checkIfCommaCanBeAdded(expression, number) {
 }
 
 function handleValidExpressions(expression, number) {
-  const numbersArray = handleNumbersArray(expression);
+  const numbersArray = getNumbersArray(expression);
 
   if (numbersArray) {
     const lastNumberPosition = numbersArray.length - 1;
@@ -239,7 +256,7 @@ function handleValidExpressions(expression, number) {
 
 function formatNumbers(expression, number = "") {
   if (expression && expression != "-") {
-    const expressionArray = getExpressionArray(expression);
+    const expressionArray = [...expression];
 
     if (currentNumber == "") {
       firstPosition = expression.indexOf(number, expression.length - 1);
@@ -262,33 +279,46 @@ function addFormattedNumbersOnDisplay(expressionArray, formattedNumber) {
   expressionInput.value = expressionArray.join("");
 }
 
-function unformatNumbers(formattedNumber) {
-  let unformattedNumber = "";
-
-  for (char in formattedNumber) {
-    if (formattedNumber[char] != ".") {
-      unformattedNumber += formattedNumber[char];
-    }
-  }
-
-  return unformattedNumber;
-}
-
 function addCharactersOnDisplay(expression, inputChar) {
   const lastChar = expression[expression.length - 1];
   const [openingCount, closingCount] = countParentheses(expression);
 
   if (
-    (openingCount > closingCount && isNaN(Number(lastChar))) ||
+    (openingCount > closingCount && !isNaN(Number(lastChar))) ||
     (openingCount > closingCount &&
       !isNaN(Number(lastChar)) &&
       inputChar != "(") ||
-    (isNaN(Number(lastChar)) && lastChar != ")" && inputChar != ")")
+    (isNaN(Number(lastChar)) &&
+      lastChar != ")" &&
+      inputChar != ")" &&
+      inputChar != "!") ||
+    (!isNaN(Number(lastChar)) && inputChar == "!")
   ) {
-    if (inputChar == "bin(" || inputChar == "oct(" || inputChar == "hex(") {
+    if (
+      inputChar == "Bin(" ||
+      inputChar == "Oct(" ||
+      inputChar == "Hex(" ||
+      inputChar == "Fib("
+    ) {
       if (expression) {
         return;
       }
+    }
+
+    if (
+      (lastChar == "π" && inputChar == "π") ||
+      (lastChar == "e" && inputChar == "e")
+    ) {
+      return;
+    }
+
+    if (
+      inputChar != "(" &&
+      inputChar != ")" &&
+      inputChar != "!" &&
+      !isNaN(Number(lastChar))
+    ) {
+      return;
     }
 
     expressionInput.value += inputChar;
@@ -296,6 +326,10 @@ function addCharactersOnDisplay(expression, inputChar) {
 
   if (!haveSeparateCalculations) {
     haveSeparateCalculations = true;
+  }
+
+  if (inputChar == "!" || inputChar == "π" || inputChar == "e") {
+    handleCalculationResult(false);
   }
 
   currentNumber = "";
@@ -306,12 +340,13 @@ function addOperatorsOnDisplay(operator) {
   const [openingCount, closingCount] = countParentheses(expression);
 
   if (
-    openingCount > closingCount ||
-    (expression.indexOf("bin(") === -1 &&
-      expression.indexOf("oct(") === -1 &&
-      expression.indexOf("hex(") === -1)
+    (openingCount > closingCount && expression[expression.length - 1] != "(") ||
+    (expression.indexOf("Bin(") === -1 &&
+      expression.indexOf("Oct(") === -1 &&
+      expression.indexOf("Hex(") === -1 &&
+      expression.indexOf("Fib(") === -1)
   ) {
-    let expressionArray = getExpressionArray(expression);
+    let expressionArray = [...expression];
     const lastChar = expression[expression.length - 1];
 
     if (!expression) {
@@ -319,7 +354,12 @@ function addOperatorsOnDisplay(operator) {
         expressionInput.value += operator;
       }
     } else {
-      if (expression.length > 1 || !isNaN(Number(lastChar))) {
+      if (
+        expression.length > 1 ||
+        !isNaN(Number(lastChar)) ||
+        lastChar == "π" ||
+        lastChar == "e"
+      ) {
         operator = handleSignRule(lastChar, expressionArray, operator);
 
         if (openingCount === closingCount) {
@@ -342,7 +382,13 @@ function addOperatorsOnDisplay(operator) {
 }
 
 function handleSignRule(lastChar, expressionArray, operator) {
-  if (isNaN(Number(lastChar)) && lastChar != ")" && lastChar != "!") {
+  if (
+    isNaN(Number(lastChar)) &&
+    lastChar != ")" &&
+    lastChar != "!" &&
+    lastChar != "π" &&
+    lastChar != "e"
+  ) {
     expressionArray.pop();
     expressionOperators.pop();
 
@@ -387,7 +433,7 @@ function handleFontSize(expression) {
 }
 
 function triggerCalculation(expression, numbersArray) {
-  const expressionArray = getExpressionArray(expression);
+  const expressionArray = [...expression];
 
   expression = expressionArray.join("");
   const isInvalidExpression = checkIfIsInvalidExpression(
@@ -413,12 +459,17 @@ function checkIfIsInvalidExpression(expression, numbersArray) {
 function handleCalculationResult(isInvalidExpression) {
   const lastOperatorPosition = expressionOperators.length - 1;
   const currentOperator = expressionOperators[lastOperatorPosition];
-  let expression = getExpressionArray(expressionInput.value, true).join("");
+  let expression = expressionInput.value
+    .replace(/\^/g, "**")
+    .replace(/\x/g, "*")
+    .replace(/\÷/g, "/");
 
   if (!isInvalidExpression) {
-    if (expression.indexOf(currentOperator) !== -1) {
-      expression = getExpressionArray(expressionInput.value).join("");
-      expression = unformatNumbers(expression).replace(",", ".");
+    if (
+      expression.indexOf(currentOperator) !== -1 ||
+      haveSeparateCalculations
+    ) {
+      expression = expressionInput.value.replace(/\./g, "").replace(/\,/g, ".");
 
       const numbersArray = handleNumbersArray(expression);
       let result;
@@ -432,7 +483,14 @@ function handleCalculationResult(isInvalidExpression) {
         );
       }
 
-      result = formatExpressionResult(result);
+      if (
+        expression.indexOf("Bin(") === -1 &&
+        expression.indexOf("Oct(") === -1 &&
+        expression.indexOf("Hex(") === -1
+      ) {
+        result = formatExpressionResult(result);
+      }
+
       showResult(result);
     }
   } else {
@@ -445,6 +503,7 @@ function calculateResult(numbersArray, number, operators, result) {
   if (number > 0) {
     const currentOperator = operators[number - 1];
     let currentNumber = Number(numbersArray[number]);
+    result = Number(result);
 
     switch (currentOperator) {
       case "+":
@@ -479,7 +538,7 @@ function calculateResult(numbersArray, number, operators, result) {
         break;
     }
   } else {
-    result = Number(numbersArray[number]);
+    result = numbersArray[number];
   }
 
   return result;
@@ -545,7 +604,7 @@ function clearExpressions() {
 function deleteLastCharacter() {
   if (expressionInput.value) {
     let expression = expressionInput.value;
-    const expressionArray = getExpressionArray(expression);
+    const expressionArray = [...expression];
     const lastPositions = [
       expressionArray.length - 1,
       expressionOperators.length - 1,
@@ -580,29 +639,6 @@ function deleteLastCharacter() {
   }
 }
 
-function getExpressionArray(expression, formatOperators = false) {
-  const expressionArray = [];
-  let currentChar;
-
-  for (let char in expression) {
-    currentChar = expression[char];
-
-    if (formatOperators) {
-      if (
-        expression[char] != "," &&
-        expression[char] != "." &&
-        isNaN(Number(expression[char]))
-      ) {
-        currentChar = handleOperators(currentChar);
-      }
-    }
-
-    expressionArray.push(currentChar);
-  }
-
-  return expressionArray;
-}
-
 function handleNumbersArray(expression) {
   if (haveSeparateCalculations) {
     expression = handleSeparateCalculations(expression);
@@ -618,7 +654,7 @@ function handleNumbersArray(expression) {
     firstChar = "-";
   }
 
-  const numbersArray = getNumbersArray(expression, expressionOperators);
+  const numbersArray = getNumbersArray(expression);
 
   if (firstCharIsAnOperator) {
     numbersArray[0] = firstChar + numbersArray[0];
@@ -627,520 +663,245 @@ function handleNumbersArray(expression) {
   return numbersArray;
 }
 
-function getNumbersArray(splittedExpression, operators) {
+function getNumbersArray(splittedExpression, operators = expressionOperators) {
   splittedExpression = String(splittedExpression);
-  let numbersArray;
+  let numbersArray = Array(splittedExpression);
 
-  if (splittedExpression) {
-    for (let operator in operators) {
-      const currentOperator = operators[operator]
-        .replace("**", "^")
-        .replace("*", "x")
-        .replace("/", "÷");
+  for (let operator in operators) {
+    const currentOperator = operators[operator]
+      .replace("**", "^")
+      .replace("*", "x")
+      .replace("/", "÷");
 
-      splittedExpression = splittedExpression.split(currentOperator);
-      splittedExpression = splittedExpression.join(" ");
-    }
+    splittedExpression = splittedExpression.split(currentOperator);
+    splittedExpression = splittedExpression.join(" ");
+  }
 
+  if (expressionInput.value.indexOf("Fib(") === -1) {
     numbersArray = splittedExpression.split(" ");
   }
 
   return numbersArray;
 }
 
-function handleSeparateCalculations(expression, hasOperations = false) {
-  expression = expression.replace(/\,/g, ".");
+function handleSeparateCalculations(expression) {
+  let newExpression = expression.replace(/\,/g, ".").replace(/\π/g, Math.PI);
+
+  if (newExpression.indexOf("e") !== -1) {
+    const previousPosition = newExpression.indexOf("e") - 1;
+    const previousChar = newExpression[previousPosition];
+
+    if (previousChar != "H") {
+      newExpression = newExpression.replace(/\e/g, Math.E);
+    }
+  }
 
   let openingParenthesisCount = 0;
   let closingParenthesisCount = 0;
 
-  let isARecursiveCall;
-  let previousConversionResult;
-  let newExpression;
-  let resultNumberIndex;
-  let firstOpeningParenthesisIndex;
-  let newFirstOpeningParenthesisIndex;
-  let newOpeningParenthesisPosition;
-  let lastClosingParenthesisIndex;
+  if (newExpression.indexOf("(") === -1) {
+    return calculateUnaryMathOperators(newExpression);
+  } else {
+    // let count = 0;
 
-  if (expression.indexOf("(") === -1) {
-    return calculateUnaryMathOperators(expression);
-  }
-
-  for (let char in expression) {
-    const currentChar = expression[char];
-
-    if (currentChar == "(") {
-      openingParenthesisCount++;
-
-      if (!firstOpeningParenthesisIndex) {
-        firstOpeningParenthesisIndex = char;
-      }
-    } else if (currentChar == ")") {
-      closingParenthesisCount++;
-    }
-
-    if (openingParenthesisCount === closingParenthesisCount) {
-      firstOpeningParenthesisIndex = "";
-      newFirstOpeningParenthesisIndex = "";
-    }
-
-    if (firstOpeningParenthesisIndex) {
-      const previousIndex = firstOpeningParenthesisIndex - 1;
-      const previousChar = expression[previousIndex]
-        .replace("^", "**")
-        .replace("x", "*")
-        .replace("÷", "/");
-      let currentMode = "";
-
-      if (
-        previousChar != "(" &&
-        expressionOperators.indexOf(previousChar) === -1
-      ) {
-        for (let index = previousIndex; index > -1; index--) {
-          const currentChar = expression[index]
-            .replace("x", "*")
-            .replace("^", "**")
-            .replace("÷", "/");
-
-          if (expressionOperators.indexOf(currentChar) !== -1) {
-            break;
-          }
-
-          currentMode += expression[index];
-        }
-
-        currentMode = [...currentMode].reverse().join("");
-      }
-
-      const nextIndex = Number(firstOpeningParenthesisIndex) + 1;
-      let partOfExpression = expression.slice(nextIndex);
-
-      const [openingCount, closingCount, closingIndex] = countParentheses(
-        partOfExpression,
-        true
+    while (newExpression.indexOf("(") !== -1) {
+      const openingParenthesisIndex = newExpression.indexOf("(");
+      const currentMode = getCurrentMode(
+        openingParenthesisIndex,
+        newExpression
       );
 
-      if (closingIndex || closingCount === openingCount) {
-        lastClosingParenthesisIndex = closingIndex;
-        partOfExpression = partOfExpression.slice(
-          0,
-          lastClosingParenthesisIndex
+      const startPosition = currentMode
+        ? openingParenthesisIndex - currentMode.length
+        : openingParenthesisIndex;
+      let partOfExpression = newExpression.slice(startPosition);
+      let expressionPartContent = newExpression.slice(
+        Number(openingParenthesisIndex) + 1
+      );
+      let closingParenthesisIndex;
+
+      for (
+        let index = openingParenthesisIndex;
+        index < newExpression.length;
+        index++
+      ) {
+        const currentChar = newExpression[index];
+
+        if (currentChar == "(") {
+          openingParenthesisCount++;
+        } else if (currentChar == ")") {
+          closingParenthesisCount++;
+
+          if (openingParenthesisCount === closingParenthesisCount) {
+            closingParenthesisIndex = index;
+            break;
+          }
+        }
+      }
+
+      if (closingParenthesisIndex) {
+        partOfExpression = newExpression.slice(
+          startPosition,
+          Number(closingParenthesisIndex) + 1
+        );
+        expressionPartContent = newExpression.slice(
+          Number(openingParenthesisIndex) + 1,
+          closingParenthesisIndex
         );
       }
 
-      const lengthOfPartOfExpression = partOfExpression.length;
+      console.log("Parte da expressão: " + partOfExpression);
+      console.log("Conteúdo ANTES: " + expressionPartContent);
 
-      if (partOfExpression.indexOf("(") !== -1) {
-        console.log("CHAMOU--------------------------------");
-        isARecursiveCall = true;
-        const operators = getOperatorsArray(partOfExpression);
+      if (expressionPartContent.indexOf("(") !== -1) {
+        console.log("CHAMOU----------------------------");
+        expressionPartContent = handleSeparateCalculations(
+          expressionPartContent
+        );
+        console.log("TERMINOU--------------------------");
+      }
 
-        if (operators.length) {
-          partOfExpression = handleSeparateCalculations(partOfExpression, true);
+      console.log("Conteúdo DEPOIS: " + expressionPartContent);
+
+      expressionPartContent = calculateUnaryMathOperators(
+        expressionPartContent
+      );
+      const operators = getOperatorsArray(expressionPartContent);
+
+      if (!operators.length) {
+        if (currentMode) {
+          if (
+            currentMode == "Bin" ||
+            currentMode == "Oct" ||
+            currentMode == "Hex"
+          ) {
+            const conversionResult = calculateConversions(
+              currentMode,
+              expressionPartContent
+            );
+
+            console.log("Resultado da conversão: " + conversionResult);
+            newExpression = newExpression.replace(
+              partOfExpression,
+              conversionResult
+            );
+          } else {
+            const result = calculateMathFunctions(
+              currentMode,
+              expressionPartContent
+            );
+
+            console.log("Resultado do cálculo: " + result);
+            newExpression = newExpression.replace(partOfExpression, result);
+          }
         } else {
-          partOfExpression = handleSeparateCalculations(partOfExpression);
-        }
-        console.log("TERMINOU------------------------------");
-      }
-
-      partOfExpression = calculateUnaryMathOperators(partOfExpression);
-      const operators = getOperatorsArray(partOfExpression);
-      let modesCount = 0;
-
-      if (currentMode) {
-        for (let char in expression) {
-          const currentChar = expression[char];
-
-          if (currentChar == "(") {
-            const previousChar = expression[char - 1];
-
-            if (
-              previousChar != "(" &&
-              expressionOperators.indexOf(previousChar) === -1
-            ) {
-              modesCount++;
-            }
-          }
+          newExpression = newExpression.replace(
+            partOfExpression,
+            expressionPartContent
+          );
         }
 
-        if (!operators.length) {
-          let conversionResult;
-
-          switch (currentMode) {
-            case "bin":
-              conversionResult = (partOfExpression >>> 0).toString(2);
-              break;
-            case "oct":
-              conversionResult = Number(partOfExpression).toString(8);
-              break;
-            case "hex":
-              conversionResult = Number(partOfExpression).toString(16);
-              break;
-            case "sin":
-              conversionResult = Math.sin(partOfExpression);
-              break;
-            case "cos":
-              conversionResult = Math.cos(partOfExpression);
-              break;
-            case "tan":
-              conversionResult = Math.tan(partOfExpression);
-              break;
-            case "log":
-              conversionResult = Math.log10(partOfExpression);
-              break;
-          }
-
-          partOfExpression = conversionResult;
-        }
-      }
-
-      const numbersArray = getNumbersArray(partOfExpression, operators);
-
-      if ((numbersArray && numbersArray.length > 1) || hasOperations) {
+        console.log("Nova expressão: " + newExpression);
+      } else {
+        const numbersArray = getNumbersArray(expressionPartContent, operators);
         let result;
 
         for (let number in numbersArray) {
           result = calculateResult(numbersArray, number, operators, result);
-
-          if (openingParenthesisCount < 2) {
-            let expressionArray = getExpressionArray(expression);
-
-            if (currentMode) {
-              let conversionResult;
-
-              if (!operators.length) {
-                expressionArray.splice(
-                  firstOpeningParenthesisIndex - currentMode.length,
-                  lengthOfPartOfExpression + 2 + currentMode.length,
-                  result
-                );
-              } else {
-                switch (currentMode) {
-                  case "bin":
-                    conversionResult = (result >>> 0).toString(2);
-                    break;
-                  case "oct":
-                    conversionResult = Number(result).toString(8);
-                    break;
-                  case "hex":
-                    conversionResult = Number(result).toString(16);
-                    break;
-                  case "sin":
-                    conversionResult = Math.sin(result);
-                    break;
-                  case "cos":
-                    conversionResult = Math.cos(result);
-                    break;
-                  case "tan":
-                    conversionResult = Math.tan(result);
-                    break;
-                  case "log":
-                    conversionResult = Math.log10(result);
-                    break;
-                }
-
-                expressionArray.splice(
-                  firstOpeningParenthesisIndex - currentMode.length,
-                  lengthOfPartOfExpression + currentMode.length + 2,
-                  conversionResult
-                );
-              }
-            } else {
-              expressionArray.splice(
-                firstOpeningParenthesisIndex,
-                lengthOfPartOfExpression + 2,
-                result
-              );
-            }
-
-            newExpression = expressionArray.join("");
-          } else {
-            let expressionArray = getExpressionArray(newExpression);
-
-            if (!newFirstOpeningParenthesisIndex) {
-              newFirstOpeningParenthesisIndex = expressionArray.indexOf("(");
-            }
-
-            if (
-              expressionArray.indexOf("(") != newFirstOpeningParenthesisIndex
-            ) {
-              const nextNumberIndex = resultNumberIndex + 1;
-
-              if (
-                !isNaN(Number(expressionArray[resultNumberIndex])) &&
-                !isNaN(Number(expressionArray[nextNumberIndex])) &&
-                !currentMode
-              ) {
-                expressionArray.splice(
-                  resultNumberIndex,
-                  String(result).length,
-                  result
-                );
-              } else {
-                if (currentMode && newFirstOpeningParenthesisIndex) {
-                  let conversionResult;
-
-                  switch (currentMode) {
-                    case "bin":
-                      conversionResult = (result >>> 0).toString(2);
-                      break;
-                    case "oct":
-                      conversionResult = Number(result).toString(8);
-                      break;
-                    case "hex":
-                      conversionResult = Number(result).toString(16);
-                      break;
-                    case "sin":
-                      conversionResult = Math.sin(result);
-                      break;
-                    case "cos":
-                      conversionResult = Math.cos(result);
-                      break;
-                    case "tan":
-                      conversionResult = Math.tan(result);
-                      break;
-                    case "log":
-                      conversionResult = Math.log10(result);
-                      break;
-                  }
-
-                  conversionResult = String(conversionResult);
-                  const startPosition =
-                    newFirstOpeningParenthesisIndex - currentMode.length;
-                  let deleteAmount = conversionResult.length;
-
-                  if (previousConversionResult) {
-                    let highestValue = conversionResult.length;
-                    let lowestValue = previousConversionResult.length;
-
-                    if (lowestValue > highestValue) {
-                      highestValue = previousConversionResult.length;
-                      lowestValue = conversionResult.length;
-                    }
-
-                    let differenceBetweenConversionResults =
-                      highestValue - lowestValue;
-
-                    deleteAmount =
-                      conversionResult.length > previousConversionResult.length
-                        ? deleteAmount - differenceBetweenConversionResults
-                        : deleteAmount + differenceBetweenConversionResults;
-                  } else {
-                    deleteAmount--;
-                  }
-
-                  let replaceNumber = "";
-
-                  for (
-                    let index = startPosition;
-                    index < newExpression.length;
-                    index++
-                  ) {
-                    if (isNaN(Number(newExpression[index]))) {
-                      break;
-                    }
-
-                    replaceNumber += newExpression[index];
-                  }
-
-                  if (deleteAmount < partOfExpression.length) {
-                    deleteAmount = partOfExpression.length - 1;
-                  }
-
-                  if (
-                    replaceNumber &&
-                    conversionResult.length > replaceNumber.length
-                  ) {
-                    deleteAmount = replaceNumber.length;
-                  }
-
-                  previousConversionResult = conversionResult;
-                  expressionArray.splice(
-                    startPosition,
-                    deleteAmount,
-                    conversionResult
-                  );
-                } else {
-                  expressionArray.splice(resultNumberIndex, 1, result);
-                }
-              }
-            } else if (
-              newFirstOpeningParenthesisIndex !== -1 &&
-              firstOpeningParenthesisIndex > newFirstOpeningParenthesisIndex
-            ) {
-              let startPosition = newFirstOpeningParenthesisIndex;
-              let deleteAmount = lengthOfPartOfExpression + 2;
-
-              if (currentMode) {
-                startPosition =
-                  newFirstOpeningParenthesisIndex - currentMode.length;
-                deleteAmount += currentMode.length;
-              }
-
-              expressionArray.splice(startPosition, deleteAmount, result);
-              resultNumberIndex = newFirstOpeningParenthesisIndex;
-            } else {
-              let conversionResult;
-
-              switch (currentMode) {
-                case "bin":
-                  conversionResult = (result >>> 0).toString(2);
-                  break;
-                case "oct":
-                  conversionResult = Number(result).toString(8);
-                  break;
-                case "hex":
-                  conversionResult = Number(result).toString(16);
-                  break;
-                case "sin":
-                  conversionResult = Math.sin(result);
-                  break;
-                case "cos":
-                  conversionResult = Math.cos(result);
-                  break;
-                case "tan":
-                  conversionResult = Math.tan(result);
-                  break;
-                case "log":
-                  conversionResult = Math.log10(result);
-                  break;
-              }
-
-              if (newFirstOpeningParenthesisIndex !== -1) {
-                expressionArray.splice(
-                  newFirstOpeningParenthesisIndex - currentMode.length,
-                  currentMode.length + partOfExpression.length + 2,
-                  conversionResult
-                );
-              } else {
-                let deleteAmount = String(result).length;
-                conversionResult = String(conversionResult);
-
-                if (previousConversionResult) {
-                  let highestValue = conversionResult.length;
-                  let lowestValue = previousConversionResult.length;
-
-                  if (lowestValue > highestValue) {
-                    highestValue = previousConversionResult.length;
-                    lowestValue = conversionResult.length;
-                  }
-
-                  let diferenceBetweenConversionResults =
-                    highestValue - lowestValue;
-
-                  deleteAmount =
-                    conversionResult.length > previousConversionResult.length
-                      ? deleteAmount - diferenceBetweenConversionResults
-                      : deleteAmount + diferenceBetweenConversionResults;
-                } else {
-                  deleteAmount--;
-                }
-
-                previousConversionResult = conversionResult;
-                expressionArray.splice(
-                  firstOpeningParenthesisIndex - currentMode.length,
-                  deleteAmount,
-                  conversionResult
-                );
-              }
-            }
-
-            newExpression = expressionArray.join("");
-          }
         }
-      } else {
-        if (newExpression) {
-          if (partOfExpression !== null || partOfExpression !== undefined) {
-            const expressionArray = getExpressionArray(newExpression);
-            let openingParenthesisPosition = expressionArray.indexOf("(");
-            let deleteAmount =
-              expressionArray.length - openingParenthesisPosition;
 
-            if (currentMode) {
-              const closingParenthesisPosition = newExpression.indexOf(")");
+        console.log("Resultado ANTES: " + result);
 
-              if (openingParenthesisPosition !== -1) {
-                startPosition = openingParenthesisPosition - currentMode.length;
-              }
+        if (currentMode) {
+          result = calculateMathFunctions(currentMode, result);
+        }
 
-              if (!isARecursiveCall) {
-                if (closingParenthesisPosition !== -1) {
-                  expressionArray.splice(
-                    openingParenthesisPosition - currentMode.length,
-                    closingParenthesisPosition -
-                      openingParenthesisPosition +
-                      1 +
-                      currentMode.length,
-                    partOfExpression
-                  );
-                } else if (
-                  openingParenthesisPosition !== -1 &&
-                  newOpeningParenthesisPosition !== -1
-                ) {
-                  if (openingParenthesisPosition === -1) {
-                    openingParenthesisPosition = newOpeningParenthesisPosition;
-                    deleteAmount =
-                      expressionArray.length - openingParenthesisPosition;
-                  }
+        console.log("Resultado DEPOIS: " + result);
+        newExpression = newExpression.replace(partOfExpression, result);
+        console.log("Nova expressão: " + newExpression);
+      }
 
-                  newOpeningParenthesisPosition = openingParenthesisPosition;
+      // count++;
 
-                  expressionArray.splice(
-                    openingParenthesisPosition - currentMode.length,
-                    deleteAmount + currentMode.length,
-                    partOfExpression
-                  );
-                }
-              }
+      // if (count === 2) {
+      //   break;
+      // }
+    }
 
-              newExpression = expressionArray.join("");
-            } else {
-              expressionArray.splice(
-                openingParenthesisPosition,
-                deleteAmount,
-                partOfExpression
-              );
+    return newExpression;
+  }
+}
 
-              newExpression = expressionArray.join("");
-              return newExpression;
-            }
-          } else {
-            return newExpression.split("(").join("").split(")").join("");
-          }
-        } else {
-          const expressionArray = getExpressionArray(expression);
+function calculateMathFunctions(currentMode, value) {
+  // const resultMode = document.querySelector("#result-mode");
+  let calculationResult = value;
 
-          if (currentMode) {
-            expressionArray.splice(
-              firstOpeningParenthesisIndex - currentMode.length,
-              currentMode.length + lengthOfPartOfExpression + 2,
-              partOfExpression
-            );
+  switch (currentMode) {
+    case "Sin":
+      calculationResult = Math.sin(value);
+      break;
+    case "Cos":
+      calculationResult = Math.cos(value);
+      break;
+    case "Tan":
+      calculationResult = Math.tan(value);
+      break;
+    case "Hypot":
+      // Considerarei uma vírgula como sendo o divisor
+      // Duas vírgulas da seguinte forma: a primeira/última será considerada o decimal do
+      // primeiro/segundo número e a do meio o divisor
+      // Três como sendo os decimais e o divisor
 
-            if (modesCount > 1) {
-              newExpression = expressionArray.join("");
-              continue;
-            }
-          } else {
-            expressionArray.splice(
-              firstOpeningParenthesisIndex,
-              lengthOfPartOfExpression + 2,
-              partOfExpression
-            );
-          }
+      console.log("Chamou");
+      break;
+    case "Log":
+      calculationResult = Math.log10(value);
+      break;
+    case "Ln":
+      calculationResult = Math.log(value);
+      break;
+    case "Fib":
+      let result = "1";
+      let previousNumber = 0;
+      let currentNumber = 1;
 
-          return expressionArray.join("");
+      if (value > 1) {
+        for (let index = 1; index < value; index++) {
+          let nextNumber = previousNumber + currentNumber;
+
+          result += `, ${nextNumber}`;
+          previousNumber = currentNumber;
+          currentNumber = nextNumber;
         }
       }
-    }
+
+      calculationResult = result;
+      break;
   }
 
-  return newExpression;
+  return calculationResult;
+}
+
+function calculateConversions(currentMode, valueToConvert) {
+  let convertedValue;
+
+  switch (currentMode) {
+    case "Bin":
+      convertedValue = (valueToConvert >>> 0).toString(2);
+      break;
+    case "Oct":
+      convertedValue = Number(valueToConvert).toString(8);
+      break;
+    case "Hex":
+      convertedValue = Number(valueToConvert).toString(16).toUpperCase();
+      break;
+  }
+
+  return convertedValue;
 }
 
 function calculateUnaryMathOperators(expression) {
-  const expressionArray = getExpressionArray(expression);
+  const expressionArray = [...expression];
 
   for (let char in expression) {
     const currentChar = expression[char];
@@ -1153,7 +914,7 @@ function calculateUnaryMathOperators(expression) {
           let slicedExpression = expression.slice(nextIndex);
 
           if (slicedExpression) {
-            let partOfExpression = "";
+            let expressionPartContent = "";
 
             for (let char in slicedExpression) {
               const currentChar = slicedExpression[char];
@@ -1162,14 +923,14 @@ function calculateUnaryMathOperators(expression) {
                 break;
               }
 
-              partOfExpression += slicedExpression[char];
+              expressionPartContent += slicedExpression[char];
             }
 
-            const result = Math.sqrt(Number(partOfExpression));
+            const result = Math.sqrt(Number(expressionPartContent));
 
             expressionArray.splice(
               startIndex,
-              String(partOfExpression).length + 1,
+              String(expressionPartContent).length + 1,
               result
             );
           }
@@ -1243,6 +1004,44 @@ function calculateUnaryMathOperators(expression) {
   return expressionArray.join("");
 }
 
+function getCurrentMode(openingParenthesisIndex, expression) {
+  let previousIndex = openingParenthesisIndex - 1;
+
+  // if (expression.length < openingParenthesisIndex) {
+  //   previousIndex = expression.indexOf("(") - 1;
+  // }
+
+  const previousChar = expression[previousIndex];
+  let currentMode = "";
+
+  if (previousChar != "(" && expressionOperators.indexOf(previousChar) === -1) {
+    for (let index = previousIndex; index > -1; index--) {
+      let currentChar = expression[index].replace("^", "**").replace("÷", "/");
+
+      if (currentChar == "x" && !isNaN(Number(expression[index - 1]))) {
+        console.log(expression[index - 1]);
+        currentChar = currentChar.replace("x", "*");
+      }
+
+      if (
+        !isNaN(Number(currentChar)) ||
+        currentChar == "+" ||
+        currentChar == "-" ||
+        currentChar == "*" ||
+        currentChar == "/" ||
+        currentChar == "%"
+      ) {
+        break;
+      }
+
+      currentMode += expression[index];
+    }
+
+    currentMode = [...currentMode].reverse().join("");
+    return currentMode;
+  }
+}
+
 function countParentheses(expression, getClosingIndex = false) {
   let openingCount = 0;
   let closingCount = 0;
@@ -1289,22 +1088,6 @@ function getOperatorsArray(expression) {
   }
 
   return operators;
-}
-
-function handleOperators(char) {
-  switch (char) {
-    case "x":
-      char = "*";
-      break;
-    case "^":
-      char = "**";
-      break;
-    case "÷":
-      char = "/";
-      break;
-  }
-
-  return char;
 }
 
 function getNewCurrentNumberValue(expression) {
