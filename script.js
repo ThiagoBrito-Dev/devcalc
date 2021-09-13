@@ -109,10 +109,19 @@ function toggleImageSource(theme) {
 }
 
 function toggleResultMode() {
+  const expression = expressionInput.value;
   const resultMode = document.querySelector("#result-mode");
 
   currentMode = resultMode.textContent;
   resultMode.textContent = currentMode.includes("RAD") ? "GRAU" : "RAD";
+
+  if (
+    expression.indexOf("Sin(") !== -1 ||
+    expression.indexOf("Cos(") !== -1 ||
+    expression.indexOf("Tan(") !== -1
+  ) {
+    handleCalculationResult(false);
+  }
 }
 
 function changeConversionMode() {
@@ -185,9 +194,10 @@ function addNumbersOnDisplay(expression, number) {
           handleValidExpressions(expression, number);
         }
       }
+
+      formatNumbers(expression, number);
     }
 
-    formatNumbers(expression, number);
     handleFontSize(expressionInput.value);
   }
 }
@@ -198,19 +208,18 @@ function checkIfCommaCanBeAdded(expression, number) {
   if (numbersArray) {
     const lastNumberPosition = numbersArray.length - 1;
     const lastNumber = numbersArray[lastNumberPosition];
-    console.log("Último número: " + lastNumber);
-    let commaCount = 0;
+    const operators = getOperatorsArray(expression);
+    let commaCount;
 
     if (lastNumber.indexOf("Hypot(") !== -1) {
-      for (let char in lastNumber) {
-        if (lastNumber[char] == ",") {
-          commaCount++;
-        }
-      }
+      commaCount = countCommas(lastNumber);
     }
 
     if (
-      (commaCount === 3 && number == ",") ||
+      ((commaCount === 3 ||
+        (operators.length === 1 && commaCount === 2) ||
+        (operators.length === 2 && commaCount === 1)) &&
+        number == ",") ||
       (lastNumber.indexOf("Hypot(") === -1 &&
         lastNumber.includes(",") &&
         number == ",")
@@ -220,6 +229,18 @@ function checkIfCommaCanBeAdded(expression, number) {
   }
 
   return true;
+}
+
+function countCommas(expression) {
+  let commaCount = 0;
+
+  for (let char in expression) {
+    if (expression[char] == ",") {
+      commaCount++;
+    }
+  }
+
+  return commaCount;
 }
 
 function handleValidExpressions(expression, number) {
@@ -243,7 +264,7 @@ function handleValidExpressions(expression, number) {
       (currentOperator == "/" &&
         number == "0" &&
         expressionOperators.indexOf(previousChar) != -1) ||
-      Number(lastNumber) == "0"
+      lastNumber == "√("
     ) {
       setDefaultStylingClasses();
       isNotCalculable = true;
@@ -333,6 +354,7 @@ function addCharactersOnDisplay(expression, inputChar) {
   }
 
   currentNumber = "";
+  handleFontSize(expression);
 }
 
 function addOperatorsOnDisplay(operator) {
@@ -360,19 +382,32 @@ function addOperatorsOnDisplay(operator) {
         lastChar == "π" ||
         lastChar == "e"
       ) {
-        operator = handleSignRule(lastChar, expressionArray, operator);
+        let cantAddOperators = false;
 
-        if (openingCount === closingCount) {
-          expressionOperators.push(operator);
+        if (
+          (expression.indexOf("Log(") !== -1 &&
+            expression.indexOf("Log(") + 4 === expression.length) ||
+          (expression.indexOf("Ln(") !== -1 &&
+            expression.indexOf("Ln(" + 3 === expression.length))
+        ) {
+          cantAddOperators = true;
         }
 
-        expression = expressionArray.join("");
-        expression += operator
-          .replace("**", "^")
-          .replace("*", "x")
-          .replace("/", "÷");
+        if (!cantAddOperators) {
+          operator = handleSignRule(lastChar, expressionArray, operator);
 
-        expressionInput.value = expression;
+          if (openingCount === closingCount) {
+            expressionOperators.push(operator);
+          }
+
+          expression = expressionArray.join("");
+          expression += operator
+            .replace("**", "^")
+            .replace("*", "x")
+            .replace("/", "÷");
+
+          expressionInput.value = expression;
+        }
       }
     }
 
@@ -385,6 +420,7 @@ function handleSignRule(lastChar, expressionArray, operator) {
   if (
     isNaN(Number(lastChar)) &&
     lastChar != ")" &&
+    lastChar != "(" &&
     lastChar != "!" &&
     lastChar != "π" &&
     lastChar != "e"
@@ -813,7 +849,15 @@ function handleSeparateCalculations(expression) {
         console.log("Resultado ANTES: " + result);
 
         if (currentMode) {
-          result = calculateMathFunctions(currentMode, result);
+          if (result) {
+            result = calculateMathFunctions(currentMode, result, operators);
+          } else if (currentMode == "Hypot") {
+            result = calculateMathFunctions(
+              currentMode,
+              expressionPartContent,
+              operators
+            );
+          }
         }
 
         console.log("Resultado DEPOIS: " + result);
@@ -832,9 +876,16 @@ function handleSeparateCalculations(expression) {
   }
 }
 
-function calculateMathFunctions(currentMode, value) {
-  // const resultMode = document.querySelector("#result-mode");
+function calculateMathFunctions(currentMode, value, operators = null) {
+  const resultMode = document.querySelector("#result-mode");
   let calculationResult = value;
+
+  if (
+    resultMode.textContent.trim() == "GRAU" &&
+    (currentMode == "Sin" || currentMode == "Cos" || currentMode == "Tan")
+  ) {
+    value *= Math.PI / 180;
+  }
 
   switch (currentMode) {
     case "Sin":
@@ -847,12 +898,56 @@ function calculateMathFunctions(currentMode, value) {
       calculationResult = Math.tan(value);
       break;
     case "Hypot":
-      // Considerarei uma vírgula como sendo o divisor
-      // Duas vírgulas da seguinte forma: a primeira/última será considerada o decimal do
-      // primeiro/segundo número e a do meio o divisor
-      // Três como sendo os decimais e o divisor
+      value = String(value);
+      const commaCount = countCommas(value.replace(/\./g, ","));
 
-      console.log("Chamou");
+      if (commaCount === 0) {
+        calculationResult = Math.hypot(value);
+      } else if (commaCount === 1) {
+        const numbers = value.split(".");
+        calculationResult = Math.hypot(...numbers);
+      } else {
+        value = [...value];
+        const firstDotIndex = value.indexOf(".");
+
+        if (!operators) {
+          const separatorIndex = value.indexOf(".", firstDotIndex + 1);
+          value.splice(separatorIndex, 1, ",");
+
+          const numbers = value.join("").split(",");
+          calculationResult = Math.hypot(...numbers);
+        } else {
+          const firstOperatorIndex = value.indexOf(operators[0]);
+
+          if (firstDotIndex > firstOperatorIndex) {
+            value.splice(firstDotIndex, 1, ",");
+
+            const numbers = value.join("").split(",");
+            const numbersArray = getNumbersArray(numbers[0], operators);
+            let result;
+
+            for (let number in numbersArray) {
+              result = calculateResult(numbersArray, number, operators, result);
+            }
+
+            calculationResult = Math.hypot(result, numbers[1]);
+          } else {
+            const separatorIndex = value.indexOf(".", firstDotIndex + 1);
+            value.splice(separatorIndex, 1, ",");
+
+            const numbers = value.join("").split(",");
+            const numbersArray = getNumbersArray(numbers[1], operators);
+            let result;
+
+            for (let number in numbersArray) {
+              result = calculateResult(numbersArray, number, operators, result);
+            }
+
+            calculationResult = Math.hypot(numbers[0], result);
+          }
+        }
+      }
+
       break;
     case "Log":
       calculationResult = Math.log10(value);
@@ -1006,11 +1101,6 @@ function calculateUnaryMathOperators(expression) {
 
 function getCurrentMode(openingParenthesisIndex, expression) {
   let previousIndex = openingParenthesisIndex - 1;
-
-  // if (expression.length < openingParenthesisIndex) {
-  //   previousIndex = expression.indexOf("(") - 1;
-  // }
-
   const previousChar = expression[previousIndex];
   let currentMode = "";
 
