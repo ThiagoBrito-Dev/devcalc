@@ -6,7 +6,6 @@ let expressionOperators = [];
 let currentNumber = "";
 let isNotCalculable = false;
 let haveSeparateCalculations = false;
-let currentMode;
 let firstPosition;
 
 function initializeInterface() {
@@ -61,12 +60,12 @@ function handleKeyboardInteractions(event) {
           clearExpressions();
           break;
         case "c":
-          if (conversionMode.classList.value != "invisible") {
-            changeConversionMode();
-          }
-
+          changeConversionMode();
           break;
-        case "Control":
+        case "o":
+          handleOptionsBox();
+          break;
+        case "AltGraph":
           toggleDevMode();
           break;
         case "Backspace":
@@ -77,6 +76,21 @@ function handleKeyboardInteractions(event) {
           break;
       }
     }
+  }
+}
+
+function handleOptionsBox() {
+  const body = document.querySelector("body");
+  const optionsBox = document.querySelector(".options-box");
+
+  if (optionsBox.classList.value.includes("invisible")) {
+    optionsBox.classList.remove("invisible");
+    setTimeout(() => {
+      body.addEventListener("click", handleOptionsBox);
+    }, 50);
+  } else {
+    optionsBox.classList.add("invisible");
+    body.removeEventListener("click", handleOptionsBox);
   }
 }
 
@@ -152,7 +166,7 @@ function toggleDevMode() {
   const conversionContainer = document.querySelector(".conversion-container");
   const sideContainer = document.querySelector(".dev-mode-side-container");
 
-  if (conversionContainer.classList.value != "invisible") {
+  if (conversionContainer.classList.value.includes("invisible")) {
     conversionMode.textContent = "BIN";
   }
 
@@ -162,6 +176,7 @@ function toggleDevMode() {
   sideContainer.classList.toggle("invisible");
 
   expressionInput.classList.remove("has-transition");
+  handleFontSize(expressionInput.value);
 }
 
 function handleAddingNumbersOrCharacters(char) {
@@ -313,7 +328,8 @@ function addCharactersOnDisplay(expression, inputChar) {
       lastChar != ")" &&
       inputChar != ")" &&
       inputChar != "!") ||
-    (!isNaN(Number(lastChar)) && inputChar == "!")
+    ((!isNaN(Number(lastChar)) || lastChar == ")") && inputChar == "!") ||
+    (lastChar == "!" && inputChar == ")")
   ) {
     if (
       inputChar == "Bin(" ||
@@ -450,12 +466,16 @@ function focalizeResult() {
 }
 
 function handleFontSize(expression) {
+  const conversionContainer = document.querySelector(".conversion-container");
+
   if (!expression) {
     expression = expressionInput.value;
   }
 
   const fontSize = expressionInput.style.fontSize;
-  const breakpoint = conversionMode.classList.value ? 18 : 25;
+  const breakpoint = conversionContainer.classList.value.includes("invisible")
+    ? 18
+    : 25;
 
   if (expression.length >= breakpoint && fontSize != "16.5px") {
     expressionInput.style.fontSize = "16.5px";
@@ -734,146 +754,144 @@ function handleSeparateCalculations(expression) {
 
   let openingParenthesisCount = 0;
   let closingParenthesisCount = 0;
+  let count = 0;
 
-  if (newExpression.indexOf("(") === -1) {
-    return calculateUnaryMathOperators(newExpression);
-  } else {
-    // let count = 0;
+  while (newExpression.indexOf("(") !== -1) {
+    const openingParenthesisIndex = newExpression.indexOf("(");
+    const currentMode = getCurrentMode(openingParenthesisIndex, newExpression);
 
-    while (newExpression.indexOf("(") !== -1) {
-      const openingParenthesisIndex = newExpression.indexOf("(");
-      const currentMode = getCurrentMode(
-        openingParenthesisIndex,
-        newExpression
-      );
+    const startPosition = currentMode
+      ? openingParenthesisIndex - currentMode.length
+      : openingParenthesisIndex;
+    let partOfExpression = newExpression.slice(startPosition);
+    let expressionPartContent = newExpression.slice(
+      Number(openingParenthesisIndex) + 1
+    );
+    let closingParenthesisIndex;
 
-      const startPosition = currentMode
-        ? openingParenthesisIndex - currentMode.length
-        : openingParenthesisIndex;
-      let partOfExpression = newExpression.slice(startPosition);
-      let expressionPartContent = newExpression.slice(
-        Number(openingParenthesisIndex) + 1
-      );
-      let closingParenthesisIndex;
+    for (
+      let index = openingParenthesisIndex;
+      index < newExpression.length;
+      index++
+    ) {
+      const currentChar = newExpression[index];
 
-      for (
-        let index = openingParenthesisIndex;
-        index < newExpression.length;
-        index++
-      ) {
-        const currentChar = newExpression[index];
+      if (currentChar == "(") {
+        openingParenthesisCount++;
+      } else if (currentChar == ")") {
+        closingParenthesisCount++;
 
-        if (currentChar == "(") {
-          openingParenthesisCount++;
-        } else if (currentChar == ")") {
-          closingParenthesisCount++;
-
-          if (openingParenthesisCount === closingParenthesisCount) {
-            closingParenthesisIndex = index;
-            break;
-          }
+        if (openingParenthesisCount === closingParenthesisCount) {
+          closingParenthesisIndex = index;
+          break;
         }
       }
+    }
 
-      if (closingParenthesisIndex) {
-        partOfExpression = newExpression.slice(
-          startPosition,
-          Number(closingParenthesisIndex) + 1
-        );
-        expressionPartContent = newExpression.slice(
-          Number(openingParenthesisIndex) + 1,
-          closingParenthesisIndex
-        );
-      }
+    if (closingParenthesisIndex) {
+      partOfExpression = newExpression.slice(
+        startPosition,
+        Number(closingParenthesisIndex) + 1
+      );
+      expressionPartContent = newExpression.slice(
+        Number(openingParenthesisIndex) + 1,
+        closingParenthesisIndex
+      );
+    }
 
-      console.log("Parte da expressão: " + partOfExpression);
-      console.log("Conteúdo ANTES: " + expressionPartContent);
+    console.log("Parte da expressão: " + partOfExpression);
+    console.log("Conteúdo ANTES: " + expressionPartContent);
 
-      if (expressionPartContent.indexOf("(") !== -1) {
-        console.log("CHAMOU----------------------------");
-        expressionPartContent = handleSeparateCalculations(
-          expressionPartContent
-        );
-        console.log("TERMINOU--------------------------");
-      }
+    if (expressionPartContent.indexOf("(") !== -1) {
+      console.log("CHAMOU----------------------------");
+      expressionPartContent = handleSeparateCalculations(expressionPartContent);
+      console.log("TERMINOU--------------------------");
+    }
 
-      console.log("Conteúdo DEPOIS: " + expressionPartContent);
-
+    if (
+      expressionPartContent.indexOf("√") !== -1 ||
+      expressionPartContent.indexOf("!") !== -1
+    ) {
       expressionPartContent = calculateUnaryMathOperators(
         expressionPartContent
       );
-      const operators = getOperatorsArray(expressionPartContent);
-
-      if (!operators.length) {
-        if (currentMode) {
-          if (
-            currentMode == "Bin" ||
-            currentMode == "Oct" ||
-            currentMode == "Hex"
-          ) {
-            const conversionResult = calculateConversions(
-              currentMode,
-              expressionPartContent
-            );
-
-            console.log("Resultado da conversão: " + conversionResult);
-            newExpression = newExpression.replace(
-              partOfExpression,
-              conversionResult
-            );
-          } else {
-            const result = calculateMathFunctions(
-              currentMode,
-              expressionPartContent
-            );
-
-            console.log("Resultado do cálculo: " + result);
-            newExpression = newExpression.replace(partOfExpression, result);
-          }
-        } else {
-          newExpression = newExpression.replace(
-            partOfExpression,
-            expressionPartContent
-          );
-        }
-
-        console.log("Nova expressão: " + newExpression);
-      } else {
-        const numbersArray = getNumbersArray(expressionPartContent, operators);
-        let result;
-
-        for (let number in numbersArray) {
-          result = calculateResult(numbersArray, number, operators, result);
-        }
-
-        console.log("Resultado ANTES: " + result);
-
-        if (currentMode) {
-          if (result) {
-            result = calculateMathFunctions(currentMode, result, operators);
-          } else if (currentMode == "Hypot") {
-            result = calculateMathFunctions(
-              currentMode,
-              expressionPartContent,
-              operators
-            );
-          }
-        }
-
-        console.log("Resultado DEPOIS: " + result);
-        newExpression = newExpression.replace(partOfExpression, result);
-        console.log("Nova expressão: " + newExpression);
-      }
-
-      // count++;
-
-      // if (count === 2) {
-      //   break;
-      // }
     }
 
-    return newExpression;
+    const operators = getOperatorsArray(expressionPartContent);
+
+    if (!operators.length) {
+      if (currentMode) {
+        if (
+          currentMode == "Bin" ||
+          currentMode == "Oct" ||
+          currentMode == "Hex"
+        ) {
+          const conversionResult = calculateConversions(
+            currentMode,
+            expressionPartContent
+          );
+
+          console.log("Resultado da conversão: " + conversionResult);
+          newExpression = newExpression.replace(
+            partOfExpression,
+            conversionResult
+          );
+        } else {
+          const result = calculateMathFunctions(
+            currentMode,
+            expressionPartContent
+          );
+
+          console.log("Resultado do cálculo: " + result);
+          newExpression = newExpression.replace(partOfExpression, result);
+        }
+      } else {
+        newExpression = newExpression.replace(
+          partOfExpression,
+          expressionPartContent
+        );
+      }
+
+      console.log("Nova expressão: " + newExpression);
+    } else {
+      const numbersArray = getNumbersArray(expressionPartContent, operators);
+      let result;
+
+      for (let number in numbersArray) {
+        result = calculateResult(numbersArray, number, operators, result);
+      }
+
+      console.log("Resultado ANTES: " + result);
+
+      if (currentMode) {
+        if (result) {
+          result = calculateMathFunctions(currentMode, result, operators);
+        } else if (currentMode == "Hypot") {
+          result = calculateMathFunctions(
+            currentMode,
+            expressionPartContent,
+            operators
+          );
+        }
+      }
+
+      console.log("Resultado DEPOIS: " + result);
+      newExpression = newExpression.replace(partOfExpression, result);
+      console.log("Nova expressão: " + newExpression);
+    }
+
+    count++;
+
+    if (count === 2) {
+      break;
+    }
   }
+
+  if (newExpression.indexOf("√") !== -1 || newExpression.indexOf("!") !== -1) {
+    newExpression = calculateUnaryMathOperators(newExpression);
+  }
+
+  return newExpression;
 }
 
 function calculateMathFunctions(currentMode, value, operators = null) {
@@ -1032,7 +1050,7 @@ function calculateUnaryMathOperators(expression) {
 
           break;
         case "!":
-          const reversedExpression = [...expression].reverse();
+          const reversedExpression = [...expressionArray].reverse();
           const factorialNumbers = [];
           let currentNumber = "";
           let exclamationIndex;
@@ -1119,7 +1137,8 @@ function getCurrentMode(openingParenthesisIndex, expression) {
         currentChar == "-" ||
         currentChar == "*" ||
         currentChar == "/" ||
-        currentChar == "%"
+        currentChar == "%" ||
+        currentChar == "√"
       ) {
         break;
       }

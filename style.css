@@ -15,6 +15,7 @@ body {
   --p-text: #d5d5d5;
   --button-text: #673ab7;
   --button-background: #ededed;
+  --button-background-effect: rgba(0, 0, 0, 0.2);
   --colorized-button-background: #f3dfef;
   --button-border: rgba(103, 58, 182, 0.05);
 
@@ -32,6 +33,10 @@ body {
   padding: 12px 0;
 }
 
+button {
+  cursor: pointer;
+}
+
 .dark-theme {
   --calc-background: #3c3c3c;
   --mode-button-text: #fcfcfc;
@@ -42,6 +47,7 @@ body {
   --p-text: #787878;
   --button-text: #a64cb6;
   --button-background: #e9e9e9;
+  --button-background-effect: rgba(255, 255, 255, 0.2);
   --colorized-button-background: #b9d1e0;
   --button-border: rgba(103, 58, 182, 0.1);
 }
@@ -63,10 +69,6 @@ body main {
   to {
     opacity: 1;
   }
-}
-
-.visible {
-  opacity: 1;
 }
 
 body main header {
@@ -112,20 +114,86 @@ div.expression-actions-container div button:hover {
 }
 
 div.interface-actions-container {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
 div.interface-actions-container button {
-  font-size: 0;
   background-color: transparent;
   border: 0;
+}
+
+button.interaction-button {
+  font-size: 0;
   transition-duration: 0.15s;
 }
 
-div.interface-actions-container button:active {
+button.interaction-button:active {
   transform: scale(0.97);
+}
+
+div.interface-actions-container div.options-box {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  top: 0;
+
+  width: 152px;
+  /* height: 168px; */
+  padding-bottom: 5px;
+  margin-right: 5.75px;
+
+  background-color: var(--input-background);
+  border-radius: 4px;
+  border: 1px solid var(--button-text);
+  overflow-x: auto;
+}
+
+div.options-box h2 {
+  margin: 6px 8px 10px;
+  font-size: 20px;
+  color: var(--calc-background);
+}
+
+div.options-box div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.5px;
+  padding: 0 4px;
+}
+
+div.options-box div button {
+  position: relative;
+  width: 100%;
+  padding: 8px 12px;
+
+  font-size: 16px;
+  background-color: var(--calc-background);
+  color: var(--mode-button-text);
+
+  border: 2px solid var(--colorized-button-background);
+  border-radius: 6px;
+}
+
+div.options-box div button::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 100%;
+
+  background-color: var(--button-background-effect);
+  border-radius: 4px;
+  transition-duration: 1s;
+}
+
+div.options-box div button:hover::before {
+  width: 100%;
 }
 
 .icon {

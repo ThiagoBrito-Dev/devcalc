@@ -56,14 +56,29 @@
         <div class="interface-actions-container">
           <button
             type="button"
+            class="interaction-button"
             aria-label="Trocar tema"
             onclick="toggleTheme()"
           >
             <img src="" id="theme-icon" class="icon" alt="Trocar tema" />
           </button>
-          <button type="button" aria-label="Abrir barra de opções">
+          <button
+            type="button"
+            class="interaction-button"
+            aria-label="Abrir caixa de opções"
+            onclick="handleOptionsBox()"
+          >
             <img src="" id="options-icon" class="icon" alt="Opções" />
           </button>
+          <div class="options-box invisible">
+            <h2>Options</h2>
+
+            <div>
+              <button>History</button>
+              <button>Example</button>
+              <button>Example</button>
+            </div>
+          </div>
         </div>
       </header>
       <section>
@@ -85,6 +100,7 @@
                 <button
                   type="button"
                   class="colorized-button"
+                  aria-label="Adicionar marcação de cálculo de seno"
                   onclick="handleAddingNumbersOrCharacters('Sin(')"
                 >
                   sin
@@ -92,6 +108,7 @@
                 <button
                   type="button"
                   class="colorized-button"
+                  aria-label="Adicionar marcação de cálculo de cosseno"
                   onclick="handleAddingNumbersOrCharacters('Cos(')"
                 >
                   cos
@@ -99,6 +116,7 @@
                 <button
                   type="button"
                   class="colorized-button"
+                  aria-label="Adicionar marcação de cálculo de tangente"
                   onclick="handleAddingNumbersOrCharacters('Tan(')"
                 >
                   tan
@@ -106,6 +124,7 @@
                 <button
                   type="button"
                   class="colorized-button"
+                  aria-label="Adicionar marcação de cálculo de hipotenusa"
                   onclick="handleAddingNumbersOrCharacters('Hypot(')"
                 >
                   hypot
@@ -115,6 +134,7 @@
                 <button
                   type="button"
                   class="colorized-button"
+                  aria-label="Adicionar fechamento de parênteses à expressão"
                   onclick="handleAddingNumbersOrCharacters('(')"
                 >
                   (
@@ -122,6 +142,7 @@
                 <button
                   type="button"
                   class="colorized-button"
+                  aria-label="Adicionar abertura de parênteses à expressão"
                   onclick="handleAddingNumbersOrCharacters(')')"
                 >
                   )
@@ -129,6 +150,7 @@
                 <button
                   type="button"
                   class="colorized-button"
+                  aria-label="Adicionar operador de exponenciação à expressão"
                   onclick="addOperatorsOnDisplay('**')"
                 >
                   ^
@@ -136,6 +158,7 @@
                 <button
                   type="button"
                   class="colorized-button"
+                  aria-label="Adicionar operador de porcentagem à expressão"
                   onclick="addOperatorsOnDisplay('%')"
                 >
                   %
@@ -147,6 +170,7 @@
                 <button
                   type="button"
                   class="colorized-button"
+                  aria-label="Adicionar operador de fatorial à expressão"
                   onclick="handleAddingNumbersOrCharacters('!')"
                 >
                   !
@@ -154,6 +178,7 @@
                 <button
                   type="button"
                   class="colorized-button"
+                  aria-label="Adicionar operador de raiz quadrada à expressão"
                   onclick="handleAddingNumbersOrCharacters('√')"
                 >
                   √
@@ -319,6 +344,7 @@
               <button
                 type="button"
                 class="colorized-button"
+                aria-label="Adicionar marcação de cálculo de logaritmo"
                 onclick="handleAddingNumbersOrCharacters('Log(')"
               >
                 log
@@ -326,6 +352,7 @@
               <button
                 type="button"
                 class="colorized-button"
+                aria-label="Adicionar marcação de cálculo de logaritmo neperiano"
                 onclick="handleAddingNumbersOrCharacters('Ln(')"
               >
                 ln
@@ -333,6 +360,7 @@
               <button
                 type="button"
                 class="colorized-button"
+                aria-label="Adicionar marcação de cálculo da sequência de Fibonacci"
                 onclick="handleAddingNumbersOrCharacters('Fib(')"
               >
                 fib
@@ -340,6 +368,7 @@
               <button
                 type="button"
                 class="colorized-button"
+                aria-label="Adicionar símbolo de PI à expressão"
                 onclick="handleAddingNumbersOrCharacters('π')"
               >
                 π
@@ -347,6 +376,7 @@
               <button
                 type="button"
                 class="colorized-button"
+                aria-label="Adicionar símbolo do número de Euler à expressão"
                 onclick="handleAddingNumbersOrCharacters('e')"
               >
                 e
