@@ -1,6 +1,8 @@
 const conversionMode = document.querySelector("#conversion-mode");
 const expressionInput = document.querySelector("input");
 const expressionResult = document.querySelector("p");
+const modalOverlay = document.querySelector(".modal-overlay");
+const history = document.querySelector(".history-modal");
 
 let expressionOperators = [];
 let currentNumber = "";
@@ -65,6 +67,18 @@ function handleKeyboardInteractions(event) {
         case "o":
           handleOptionsBox();
           break;
+        case "h":
+          if (history.classList.value.includes("invisible")) {
+            handleHistoryAccess();
+          }
+
+          break;
+        case "Escape":
+          if (!modalOverlay.classList.value.includes("invisible")) {
+            handleModalState();
+          }
+
+          break;
         case "AltGraph":
           toggleDevMode();
           break;
@@ -92,6 +106,19 @@ function handleOptionsBox() {
     optionsBox.classList.add("invisible");
     body.removeEventListener("click", handleOptionsBox);
   }
+}
+
+function handleModalState() {
+  modalOverlay.classList.toggle("invisible");
+
+  if (modalOverlay.classList.value.includes("invisible")) {
+    history.classList.add("invisible");
+  }
+}
+
+function handleHistoryAccess() {
+  handleModalState();
+  history.classList.remove("invisible");
 }
 
 function toggleTheme() {

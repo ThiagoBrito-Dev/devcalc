@@ -74,8 +74,8 @@
             <h2>Options</h2>
 
             <div>
-              <button>History</button>
-              <button>Example</button>
+              <button onclick="handleHistoryAccess()">History</button>
+              <button>Atalhos</button>
               <button>Example</button>
             </div>
           </div>
@@ -386,6 +386,51 @@
         </div>
       </section>
     </main>
+
+    <div class="modal-overlay invisible">
+      <section class="history-modal invisible">
+        <header>
+          <h2>History</h2>
+          <button type="button" onclick="handleModalState()">X</button>
+        </header>
+
+        <div class="history-content">
+          <h3>12 de setembro</h3>
+          <div class="operations-info">
+            <div>
+              <p>10+5x2÷3^2%50</p>
+              <p>50</p>
+            </div>
+            <div>
+              <p>500-200</p>
+              <p>300</p>
+            </div>
+            <div>
+              <p>199x2</p>
+              <p>398</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="history-content">
+          <h3>Hoje</h3>
+          <div class="operations-info">
+            <div>
+              <p>10+5x2÷3^2%50</p>
+              <p>50</p>
+            </div>
+            <div>
+              <p>500-200</p>
+              <p>300</p>
+            </div>
+            <div>
+              <p>199x2</p>
+              <p>398</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
 
     <script src="script.js"></script>
   </body>
