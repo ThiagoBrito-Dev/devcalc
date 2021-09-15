@@ -118,6 +118,11 @@ function handleModalState() {
 
 function handleHistoryAccess() {
   handleModalState();
+
+  const optionsBox = document.querySelector(".options-box");
+  if (!optionsBox.classList.value.includes("invisible")) {
+    handleOptionsBox();
+  }
   history.classList.remove("invisible");
 }
 
