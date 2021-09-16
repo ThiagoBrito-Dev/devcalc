@@ -9,8 +9,17 @@ let currentNumber = "";
 let isNotCalculable = false;
 let haveSeparateCalculations = false;
 let firstPosition;
+let operations;
 
 function initializeInterface() {
+  operations = JSON.parse(localStorage.getItem("devcalc:history")) || [];
+
+  if (operations.length) {
+    operations.forEach((operation, index) => {
+      handleAddingOperationsOnHistory(operation, index);
+    });
+  }
+
   let userTheme = localStorage.getItem("userTheme");
 
   if (userTheme === null) {
@@ -487,14 +496,80 @@ function handleSignRule(lastChar, expressionArray, operator) {
 }
 
 function focalizeResult() {
-  expressionInput.value = "Expressão inválida";
-
   if (!isNotCalculable) {
+    handleAddingOperationsOnHistory();
     setDefaultStylingClasses();
     expressionInput.value = expressionResult.textContent;
     expressionResult.textContent = "";
     currentNumber = "";
+    return;
   }
+
+  expressionInput.value = "Expressão inválida";
+}
+
+function handleAddingOperationsOnHistory(operationData = null, index = null) {
+  if (!operationData) {
+    const dateFormatter = Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "long",
+    });
+
+    operationData = {
+      operationDate: dateFormatter.format(Date.now()),
+      expression: expressionInput.value,
+      result: expressionResult.textContent,
+    };
+
+    operations.push(operationData);
+    localStorage.setItem("devcalc:history", JSON.stringify(operations));
+  }
+
+  let operationInfo = createOperationInfo(operationData);
+
+  if (
+    index === 0 ||
+    operations.length === 1 ||
+    operations[operations.length - 2].operationDate !==
+      operationData.operationDate
+  ) {
+    const historyContent = createHistoryContent(operationData, operationInfo);
+    history.appendChild(historyContent);
+    return;
+  }
+
+  const operationsInfo = document.querySelector(".operations-info");
+  operationsInfo.appendChild(operationInfo);
+}
+
+function createOperationInfo(operationData) {
+  const operationInfo = document.createElement("div");
+
+  const performedExpression = document.createElement("p");
+  performedExpression.textContent = operationData.expression;
+
+  const expressionResult = document.createElement("p");
+  expressionResult.textContent = operationData.result;
+
+  operationInfo.appendChild(performedExpression);
+  operationInfo.appendChild(expressionResult);
+  return operationInfo;
+}
+
+function createHistoryContent(operationData, operationInfo) {
+  const historyContent = document.createElement("div");
+  historyContent.classList.add("history-content");
+
+  const operationsDate = document.createElement("h3");
+  operationsDate.textContent = operationData.operationDate;
+
+  const operationsInfo = document.createElement("div");
+  operationsInfo.classList.add("operations-info");
+
+  operationsInfo.appendChild(operationInfo);
+  historyContent.appendChild(operationsDate);
+  historyContent.append(operationsInfo);
+  return historyContent;
 }
 
 function handleFontSize(expression) {
