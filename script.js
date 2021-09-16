@@ -3,6 +3,7 @@ const expressionInput = document.querySelector("input");
 const expressionResult = document.querySelector("p");
 const modalOverlay = document.querySelector(".modal-overlay");
 const history = document.querySelector(".history-modal");
+const shortcuts = document.querySelector(".shortcuts-modal");
 
 let expressionOperators = [];
 let currentNumber = "";
@@ -30,7 +31,7 @@ function initializeInterface() {
   toggleImageSource(userTheme);
 }
 
-function handleKeyboardInteractions(event) {
+function handleKeyboardShortcuts(event) {
   if (event.key !== " " && (event.key == "," || !isNaN(Number(event.key)))) {
     addNumbersOnDisplay(expressionInput.value, event.key);
   } else {
@@ -82,6 +83,12 @@ function handleKeyboardInteractions(event) {
           }
 
           break;
+        case "a":
+          if (shortcuts.classList.value.includes("invisible")) {
+            handleShortcutsAccess();
+          }
+
+          break;
         case "Escape":
           if (!modalOverlay.classList.value.includes("invisible")) {
             handleModalState();
@@ -122,6 +129,7 @@ function handleModalState() {
 
   if (modalOverlay.classList.value.includes("invisible")) {
     history.classList.add("invisible");
+    shortcuts.classList.add("invisible");
   }
 }
 
@@ -133,6 +141,16 @@ function handleHistoryAccess() {
     handleOptionsBox();
   }
   history.classList.remove("invisible");
+}
+
+function handleShortcutsAccess() {
+  handleModalState();
+
+  const optionsBox = document.querySelector(".options-box");
+  if (!optionsBox.classList.value.includes("invisible")) {
+    handleOptionsBox();
+  }
+  shortcuts.classList.remove("invisible");
 }
 
 function toggleTheme() {

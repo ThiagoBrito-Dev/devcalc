@@ -208,7 +208,7 @@ div.options-box div button:hover::before {
   background-color: rgba(0, 0, 0, 0.35);
 }
 
-div.modal-overlay section.history-modal {
+div.modal-overlay section {
   width: 282px;
   max-height: 320px;
   overflow-y: auto;
@@ -219,11 +219,11 @@ div.modal-overlay section.history-modal {
   border-radius: 6px;
 }
 
-section.history-modal::-webkit-scrollbar {
+section::-webkit-scrollbar {
   width: 6px;
 }
 
-section.history-modal::-webkit-scrollbar-thumb {
+section::-webkit-scrollbar-thumb {
   border-radius: 4px;
   background: linear-gradient(
     var(--button-text),
@@ -231,7 +231,7 @@ section.history-modal::-webkit-scrollbar-thumb {
   );
 }
 
-section.history-modal header {
+section header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -301,6 +301,59 @@ div.operations-info div p:last-of-type::-webkit-scrollbar {
 div.operations-info div p:last-of-type {
   opacity: 0.9;
   margin-top: 2px;
+}
+
+div.modal-overlay section.shortcuts-modal {
+  width: min(1025px, 96.5%);
+  max-height: 425px;
+}
+
+section.shortcuts-modal div.shortcuts-content {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+div.shortcuts-content div.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 230px;
+  height: 160px;
+  padding: 16px;
+  overflow-y: auto;
+
+  background-color: var(--button-background);
+  border-radius: 2px;
+}
+
+div.card::-webkit-scrollbar {
+  width: 2px;
+}
+
+div.card::-webkit-scrollbar-thumb {
+  background-color: var(--calc-background);
+  border-radius: 4px;
+}
+
+div.card button {
+  font-size: 16px;
+  background-color: var(--calc-background);
+  color: var(--input-background);
+
+  padding: 10px 18px;
+  margin-bottom: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: default;
+}
+
+div.card p {
+  font-size: 18px;
+  color: var(--p-text);
+  text-align: center;
 }
 
 .icon {

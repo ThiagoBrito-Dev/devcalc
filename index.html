@@ -19,7 +19,7 @@
 
   <body
     onload="initializeInterface()"
-    onkeydown="handleKeyboardInteractions(event)"
+    onkeydown="handleKeyboardShortcuts(event)"
   >
     <main>
       <header>
@@ -75,7 +75,7 @@
 
             <div>
               <button onclick="handleHistoryAccess()">History</button>
-              <button>Atalhos</button>
+              <button onclick="handleShortcutsAccess()">Atalhos</button>
               <button>Example</button>
             </div>
           </div>
@@ -387,12 +387,132 @@
       </section>
     </main>
 
-    <div class="modal-overlay invisible">
+    <div class="modal-overlay">
       <section class="history-modal invisible">
         <header>
           <h2>History</h2>
           <button type="button" onclick="handleModalState()">X</button>
         </header>
+      </section>
+      <section class="shortcuts-modal">
+        <header>
+          <h2>Keyboard Shortcuts</h2>
+          <button type="button" onclick="handleModalState()">X</button>
+        </header>
+
+        <div class="shortcuts-content">
+          <div class="card">
+            <button>NUM</button>
+            <p>Adiciona o número pressionado ao display da expressão</p>
+          </div>
+
+          <div class="card">
+            <button>+</button>
+            <p>Insere o operador de adição ao display da expressão</p>
+          </div>
+
+          <div class="card">
+            <button>-</button>
+            <p>Insere o operador de subtração ao display da expressão</p>
+          </div>
+
+          <div class="card">
+            <button>*</button>
+            <p>Insere o operador de multiplicação ao display da expressão</p>
+          </div>
+
+          <div class="card">
+            <button>/</button>
+            <p>Insere o operador de divisão ao display da expressão</p>
+          </div>
+
+          <div class="card">
+            <button>^</button>
+            <p>Insere o operador de exponenciação ao display da expressão</p>
+          </div>
+
+          <div class="card">
+            <button>%</button>
+            <p>Insere o operador de porcentagem ao display da expressão</p>
+          </div>
+
+          <div class="card">
+            <button>R</button>
+            <p>
+              Altera o modo de exibição do resultado de funções trigonométricas
+              (seno, cosseno e tangente)
+            </p>
+          </div>
+
+          <div class="card">
+            <button>T</button>
+            <p>
+              Altera o tema da aplicação (de light para dark theme, e
+              vice-versa)
+            </p>
+          </div>
+
+          <div class="card">
+            <button>L</button>
+            <p>Realiza a limpeza completa do display da expressão</p>
+          </div>
+
+          <div class="card">
+            <button>C</button>
+            <p>
+              Altera o tipo de conversão numérica que será inserido no display
+              da expressão
+            </p>
+          </div>
+
+          <div class="card">
+            <button>O</button>
+            <p>Realiza a abertura, e o fechamento, da caixa de opções</p>
+          </div>
+
+          <div class="card">
+            <button>H</button>
+            <p>Acessa o histórico de operações e resultados da aplicação</p>
+          </div>
+
+          <div class="card">
+            <button>A</button>
+            <p>Acessa a página de informação acerca dos atalhos da aplicação</p>
+          </div>
+
+          <div class="card">
+            <button>P</button>
+            <p>Acessa a página de informação acerca dos atalhos da aplicação</p>
+          </div>
+
+          <div class="card">
+            <button>ESC</button>
+            <p>
+              Realiza o fechamento do modal (componente que envolve as páginas
+              alternativas da aplicação)
+            </p>
+          </div>
+
+          <div class="card">
+            <button>LEFT ALT</button>
+            <p>
+              Ativa/desativa o modo de desenvolvedor (calculadora científica)
+            </p>
+          </div>
+
+          <div class="card">
+            <button>BACKSPACE</button>
+            <p>Apaga o último caractere adicionado ao display da expressão</p>
+          </div>
+
+          <div class="card">
+            <button>ENTER</button>
+            <p>
+              Amplia o resultado da expressão e realiza o registro da operação
+              no histórico
+            </p>
+          </div>
+        </div>
       </section>
     </div>
 
