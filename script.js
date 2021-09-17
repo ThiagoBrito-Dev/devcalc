@@ -1,9 +1,15 @@
 const conversionMode = document.querySelector("#conversion-mode");
 const expressionInput = document.querySelector("input");
 const expressionResult = document.querySelector("p");
+
+const optionsBox = document.querySelector(".options-box");
 const modalOverlay = document.querySelector(".modal-overlay");
-const history = document.querySelector(".history-modal");
-const shortcuts = document.querySelector(".shortcuts-modal");
+const modal = document.querySelector(".modal-overlay section");
+const modalTitle = document.querySelector("#modal-title");
+const historyModalContent = document.querySelector(".history-modal-content");
+const shortcutsModalContent = document.querySelector(
+  ".shortcuts-modal-content"
+);
 
 let expressionOperators = [];
 let currentNumber = "";
@@ -78,13 +84,13 @@ function handleKeyboardShortcuts(event) {
           handleOptionsBox();
           break;
         case "h":
-          if (history.classList.value.includes("invisible")) {
+          if (historyModalContent.classList.value.includes("invisible")) {
             handleHistoryAccess();
           }
 
           break;
         case "a":
-          if (shortcuts.classList.value.includes("invisible")) {
+          if (shortcutsModalContent.classList.value.includes("invisible")) {
             handleShortcutsAccess();
           }
 
@@ -124,33 +130,47 @@ function handleOptionsBox() {
   }
 }
 
-function handleModalState() {
-  modalOverlay.classList.toggle("invisible");
+function clearModal() {
+  modal.classList.value = "";
+  modalTitle.textContent = "";
+  historyModalContent.classList.add("invisible");
+  shortcutsModalContent.classList.add("invisible");
+}
 
-  if (modalOverlay.classList.value.includes("invisible")) {
-    history.classList.add("invisible");
-    shortcuts.classList.add("invisible");
+function handleModalState() {
+  if (!modalOverlay.classList.value.includes("invisible")) {
+    clearModal();
   }
+
+  modalOverlay.classList.toggle("invisible");
 }
 
 function handleHistoryAccess() {
-  handleModalState();
+  !modalOverlay.classList.value.includes("invisible")
+    ? clearModal()
+    : handleModalState();
 
-  const optionsBox = document.querySelector(".options-box");
   if (!optionsBox.classList.value.includes("invisible")) {
     handleOptionsBox();
   }
-  history.classList.remove("invisible");
+
+  modal.classList.add("history-modal");
+  modalTitle.textContent = "History";
+  historyModalContent.classList.remove("invisible");
 }
 
 function handleShortcutsAccess() {
-  handleModalState();
+  !modalOverlay.classList.value.includes("invisible")
+    ? clearModal()
+    : handleModalState();
 
-  const optionsBox = document.querySelector(".options-box");
   if (!optionsBox.classList.value.includes("invisible")) {
     handleOptionsBox();
   }
-  shortcuts.classList.remove("invisible");
+
+  modal.classList.add("shortcuts-modal");
+  modalTitle.textContent = "Keyboard Shortcuts";
+  shortcutsModalContent.classList.remove("invisible");
 }
 
 function toggleTheme() {
@@ -551,12 +571,13 @@ function handleAddingOperationsOnHistory(operationData = null, index = null) {
     operations[operations.length - 2].operationDate !==
       operationData.operationDate
   ) {
-    const historyContent = createHistoryContent(operationData, operationInfo);
-    history.appendChild(historyContent);
+    createContentElements(operationData, operationInfo);
     return;
   }
 
-  const operationsInfo = document.querySelector(".operations-info");
+  const operationsInfo = document.querySelector(
+    ".history-modal-content div:last-of-type .operations-info"
+  );
   operationsInfo.appendChild(operationInfo);
 }
 
@@ -574,9 +595,8 @@ function createOperationInfo(operationData) {
   return operationInfo;
 }
 
-function createHistoryContent(operationData, operationInfo) {
-  const historyContent = document.createElement("div");
-  historyContent.classList.add("history-content");
+function createContentElements(operationData, operationInfo) {
+  const contentContainer = document.createElement("div");
 
   const operationsDate = document.createElement("h3");
   operationsDate.textContent = operationData.operationDate;
@@ -585,9 +605,9 @@ function createHistoryContent(operationData, operationInfo) {
   operationsInfo.classList.add("operations-info");
 
   operationsInfo.appendChild(operationInfo);
-  historyContent.appendChild(operationsDate);
-  historyContent.append(operationsInfo);
-  return historyContent;
+  contentContainer.appendChild(operationsDate);
+  contentContainer.appendChild(operationsInfo);
+  historyModalContent.appendChild(contentContainer);
 }
 
 function handleFontSize(expression) {

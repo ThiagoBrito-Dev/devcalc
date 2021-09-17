@@ -214,7 +214,7 @@ div.modal-overlay section {
   overflow-y: auto;
   overflow-x: hidden;
 
-  padding: 12px 16px;
+  padding: 12px;
   background-color: var(--input-background);
   border-radius: 6px;
 }
@@ -254,22 +254,22 @@ header button:active {
   transform: scale(0.95);
 }
 
-section.history-modal div.history-content {
+div.history-modal-content > div {
   display: flex;
 }
 
-section.history-modal div.history-content + div.history-content {
+div.history-modal-content > div + div {
   margin-top: 16px;
 }
 
-div.history-content h3 {
+div.history-modal-content h3 {
   min-width: 115px;
   height: fit-content;
   color: var(--button-text);
   font-size: 16px;
 }
 
-div.history-content div.operations-info {
+div.history-modal-content div.operations-info {
   margin-left: 20px;
   padding-left: 20px;
   border-left: 2px dashed var(--colorized-button-background);
@@ -287,10 +287,11 @@ div.operations-info div + div {
 
 div.operations-info div p:first-of-type,
 div.operations-info div p:last-of-type {
-  cursor: default;
-  width: 94px;
+  width: 96.5px;
+  white-space: nowrap;
   overflow-x: auto;
   border-radius: 8px;
+  cursor: default;
 }
 
 div.operations-info div p:first-of-type::-webkit-scrollbar,
@@ -308,14 +309,14 @@ div.modal-overlay section.shortcuts-modal {
   max-height: 425px;
 }
 
-section.shortcuts-modal div.shortcuts-content {
+.shortcuts-modal-content {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
   gap: 12px;
 }
 
-div.shortcuts-content div.card {
+div.shortcuts-modal-content div.card {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -343,7 +344,7 @@ div.card button {
   background-color: var(--calc-background);
   color: var(--input-background);
 
-  padding: 10px 18px;
+  padding: 10px 16px;
   margin-bottom: 16px;
   border: none;
   border-radius: 4px;

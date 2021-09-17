@@ -387,20 +387,15 @@
       </section>
     </main>
 
-    <div class="modal-overlay">
-      <section class="history-modal invisible">
+    <div class="modal-overlay invisible">
+      <section class="">
         <header>
-          <h2>History</h2>
-          <button type="button" onclick="handleModalState()">X</button>
-        </header>
-      </section>
-      <section class="shortcuts-modal">
-        <header>
-          <h2>Keyboard Shortcuts</h2>
+          <h2 id="modal-title"></h2>
           <button type="button" onclick="handleModalState()">X</button>
         </header>
 
-        <div class="shortcuts-content">
+        <div class="history-modal-content invisible"></div>
+        <div class="shortcuts-modal-content invisible">
           <div class="card">
             <button>NUM</button>
             <p>Adiciona o número pressionado ao display da expressão</p>
@@ -434,6 +429,14 @@
           <div class="card">
             <button>%</button>
             <p>Insere o operador de porcentagem ao display da expressão</p>
+          </div>
+
+          <div class="card">
+            <button>SHIFT + SCROLL</button>
+            <p>
+              Manipula a área de visão de expressões que excedem o tamanho do
+              display
+            </p>
           </div>
 
           <div class="card">
