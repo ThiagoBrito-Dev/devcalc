@@ -75,8 +75,10 @@
 
             <div>
               <button onclick="handleHistoryAccess()">History</button>
-              <button onclick="handleShortcutsAccess()">Atalhos</button>
-              <button>Example</button>
+              <button onclick="handleShortcutsAccess()">Shortcuts</button>
+              <button onclick="handlePersonalizationAccess()">
+                Personalize
+              </button>
             </div>
           </div>
         </div>
@@ -485,7 +487,7 @@
 
           <div class="card">
             <button>P</button>
-            <p>Acessa a página de informação acerca dos atalhos da aplicação</p>
+            <p>Acessa a página de personalização do tema da aplicação</p>
           </div>
 
           <div class="card">
@@ -515,6 +517,48 @@
               no histórico
             </p>
           </div>
+        </div>
+        <div class="personalization-modal-content invisible">
+          <table>
+            <caption>
+              Criação de tema personalizado
+            </caption>
+
+            <thead>
+              <tr>
+                <th scope="col">Descrição</th>
+                <th scope="col">Cor atual</th>
+                <th scope="col">Nova cor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  Cor primária 1 - Aplicada ao fundo dos botões de destaque
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    name="current-color"
+                    class="current-color"
+                    readonly
+                  />
+                </td>
+                <td>
+                  <div>
+                    <input type="text" id="fake-color-input" />
+                    <input
+                      type="color"
+                      name="new-color"
+                      id="color-input"
+                      value="#000000"
+                      class="untraceable"
+                    />
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
     </div>

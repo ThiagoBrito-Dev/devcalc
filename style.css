@@ -357,6 +357,87 @@ div.card p {
   text-align: center;
 }
 
+div.modal-overlay section.personalization-modal {
+  width: min(96.5%, 800px);
+  max-height: 340px;
+}
+
+section.personalization-modal div.personalization-modal-content {
+  display: flex;
+  justify-content: center;
+}
+
+div.personalization-modal-content table {
+  padding: 8px 10px;
+  background-color: var(--calc-background);
+  width: 90%;
+  border: 2.5px solid var(--p-text);
+  border-spacing: 0 6px;
+  border-radius: 12px;
+}
+
+table caption {
+  margin-bottom: 6px;
+  color: var(--p-text);
+}
+
+table thead,
+table tbody {
+  color: var(--input-background);
+  background-color: var(--header-line);
+}
+
+thead tr th:first-child,
+tbody tr td:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+thead tr th:last-child,
+tbody tr td:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+thead tr th,
+tbody tr td {
+  padding: 10px;
+}
+
+tbody tr td:nth-child(2),
+tbody tr td:last-child {
+  text-align: center;
+}
+
+tbody tr td input[type="text"] {
+  border: 0;
+  border-radius: 50%;
+}
+
+tbody tr td input.current-color {
+  width: 45px;
+  height: 45px;
+  background-color: #b8d1e0;
+  outline: none;
+  cursor: default;
+}
+
+tbody tr td:last-child div {
+  position: relative;
+  width: 45px;
+  height: 45px;
+}
+
+tbody tr td div input:first-child {
+  background-color: #000;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+tbody tr td div input[type="color"] {
+  left: 0;
+  top: 0;
+}
+
 .icon {
   width: 18.5px;
   height: 18.5px;
@@ -505,6 +586,15 @@ body main section div div div button:active {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.untraceable {
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  margin: -1px;
+  overflow: hidden;
+  border-width: 0;
 }
 
 .invisible {

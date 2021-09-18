@@ -10,6 +10,9 @@ const historyModalContent = document.querySelector(".history-modal-content");
 const shortcutsModalContent = document.querySelector(
   ".shortcuts-modal-content"
 );
+const personalizationModalContent = document.querySelector(
+  ".personalization-modal-content"
+);
 
 let expressionOperators = [];
 let currentNumber = "";
@@ -95,6 +98,14 @@ function handleKeyboardShortcuts(event) {
           }
 
           break;
+        case "p":
+          if (
+            personalizationModalContent.classList.value.includes("invisible")
+          ) {
+            handlePersonalizationAccess();
+          }
+
+          break;
         case "Escape":
           if (!modalOverlay.classList.value.includes("invisible")) {
             handleModalState();
@@ -135,6 +146,7 @@ function clearModal() {
   modalTitle.textContent = "";
   historyModalContent.classList.add("invisible");
   shortcutsModalContent.classList.add("invisible");
+  personalizationModalContent.classList.add("invisible");
 }
 
 function handleModalState() {
@@ -172,6 +184,30 @@ function handleShortcutsAccess() {
   modalTitle.textContent = "Keyboard Shortcuts";
   shortcutsModalContent.classList.remove("invisible");
 }
+
+function handlePersonalizationAccess() {
+  !modalOverlay.classList.value.includes("invisible")
+    ? clearModal()
+    : handleModalState();
+
+  if (!optionsBox.classList.value.includes("invisible")) {
+    handleOptionsBox();
+  }
+
+  modal.classList.add("personalization-modal");
+  modalTitle.textContent = "Personalization";
+  personalizationModalContent.classList.remove("invisible");
+}
+
+// function triggerColorInput() {
+//   const fakeColorInput = document.querySelector("#fake-color-input");
+//   const colorInput = document.querySelector("#color-input");
+
+//   colorInput.click();
+//   colorInput.addEventListener("change", () => {
+//     fakeColorInput.style.backgroundColor = colorInput.value;
+//   });
+// }
 
 function toggleTheme() {
   applyNewStylingClasses();
@@ -568,15 +604,19 @@ function handleAddingOperationsOnHistory(operationData = null, index = null) {
   if (
     index === 0 ||
     operations.length === 1 ||
-    operations[operations.length - 2].operationDate !==
-      operationData.operationDate
+    (index === null &&
+      operations[operations.length - 2].operationDate !==
+        operationData.operationDate) ||
+    (index &&
+      document.querySelector("div.history-modal-content div:last-of-type h3")
+        .textContent != operationData.operationDate)
   ) {
     createContentElements(operationData, operationInfo);
     return;
   }
 
   const operationsInfo = document.querySelector(
-    ".history-modal-content div:last-of-type .operations-info"
+    "div.history-modal-content div:last-of-type div.operations-info"
   );
   operationsInfo.appendChild(operationInfo);
 }
