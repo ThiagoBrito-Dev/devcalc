@@ -22,7 +22,7 @@ let firstPosition;
 let operations;
 
 function initializeInterface() {
-  operations = JSON.parse(localStorage.getItem("devcalc:history")) || [];
+  operations = JSON.parse(localStorage.getItem("devcalc-history")) || [];
 
   if (operations.length) {
     operations.forEach((operation, index) => {
@@ -30,7 +30,7 @@ function initializeInterface() {
     });
   }
 
-  let userTheme = localStorage.getItem("userTheme");
+  let userTheme = localStorage.getItem("devcalc-userTheme");
 
   if (userTheme === null) {
     userTheme = "";
@@ -38,6 +38,7 @@ function initializeInterface() {
 
   document.body.classList = userTheme;
   toggleImageSource(userTheme);
+  handleCurrentInputColor();
 }
 
 function handleKeyboardShortcuts(event) {
@@ -128,7 +129,6 @@ function handleKeyboardShortcuts(event) {
 
 function handleOptionsBox() {
   const body = document.querySelector("body");
-  const optionsBox = document.querySelector(".options-box");
 
   if (optionsBox.classList.value.includes("invisible")) {
     optionsBox.classList.remove("invisible");
@@ -149,6 +149,16 @@ function clearModal() {
   personalizationModalContent.classList.add("invisible");
 }
 
+function handleModalVisibilityConflicts() {
+  !modalOverlay.classList.value.includes("invisible")
+    ? clearModal()
+    : handleModalState();
+
+  if (!optionsBox.classList.value.includes("invisible")) {
+    handleOptionsBox();
+  }
+}
+
 function handleModalState() {
   if (!modalOverlay.classList.value.includes("invisible")) {
     clearModal();
@@ -158,45 +168,66 @@ function handleModalState() {
 }
 
 function handleHistoryAccess() {
-  !modalOverlay.classList.value.includes("invisible")
-    ? clearModal()
-    : handleModalState();
-
-  if (!optionsBox.classList.value.includes("invisible")) {
-    handleOptionsBox();
-  }
-
+  handleModalVisibilityConflicts();
   modal.classList.add("history-modal");
   modalTitle.textContent = "History";
   historyModalContent.classList.remove("invisible");
 }
 
 function handleShortcutsAccess() {
-  !modalOverlay.classList.value.includes("invisible")
-    ? clearModal()
-    : handleModalState();
-
-  if (!optionsBox.classList.value.includes("invisible")) {
-    handleOptionsBox();
-  }
-
+  handleModalVisibilityConflicts();
   modal.classList.add("shortcuts-modal");
   modalTitle.textContent = "Keyboard Shortcuts";
   shortcutsModalContent.classList.remove("invisible");
 }
 
 function handlePersonalizationAccess() {
-  !modalOverlay.classList.value.includes("invisible")
-    ? clearModal()
-    : handleModalState();
-
-  if (!optionsBox.classList.value.includes("invisible")) {
-    handleOptionsBox();
-  }
-
+  handleModalVisibilityConflicts();
   modal.classList.add("personalization-modal");
   modalTitle.textContent = "Personalization";
   personalizationModalContent.classList.remove("invisible");
+}
+
+function handleCurrentInputColor() {
+  const cssVariables = [
+    "--calc-background",
+    "--mode-button-text",
+    "--mode-button-background",
+    "--header-line",
+    "--input-text",
+    "--input-background",
+    "--p-text",
+    "--button-text",
+    "--button-background",
+    "--button-background-effect",
+    "--colorized-button-background",
+    "--button-border",
+  ];
+  const bodyTheme = document.body.classList.value.includes("dark-theme")
+    ? ".dark-theme"
+    : "body";
+
+  cssVariables.forEach((variable, index) => {
+    const color = getComputedStyle(
+      document.querySelector(bodyTheme)
+    ).getPropertyValue(variable);
+    const currentColorData = document.querySelector(
+      `table tbody tr:nth-child(${index + 1}) td.current-color-data`
+    );
+
+    const currentColorInput = document.createElement("input");
+    currentColorInput.setAttribute("type", "text");
+    currentColorInput.setAttribute("readonly", "true");
+    currentColorInput.classList.add("current-color");
+    currentColorInput.style.backgroundColor = color;
+
+    currentColorData.childNodes.length
+      ? currentColorData.replaceChild(
+          currentColorInput,
+          currentColorData.querySelector("input.current-color")
+        )
+      : currentColorData.appendChild(currentColorInput);
+  });
 }
 
 // function triggerColorInput() {
@@ -215,8 +246,9 @@ function toggleTheme() {
 
   const currentTheme = document.body.classList.value;
   toggleImageSource(currentTheme);
+  handleCurrentInputColor();
 
-  localStorage.setItem("userTheme", currentTheme);
+  localStorage.setItem("devcalc-userTheme", currentTheme);
 }
 
 function toggleImageSource(theme) {
@@ -596,7 +628,7 @@ function handleAddingOperationsOnHistory(operationData = null, index = null) {
     };
 
     operations.push(operationData);
-    localStorage.setItem("devcalc:history", JSON.stringify(operations));
+    localStorage.setItem("devcalc-history", JSON.stringify(operations));
   }
 
   let operationInfo = createOperationInfo(operationData);
