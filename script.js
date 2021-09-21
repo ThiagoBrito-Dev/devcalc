@@ -230,15 +230,26 @@ function handleCurrentInputColor() {
   });
 }
 
-// function triggerColorInput() {
-//   const fakeColorInput = document.querySelector("#fake-color-input");
-//   const colorInput = document.querySelector("#color-input");
+function triggerColorInput(event) {
+  const fakeColorInput = event.target;
+  const colorInput = fakeColorInput.nextElementSibling;
 
-//   colorInput.click();
-//   colorInput.addEventListener("change", () => {
-//     fakeColorInput.style.backgroundColor = colorInput.value;
-//   });
-// }
+  colorInput.click();
+  colorInput.addEventListener("change", () => {
+    fakeColorInput.style.backgroundColor = colorInput.value;
+  });
+}
+
+function applyDefaultColorValue() {
+  const colorInputs = document.getElementsByName("new-color");
+
+  colorInputs.forEach((input) => {
+    const fakeColorInput = input.previousElementSibling;
+
+    fakeColorInput.style.backgroundColor = "#000000";
+    input.value = "#000000";
+  });
+}
 
 function toggleTheme() {
   applyNewStylingClasses();
