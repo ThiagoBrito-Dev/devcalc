@@ -30,14 +30,16 @@ function initializeInterface() {
     });
   }
 
-  let userTheme = localStorage.getItem("devcalc-userTheme");
-
+  let userTheme = localStorage.getItem("devcalc-userDefaultTheme");
   if (userTheme === null) {
     userTheme = "";
   }
 
-  document.body.classList = userTheme;
-  toggleImageSource(userTheme);
+  const attributeName =
+    userTheme !== "" && userTheme != "dark-theme" ? "style" : "class";
+  document.body.setAttribute(attributeName, userTheme);
+
+  toggleThemeIcon(userTheme);
   handleCurrentInputColor();
 }
 
@@ -251,33 +253,135 @@ function applyDefaultColorValue() {
   });
 }
 
-function toggleTheme() {
-  applyNewStylingClasses();
-  document.body.classList.toggle("dark-theme");
+function showPersonalizedThemePreview() {
+  modalOverlay.classList.add("invisible");
 
-  const currentTheme = document.body.classList.value;
-  toggleImageSource(currentTheme);
-  handleCurrentInputColor();
+  const colorInputs = document.getElementsByName("new-color");
+  const cssVariables = [
+    "--calc-background",
+    "--mode-button-text",
+    "--mode-button-background",
+    "--header-line",
+    "--input-text",
+    "--input-background",
+    "--p-text",
+    "--button-text",
+    "--button-background",
+    "--button-background-effect",
+    "--colorized-button-background",
+    "--button-border",
+  ];
 
-  localStorage.setItem("devcalc-userTheme", currentTheme);
+  colorInputs.forEach((input, index) => {
+    document.body.style.setProperty(cssVariables[index], input.value);
+  });
+
+  document.body.addEventListener(
+    "mouseup",
+    stopShowingPersonalizedThemePreview
+  );
 }
 
-function toggleImageSource(theme) {
-  const arrowLeft = document.querySelector("#arrow-left");
+function stopShowingPersonalizedThemePreview() {
+  modalOverlay.classList.remove("invisible");
+  document.body.removeEventListener(
+    "mouseup",
+    stopShowingPersonalizedThemePreview
+  );
+
+  const userTheme = localStorage.getItem("devcalc-userDefaultTheme");
+  document.body.removeAttribute("style");
+
+  if (userTheme !== "" || userTheme != "dark-theme") {
+    document.body.setAttribute("style", userTheme);
+  }
+}
+
+function createPersonalizedTheme() {
+  const colorInputs = document.getElementsByName("new-color");
+  const cssVariables = [
+    "--calc-background",
+    "--mode-button-text",
+    "--mode-button-background",
+    "--header-line",
+    "--input-text",
+    "--input-background",
+    "--p-text",
+    "--button-text",
+    "--button-background",
+    "--button-background-effect",
+    "--colorized-button-background",
+    "--button-border",
+  ];
+  const isValidTheme = handleValidThemes(colorInputs);
+
+  if (isValidTheme) {
+    colorInputs.forEach((input, index) => {
+      document.body.style.setProperty(cssVariables[index], input.value);
+    });
+
+    const themeIcon = document.querySelector("#theme-icon");
+    themeIcon.setAttribute("class", "fas fa-user-circle");
+    handleCurrentInputColor();
+    applyDefaultColorValue();
+
+    localStorage.setItem(
+      "devcalc-userCustomTheme",
+      document.body.getAttribute("style")
+    );
+  }
+}
+
+function handleValidThemes(colorInputs) {
+  let isValidTheme = false;
+  let firstColor;
+
+  colorInputs.forEach((input, index) => {
+    if (index === 0) {
+      firstColor = input.value;
+    } else if (firstColor !== input.value) {
+      isValidTheme = true;
+    }
+  });
+
+  return isValidTheme;
+}
+
+function toggleTheme() {
+  applyNewStylingClasses();
+  let currentTheme = "";
+
+  if (document.body.getAttribute("style")) {
+    document.body.removeAttribute("style");
+  } else {
+    document.body.classList.toggle("dark-theme");
+
+    if (
+      document.body.classList.value == "" &&
+      localStorage.getItem("devcalc-userCustomTheme")
+    ) {
+      currentTheme = localStorage.getItem("devcalc-userCustomTheme");
+      document.body.style = currentTheme;
+    } else {
+      currentTheme = document.body.classList.value;
+    }
+  }
+
+  localStorage.setItem("devcalc-userDefaultTheme", currentTheme);
+  toggleThemeIcon(currentTheme);
+  handleCurrentInputColor();
+}
+
+function toggleThemeIcon(theme) {
   const themeIcon = document.querySelector("#theme-icon");
-  const optionsIcon = document.querySelector("#options-icon");
-  const deleteIcon = document.querySelector("#delete-icon");
+  const iconClass =
+    theme == "dark-theme"
+      ? "fas fa-sun"
+      : theme == ""
+      ? "fas fa-moon"
+      : "fas fa-user-circle";
 
-  const isDarkTheme = theme == "dark-theme";
-
-  arrowLeft.src = isDarkTheme
-    ? "assets/arrow-right-white.png"
-    : "assets/arrow-right.png";
-  themeIcon.src = isDarkTheme ? "assets/sun.png" : "assets/moon.png";
-  optionsIcon.src = isDarkTheme
-    ? "assets/options-white.png"
-    : "assets/options.png";
-  deleteIcon.src = isDarkTheme ? "assets/delete-dark.png" : "assets/delete.png";
+  themeIcon.setAttribute("class", iconClass);
 }
 
 function toggleResultMode() {
