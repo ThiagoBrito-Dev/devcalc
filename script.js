@@ -37,8 +37,8 @@ function initializeInterface() {
 
   const attributeName =
     userTheme !== "" && userTheme != "dark-theme" ? "style" : "class";
-  document.body.setAttribute(attributeName, userTheme);
 
+  document.body.setAttribute(attributeName, userTheme);
   toggleThemeIcon(userTheme);
   handleCurrentInputColor();
 }
@@ -192,28 +192,28 @@ function handlePersonalizationAccess() {
 
 function handleCurrentInputColor() {
   const cssVariables = [
-    "--calc-background",
-    "--mode-button-text",
-    "--mode-button-background",
-    "--header-line",
-    "--input-text",
-    "--input-background",
-    "--p-text",
-    "--button-text",
-    "--button-background",
-    "--button-background-effect",
-    "--colorized-button-background",
-    "--button-border",
+    "--calc-background", // primary
+    "--input-text", // primary
+    "--input-background", // primary
+    "--p-text", // primary
+    "--button-text", // primary
+    "--button-background", // primary
+    "--mode-button-text", // secondary
+    "--mode-button-background", // secondary
+    "--colorized-button-background", // secondary
+    "--header-line", // tertiary
+    "--button-background-effect", // tertiary
+    "--button-border", // tertiary
   ];
   const bodyTheme = document.body.classList.value.includes("dark-theme")
     ? ".dark-theme"
     : "body";
 
   cssVariables.forEach((variable, index) => {
-    const color = getComputedStyle(
+    const currentColor = getComputedStyle(
       document.querySelector(bodyTheme)
     ).getPropertyValue(variable);
-    const currentColorData = document.querySelector(
+    const currentColorTableData = document.querySelector(
       `table tbody tr:nth-child(${index + 1}) td.current-color-data`
     );
 
@@ -221,15 +221,52 @@ function handleCurrentInputColor() {
     currentColorInput.setAttribute("type", "text");
     currentColorInput.setAttribute("readonly", "true");
     currentColorInput.classList.add("current-color");
-    currentColorInput.style.backgroundColor = color;
+    currentColorInput.classList.add("has-transition");
+    currentColorInput.style.backgroundColor = currentColor;
 
-    currentColorData.childNodes.length
-      ? currentColorData.replaceChild(
+    currentColorInput.addEventListener(
+      "dblclick",
+      copyCurrentColorToNewColorField
+    );
+
+    currentColorTableData.childNodes.length
+      ? currentColorTableData.replaceChild(
           currentColorInput,
-          currentColorData.querySelector("input.current-color")
+          currentColorTableData.querySelector("input.current-color")
         )
-      : currentColorData.appendChild(currentColorInput);
+      : currentColorTableData.appendChild(currentColorInput);
   });
+}
+
+function copyCurrentColorToNewColorField(event) {
+  const unformattedCurrentColor = event.target.style.backgroundColor;
+  const splittedCurrentColor = unformattedCurrentColor
+    .replace(/[^0-9\,]/g, "")
+    .split(",");
+  let formattedCurrentColor = "#";
+
+  splittedCurrentColor.forEach((colorChannelValue) => {
+    let convertedColorChannelValue = calculateConversions(
+      "Hex",
+      colorChannelValue
+    );
+
+    if (convertedColorChannelValue.length % 2 === 1) {
+      convertedColorChannelValue = "0" + convertedColorChannelValue;
+    }
+
+    formattedCurrentColor += convertedColorChannelValue;
+  });
+
+  const targetParentSibling = event.target.parentElement.nextElementSibling;
+  const fakeNewColorInput =
+    targetParentSibling.querySelector("input[type='text']");
+  const newColorInput = targetParentSibling.querySelector(
+    "input[type='color']"
+  );
+
+  fakeNewColorInput.style.backgroundColor = formattedCurrentColor;
+  newColorInput.value = formattedCurrentColor;
 }
 
 function triggerColorInput(event) {
@@ -259,16 +296,16 @@ function showPersonalizedThemePreview() {
   const colorInputs = document.getElementsByName("new-color");
   const cssVariables = [
     "--calc-background",
-    "--mode-button-text",
-    "--mode-button-background",
-    "--header-line",
     "--input-text",
     "--input-background",
     "--p-text",
     "--button-text",
     "--button-background",
-    "--button-background-effect",
+    "--mode-button-text",
+    "--mode-button-background",
     "--colorized-button-background",
+    "--header-line",
+    "--button-background-effect",
     "--button-border",
   ];
 
@@ -301,16 +338,16 @@ function createPersonalizedTheme() {
   const colorInputs = document.getElementsByName("new-color");
   const cssVariables = [
     "--calc-background",
-    "--mode-button-text",
-    "--mode-button-background",
-    "--header-line",
     "--input-text",
     "--input-background",
     "--p-text",
     "--button-text",
     "--button-background",
-    "--button-background-effect",
+    "--mode-button-text",
+    "--mode-button-background",
     "--colorized-button-background",
+    "--header-line",
+    "--button-background-effect",
     "--button-border",
   ];
   const isValidTheme = handleValidThemes(colorInputs);
@@ -424,16 +461,21 @@ function addConversionModesOnInput() {
 }
 
 function toggleDevMode() {
+  const calcHeader = document.querySelector("main header");
+  const actionsContainer = document.querySelector(
+    ".expression-actions-container"
+  );
   const topContainer = document.querySelector(".dev-mode-top-container");
-  const conversionContainer = document.querySelector(".conversion-container");
   const sideContainer = document.querySelector(".dev-mode-side-container");
 
-  if (conversionContainer.classList.value.includes("invisible")) {
+  if (actionsContainer.classList.value.includes("invisible")) {
     conversionMode.textContent = "BIN";
   }
 
+  calcHeader.classList.toggle("space-between");
   topContainer.classList.toggle("invisible");
-  conversionContainer.classList.toggle("invisible");
+  actionsContainer.classList.toggle("invisible");
+  actionsContainer.classList.toggle("space-between");
   expressionInput.classList.toggle("stretch");
   sideContainer.classList.toggle("invisible");
 
@@ -605,8 +647,8 @@ function addCharactersOnDisplay(expression, inputChar) {
     }
 
     if (
-      (lastChar == "π" && inputChar == "π") ||
-      (lastChar == "e" && inputChar == "e")
+      (lastChar == "π" && (inputChar == "π" || inputChar == "e")) ||
+      (lastChar == "e" && (inputChar == "e" || inputChar == "π"))
     ) {
       return;
     }
@@ -717,6 +759,8 @@ function handleSignRule(lastChar, expressionArray, operator) {
 }
 
 function focalizeResult() {
+  expressionOperators = [];
+
   if (!isNotCalculable) {
     handleAddingOperationsOnHistory();
     setDefaultStylingClasses();
@@ -860,6 +904,7 @@ function handleCalculationResult(isInvalidExpression) {
       expression = expressionInput.value.replace(/\./g, "").replace(/\,/g, ".");
 
       const numbersArray = handleNumbersArray(expression);
+      console.log("Array de números: ", numbersArray);
       let result;
 
       for (number in numbersArray) {
@@ -1131,13 +1176,8 @@ function handleSeparateCalculations(expression) {
       );
     }
 
-    console.log("Parte da expressão: " + partOfExpression);
-    console.log("Conteúdo ANTES: " + expressionPartContent);
-
     if (expressionPartContent.indexOf("(") !== -1) {
-      console.log("CHAMOU----------------------------");
       expressionPartContent = handleSeparateCalculations(expressionPartContent);
-      console.log("TERMINOU--------------------------");
     }
 
     if (
@@ -1163,7 +1203,6 @@ function handleSeparateCalculations(expression) {
             expressionPartContent
           );
 
-          console.log("Resultado da conversão: " + conversionResult);
           newExpression = newExpression.replace(
             partOfExpression,
             conversionResult
@@ -1174,7 +1213,6 @@ function handleSeparateCalculations(expression) {
             expressionPartContent
           );
 
-          console.log("Resultado do cálculo: " + result);
           newExpression = newExpression.replace(partOfExpression, result);
         }
       } else {
@@ -1183,8 +1221,6 @@ function handleSeparateCalculations(expression) {
           expressionPartContent
         );
       }
-
-      console.log("Nova expressão: " + newExpression);
     } else {
       const numbersArray = getNumbersArray(expressionPartContent, operators);
       let result;
@@ -1192,8 +1228,6 @@ function handleSeparateCalculations(expression) {
       for (let number in numbersArray) {
         result = calculateResult(numbersArray, number, operators, result);
       }
-
-      console.log("Resultado ANTES: " + result);
 
       if (currentMode) {
         if (result) {
@@ -1207,9 +1241,7 @@ function handleSeparateCalculations(expression) {
         }
       }
 
-      console.log("Resultado DEPOIS: " + result);
       newExpression = newExpression.replace(partOfExpression, result);
-      console.log("Nova expressão: " + newExpression);
     }
 
     count++;
@@ -1357,6 +1389,10 @@ function calculateUnaryMathOperators(expression) {
           const startIndex = expressionArray.indexOf("√");
           const nextIndex = Number(char) + 1;
           let slicedExpression = expression.slice(nextIndex);
+
+          // if (slicedExpression.indexOf("√") !== -1) {
+          //   slicedExpression = calculateUnaryMathOperators(slicedExpression);
+          // }
 
           if (slicedExpression) {
             let expressionPartContent = "";

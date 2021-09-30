@@ -32,7 +32,7 @@
   >
     <main>
       <header>
-        <div class="expression-actions-container">
+        <div class="expression-actions-container invisible">
           <div>
             <button
               type="button"
@@ -96,7 +96,7 @@
         <div>
           <input
             type="text"
-            class="stretch"
+            class=""
             aria-label="Expressão/resultado"
             tabindex="-1"
             placeholder="0"
@@ -105,7 +105,7 @@
           <p class="invisible"></p>
         </div>
         <div class="buttons-wrapper">
-          <div class="dev-mode-top-container">
+          <div class="dev-mode-top-container invisible">
             <div class="left-column-top-row">
               <div>
                 <button
@@ -350,7 +350,7 @@
               </button>
             </div>
           </div>
-          <div class="dev-mode-side-container">
+          <div class="dev-mode-side-container invisible">
             <div>
               <button
                 type="button"
@@ -528,217 +528,218 @@
           </div>
         </div>
         <div class="personalization-modal-content invisible">
-          <table>
-            <caption>
-              Criação de tema personalizado
-            </caption>
+          <div class="table-container">
+            <table>
+              <caption>
+                Criação de tema personalizado
+              </caption>
 
-            <thead>
-              <tr>
-                <th scope="col"></th>
-                <th scope="col">Descrição</th>
-                <th scope="col">Cor atual</th>
-                <th scope="col">Nova cor</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">Cor primária 1</th>
-                <td>Aplicada ao fundo da calculadora</td>
-                <td class="current-color-data"></td>
-                <td>
-                  <div>
-                    <input type="text" onclick="triggerColorInput(event)" />
-                    <input
-                      type="color"
-                      name="new-color"
-                      value="#000000"
-                      class="untraceable"
-                    />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Cor secundária 1</th>
-                <td>Aplicada aos textos dos botões superiores</td>
-                <td class="current-color-data"></td>
-                <td>
-                  <div>
-                    <input type="text" onclick="triggerColorInput(event)" />
-                    <input
-                      type="color"
-                      name="new-color"
-                      value="#000000"
-                      class="untraceable"
-                    />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Cor secundária 2</th>
-                <td>Aplicada ao fundo dos botões superiores</td>
-                <td class="current-color-data"></td>
-                <td>
-                  <div>
-                    <input type="text" onclick="triggerColorInput(event)" />
-                    <input
-                      type="color"
-                      name="new-color"
-                      value="#000000"
-                      class="untraceable"
-                    />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Cor terciária 1</th>
-                <td>Aplicada às linhas de separação de sessões</td>
-                <td class="current-color-data"></td>
-                <td>
-                  <div>
-                    <input type="text" onclick="triggerColorInput(event)" />
-                    <input
-                      type="color"
-                      name="new-color"
-                      value="#000000"
-                      class="untraceable"
-                    />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Cor primária 2</th>
-                <td>Aplicada ao texto do display da expressão</td>
-                <td class="current-color-data"></td>
-                <td>
-                  <div>
-                    <input type="text" onclick="triggerColorInput(event)" />
-                    <input
-                      type="color"
-                      name="new-color"
-                      value="#000000"
-                      class="untraceable"
-                    />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Cor primária 3</th>
-                <td>Aplicada ao fundo do display da expressão</td>
-                <td class="current-color-data"></td>
-                <td>
-                  <div>
-                    <input type="text" onclick="triggerColorInput(event)" />
-                    <input
-                      type="color"
-                      name="new-color"
-                      value="#000000"
-                      class="untraceable"
-                    />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Cor primária 4</th>
-                <td>Aplicada ao texto do resultado da expressão</td>
-                <td class="current-color-data"></td>
-                <td>
-                  <div>
-                    <input type="text" onclick="triggerColorInput(event)" />
-                    <input
-                      type="color"
-                      name="new-color"
-                      value="#000000"
-                      class="untraceable"
-                    />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Cor primária 5</th>
-                <td>Aplicada ao texto dos botões principais</td>
-                <td class="current-color-data"></td>
-                <td>
-                  <div>
-                    <input type="text" onclick="triggerColorInput(event)" />
-                    <input
-                      type="color"
-                      name="new-color"
-                      value="#000000"
-                      class="untraceable"
-                    />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Cor primária 6</th>
-                <td>Aplicada ao fundo dos botões padrão</td>
-                <td class="current-color-data"></td>
-                <td>
-                  <div>
-                    <input type="text" onclick="triggerColorInput(event)" />
-                    <input
-                      type="color"
-                      name="new-color"
-                      value="#000000"
-                      class="untraceable"
-                    />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Cor terciária 2</th>
-                <td>
-                  Aplicada ao efeito de animação dos botões da caixa de opções
-                </td>
-                <td class="current-color-data"></td>
-                <td>
-                  <div>
-                    <input type="text" onclick="triggerColorInput(event)" />
-                    <input
-                      type="color"
-                      name="new-color"
-                      value="#000000"
-                      class="untraceable"
-                    />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Cor secundária 2</th>
-                <td>Aplicada ao fundo dos botões (principais) especiais</td>
-                <td class="current-color-data"></td>
-                <td>
-                  <div>
-                    <input type="text" onclick="triggerColorInput(event)" />
-                    <input
-                      type="color"
-                      name="new-color"
-                      value="#000000"
-                      class="untraceable"
-                    />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Cor terciária 3</th>
-                <td>Aplicada às bordas dos botões principais</td>
-                <td class="current-color-data"></td>
-                <td>
-                  <div>
-                    <input type="text" onclick="triggerColorInput(event)" />
-                    <input
-                      type="color"
-                      name="new-color"
-                      value="#000000"
-                      class="untraceable"
-                    />
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col">Descrição</th>
+                  <th scope="col">Cor atual</th>
+                  <th scope="col">Nova cor</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Cor primária 1</th>
+                  <td>Aplicada ao fundo da calculadora</td>
+                  <td class="current-color-data"></td>
+                  <td>
+                    <div>
+                      <input type="text" onclick="triggerColorInput(event)" />
+                      <input
+                        type="color"
+                        name="new-color"
+                        value="#000000"
+                        class="untraceable"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Cor primária 2</th>
+                  <td>Aplicada ao texto do display da expressão</td>
+                  <td class="current-color-data"></td>
+                  <td>
+                    <div>
+                      <input type="text" onclick="triggerColorInput(event)" />
+                      <input
+                        type="color"
+                        name="new-color"
+                        value="#000000"
+                        class="untraceable"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Cor primária 3</th>
+                  <td>Aplicada ao fundo do display da expressão</td>
+                  <td class="current-color-data"></td>
+                  <td>
+                    <div>
+                      <input type="text" onclick="triggerColorInput(event)" />
+                      <input
+                        type="color"
+                        name="new-color"
+                        value="#000000"
+                        class="untraceable"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Cor primária 4</th>
+                  <td>Aplicada ao texto do resultado da expressão</td>
+                  <td class="current-color-data"></td>
+                  <td>
+                    <div>
+                      <input type="text" onclick="triggerColorInput(event)" />
+                      <input
+                        type="color"
+                        name="new-color"
+                        value="#000000"
+                        class="untraceable"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Cor primária 5</th>
+                  <td>Aplicada ao texto dos botões principais</td>
+                  <td class="current-color-data"></td>
+                  <td>
+                    <div>
+                      <input type="text" onclick="triggerColorInput(event)" />
+                      <input
+                        type="color"
+                        name="new-color"
+                        value="#000000"
+                        class="untraceable"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Cor primária 6</th>
+                  <td>Aplicada ao fundo dos botões padrão</td>
+                  <td class="current-color-data"></td>
+                  <td>
+                    <div>
+                      <input type="text" onclick="triggerColorInput(event)" />
+                      <input
+                        type="color"
+                        name="new-color"
+                        value="#000000"
+                        class="untraceable"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Cor secundária 1</th>
+                  <td>Aplicada aos textos dos botões superiores</td>
+                  <td class="current-color-data"></td>
+                  <td>
+                    <div>
+                      <input type="text" onclick="triggerColorInput(event)" />
+                      <input
+                        type="color"
+                        name="new-color"
+                        value="#000000"
+                        class="untraceable"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Cor secundária 2</th>
+                  <td>Aplicada ao fundo dos botões superiores</td>
+                  <td class="current-color-data"></td>
+                  <td>
+                    <div>
+                      <input type="text" onclick="triggerColorInput(event)" />
+                      <input
+                        type="color"
+                        name="new-color"
+                        value="#000000"
+                        class="untraceable"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Cor secundária 3</th>
+                  <td>Aplicada ao fundo dos botões (principais) especiais</td>
+                  <td class="current-color-data"></td>
+                  <td>
+                    <div>
+                      <input type="text" onclick="triggerColorInput(event)" />
+                      <input
+                        type="color"
+                        name="new-color"
+                        value="#000000"
+                        class="untraceable"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Cor terciária 1</th>
+                  <td>Aplicada às linhas de separação de sessões</td>
+                  <td class="current-color-data"></td>
+                  <td>
+                    <div>
+                      <input type="text" onclick="triggerColorInput(event)" />
+                      <input
+                        type="color"
+                        name="new-color"
+                        value="#000000"
+                        class="untraceable"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Cor terciária 2</th>
+                  <td>
+                    Aplicada ao efeito de animação dos botões da caixa de opções
+                  </td>
+                  <td class="current-color-data"></td>
+                  <td>
+                    <div>
+                      <input type="text" onclick="triggerColorInput(event)" />
+                      <input
+                        type="color"
+                        name="new-color"
+                        value="#000000"
+                        class="untraceable"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Cor terciária 3</th>
+                  <td>Aplicada às bordas dos botões principais</td>
+                  <td class="current-color-data"></td>
+                  <td>
+                    <div>
+                      <input type="text" onclick="triggerColorInput(event)" />
+                      <input
+                        type="color"
+                        name="new-color"
+                        value="#000000"
+                        class="untraceable"
+                      />
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <div class="actions">
             <button type="button" onclick="applyDefaultColorValue()">
               Limpar
