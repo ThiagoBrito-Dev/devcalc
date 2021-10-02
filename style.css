@@ -14,10 +14,10 @@ body {
   --input-background: #454545;
   --p-text: #d5d5d5;
   --button-text: #673ab7;
-  --button-background: #ededed;
-  --button-background-effect: rgba(0, 0, 0, 0.15);
+  --button-background: #eaeaea;
+  --button-background-effect: #c3c3c3;
   --colorized-button-background: #f3dfef;
-  --button-border: rgba(103, 58, 182, 0.05);
+  --button-border: #683ab6;
 
   display: flex;
   justify-content: center;
@@ -46,9 +46,9 @@ button {
   --p-text: #787878;
   --button-text: #a64cb6;
   --button-background: #e9e9e9;
-  --button-background-effect: rgba(255, 255, 255, 0.2);
+  --button-background-effect: #656565;
   --colorized-button-background: #b9d1e0;
-  --button-border: rgba(103, 58, 182, 0.1);
+  --button-border: #683ab6;
 }
 
 body main {
@@ -170,7 +170,7 @@ div.options-box div {
 div.options-box div button {
   position: relative;
   width: 100%;
-  padding: 8px 12px;
+  height: 39.25px;
 
   font-size: 16px;
   background-color: var(--calc-background);
@@ -195,6 +195,12 @@ div.options-box div button::before {
 
 div.options-box div button:hover::before {
   width: 100%;
+}
+
+div.options-box div span {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
 }
 
 .modal-overlay {
@@ -568,8 +574,9 @@ body main section input::placeholder {
 body main section button {
   width: 48px;
   height: 48px;
+  border: none;
   border-radius: 50%;
-  border: 1.5px solid var(--button-border);
+  box-shadow: 0 0 2px var(--button-border);
 
   font-size: 16px;
   color: var(--button-text);
@@ -629,6 +636,10 @@ body main section div div div button:active {
 
 .main-container {
   grid-area: default-container;
+}
+
+.main-container div:last-child button {
+  box-shadow: 0 0 1.5px var(--button-border);
 }
 
 .main-container div:last-child button:first-child {

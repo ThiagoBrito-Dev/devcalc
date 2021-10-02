@@ -583,7 +583,8 @@ function handleValidExpressions(expression, number) {
       (currentOperator == "/" &&
         number == "0" &&
         expressionOperators.indexOf(previousChar) != -1) ||
-      lastNumber == "√("
+      lastNumber == "√(" ||
+      lastNumber == "√"
     ) {
       setDefaultStylingClasses();
       isNotCalculable = true;
@@ -604,7 +605,11 @@ function formatNumbers(expression, number = "") {
 
     currentNumber += number;
 
-    if (!expression.includes(",") && currentNumber) {
+    if (
+      !expression.includes(",") &&
+      currentNumber &&
+      !isNaN(Number(currentNumber))
+    ) {
       const formattedNumber = Number(currentNumber).toLocaleString("pt-BR");
 
       addFormattedNumbersOnDisplay(expressionArray, formattedNumber);
@@ -633,8 +638,10 @@ function addCharactersOnDisplay(expression, inputChar) {
       inputChar != ")" &&
       inputChar != "!") ||
     ((!isNaN(Number(lastChar)) || lastChar == ")") && inputChar == "!") ||
-    (lastChar == "!" && inputChar == ")")
+    (lastChar == "!" && (inputChar == ")" || inputChar == "!"))
   ) {
+    const penultimateChar = expression[expression.length - 2];
+
     if (
       inputChar == "Bin(" ||
       inputChar == "Oct(" ||
@@ -662,19 +669,25 @@ function addCharactersOnDisplay(expression, inputChar) {
       return;
     }
 
+    if (penultimateChar == "!" && lastChar == "!" && inputChar == "!") {
+      return;
+    }
+
     expressionInput.value += inputChar;
   }
 
-  if (!haveSeparateCalculations) {
-    haveSeparateCalculations = true;
-  }
+  if (expressionInput.value) {
+    if (!haveSeparateCalculations) {
+      haveSeparateCalculations = true;
+    }
 
-  if (inputChar == "!" || inputChar == "π" || inputChar == "e") {
-    handleCalculationResult(false);
-  }
+    if (inputChar == "!" || inputChar == "π" || inputChar == "e") {
+      handleCalculationResult(false);
+    }
 
-  currentNumber = "";
-  handleFontSize(expression);
+    currentNumber = "";
+    handleFontSize(expression);
+  }
 }
 
 function addOperatorsOnDisplay(operator) {
@@ -904,7 +917,6 @@ function handleCalculationResult(isInvalidExpression) {
       expression = expressionInput.value.replace(/\./g, "").replace(/\,/g, ".");
 
       const numbersArray = handleNumbersArray(expression);
-      console.log("Array de números: ", numbersArray);
       let result;
 
       for (number in numbersArray) {
@@ -989,7 +1001,7 @@ function formatExpressionResult(result) {
 
     result = splittedResult.join(",");
   } else {
-    result = result.toLocaleString("pt-BR");
+    result = Number(result).toLocaleString("pt-BR");
   }
 
   return result;
@@ -1057,7 +1069,11 @@ function deleteLastCharacter() {
     expression = expressionArray.join("");
     expressionInput.value = expression;
 
-    if (expression.indexOf("(") == -1) {
+    if (
+      expression.indexOf("(") === -1 &&
+      expression.indexOf("!") === -1 &&
+      expression.indexOf("√") === -1
+    ) {
       haveSeparateCalculations = false;
     }
 
@@ -1067,8 +1083,6 @@ function deleteLastCharacter() {
     formatNumbers(expression);
     handleValidExpressions(expression, lastChar);
     handleFontSize(expression);
-
-    isNotCalculable = false;
   }
 }
 
@@ -1378,111 +1392,104 @@ function calculateConversions(currentMode, valueToConvert) {
 }
 
 function calculateUnaryMathOperators(expression) {
-  const expressionArray = [...expression];
+  let newExpression = expression;
 
-  for (let char in expression) {
-    const currentChar = expression[char];
+  while (
+    newExpression.indexOf("√") !== -1 ||
+    newExpression.indexOf("!") !== -1
+  ) {
+    if (newExpression.indexOf("√") !== -1) {
+      const firstSquareRootIndex = newExpression.indexOf("√");
+      const nextIndex = firstSquareRootIndex + 1;
 
-    if (currentChar == "√" || currentChar == "!") {
-      switch (currentChar) {
-        case "√":
-          const startIndex = expressionArray.indexOf("√");
-          const nextIndex = Number(char) + 1;
-          let slicedExpression = expression.slice(nextIndex);
+      let lastSquareRootIndex = firstSquareRootIndex;
+      let matchString = "√";
+      let squareRootNumber = "";
+      let squareRootCount = 1;
 
-          // if (slicedExpression.indexOf("√") !== -1) {
-          //   slicedExpression = calculateUnaryMathOperators(slicedExpression);
-          // }
-
-          if (slicedExpression) {
-            let expressionPartContent = "";
-
-            for (let char in slicedExpression) {
-              const currentChar = slicedExpression[char];
-
-              if (isNaN(Number(currentChar))) {
-                break;
-              }
-
-              expressionPartContent += slicedExpression[char];
-            }
-
-            const result = Math.sqrt(Number(expressionPartContent));
-
-            expressionArray.splice(
-              startIndex,
-              String(expressionPartContent).length + 1,
-              result
-            );
+      if (newExpression[nextIndex] == "√") {
+        for (
+          let index = firstSquareRootIndex + 1;
+          index < newExpression.length;
+          index++
+        ) {
+          if (!isNaN(newExpression[index])) {
+            break;
           }
 
-          break;
-        case "!":
-          const reversedExpression = [...expressionArray].reverse();
-          const factorialNumbers = [];
-          let currentNumber = "";
-          let exclamationIndex;
-
-          for (let char in reversedExpression) {
-            const currentChar = reversedExpression[char];
-
-            if (currentChar == "!") {
-              exclamationIndex = char;
-            } else if (exclamationIndex) {
-              if (currentChar != "." && isNaN(Number(currentChar))) {
-                exclamationIndex = "";
-                factorialNumbers.push(Number(currentNumber));
-                currentNumber = "";
-              } else {
-                currentNumber += currentChar;
-              }
-            }
-          }
-
-          if (currentNumber) {
-            factorialNumbers.push(currentNumber);
-          }
-
-          let results = [];
-
-          for (let number in factorialNumbers) {
-            const currentFactorialNumber = factorialNumbers[number];
-            let result = currentFactorialNumber;
-
-            for (let index = currentFactorialNumber - 1; index > 0; index--) {
-              result *= index;
-            }
-
-            results.push(result);
-          }
-
-          results = results.reverse();
-          let position = 0;
-
-          for (let char in expressionArray) {
-            const currentChar = expressionArray[char];
-
-            if (currentChar == "!") {
-              const firstDigitIndex =
-                char - String(factorialNumbers[position]).length;
-              let deleteAmount = char - firstDigitIndex + 1;
-
-              expressionArray.splice(
-                firstDigitIndex,
-                deleteAmount,
-                results[position]
-              );
-
-              position++;
-            }
-          }
-
-          break;
+          matchString += "√";
+          lastSquareRootIndex++;
+          squareRootCount++;
+        }
       }
+
+      for (
+        let index = lastSquareRootIndex + 1;
+        index < newExpression.length;
+        index++
+      ) {
+        if (!isNaN(Number(newExpression[index]))) {
+          squareRootNumber += newExpression[index];
+          continue;
+        }
+
+        break;
+      }
+
+      let result;
+
+      for (let index = squareRootCount; index > 0; index--) {
+        if (result) {
+          result = Math.sqrt(result);
+          continue;
+        }
+
+        result = Math.sqrt(squareRootNumber);
+      }
+
+      matchString += squareRootNumber;
+      newExpression = newExpression.replace(matchString, result);
+    }
+
+    if (newExpression.indexOf("!") !== -1) {
+      const exclamationIndex = newExpression.indexOf("!");
+      const nextIndex = exclamationIndex + 1;
+      let decreaseValue = 1;
+      let matchString = "!";
+
+      if (newExpression[nextIndex] == "!") {
+        matchString += "!";
+        decreaseValue = 2;
+      }
+
+      let factorialNumber = "";
+
+      for (let index = exclamationIndex - 1; index >= 0; index--) {
+        if (!isNaN(Number(newExpression[index]))) {
+          factorialNumber += newExpression[index];
+          continue;
+        }
+
+        break;
+      }
+
+      factorialNumber = [...factorialNumber].reverse().join("");
+      let result = Number(factorialNumber);
+
+      for (
+        let index = factorialNumber - decreaseValue;
+        index >= 1;
+        index -= decreaseValue
+      ) {
+        result *= index;
+      }
+
+      matchString = factorialNumber + matchString;
+      newExpression = newExpression.replace(matchString, result);
     }
   }
 
-  return expressionArray.join("");
+  return newExpression;
 }
 
 function getCurrentMode(openingParenthesisIndex, expression) {

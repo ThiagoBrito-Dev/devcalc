@@ -31,8 +31,8 @@
     class=""
   >
     <main>
-      <header>
-        <div class="expression-actions-container invisible">
+      <header class="space-between">
+        <div class="expression-actions-container">
           <div>
             <button
               type="button"
@@ -83,10 +83,14 @@
             <h2>Options</h2>
 
             <div>
-              <button onclick="handleHistoryAccess()">History</button>
-              <button onclick="handleShortcutsAccess()">Shortcuts</button>
+              <button onclick="handleHistoryAccess()">
+                <span>History</span>
+              </button>
+              <button onclick="handleShortcutsAccess()">
+                <span>Shortcuts</span>
+              </button>
               <button onclick="handlePersonalizationAccess()">
-                Personalize
+                <span>Personalize</span>
               </button>
             </div>
           </div>
@@ -96,7 +100,7 @@
         <div>
           <input
             type="text"
-            class=""
+            class="stretch"
             aria-label="Expressão/resultado"
             tabindex="-1"
             placeholder="0"
@@ -105,7 +109,7 @@
           <p class="invisible"></p>
         </div>
         <div class="buttons-wrapper">
-          <div class="dev-mode-top-container invisible">
+          <div class="dev-mode-top-container">
             <div class="left-column-top-row">
               <div>
                 <button
@@ -350,7 +354,7 @@
               </button>
             </div>
           </div>
-          <div class="dev-mode-side-container invisible">
+          <div class="dev-mode-side-container">
             <div>
               <button
                 type="button"
