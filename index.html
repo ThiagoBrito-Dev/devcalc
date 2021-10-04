@@ -31,8 +31,8 @@
     class=""
   >
     <main>
-      <header class="space-between">
-        <div class="expression-actions-container">
+      <header class="">
+        <div class="expression-actions-container invisible">
           <div>
             <button
               type="button"
@@ -80,17 +80,17 @@
             <i id="options-icon" class="fas fa-ellipsis-v"></i>
           </button>
           <div class="options-box invisible">
-            <h2>Options</h2>
+            <h2>Opções</h2>
 
             <div>
               <button onclick="handleHistoryAccess()">
-                <span>History</span>
+                <span>Histórico</span>
               </button>
               <button onclick="handleShortcutsAccess()">
-                <span>Shortcuts</span>
+                <span>Atalhos</span>
               </button>
               <button onclick="handlePersonalizationAccess()">
-                <span>Personalize</span>
+                <span>Personalizar</span>
               </button>
             </div>
           </div>
@@ -100,7 +100,7 @@
         <div>
           <input
             type="text"
-            class="stretch"
+            class=""
             aria-label="Expressão/resultado"
             tabindex="-1"
             placeholder="0"
@@ -109,7 +109,7 @@
           <p class="invisible"></p>
         </div>
         <div class="buttons-wrapper">
-          <div class="dev-mode-top-container">
+          <div class="dev-mode-top-container invisible">
             <div class="left-column-top-row">
               <div>
                 <button
@@ -354,7 +354,7 @@
               </button>
             </div>
           </div>
-          <div class="dev-mode-side-container">
+          <div class="dev-mode-side-container invisible">
             <div>
               <button
                 type="button"
@@ -464,10 +464,7 @@
 
           <div class="card">
             <button>T</button>
-            <p>
-              Altera o tema da aplicação (de light para dark theme, e
-              vice-versa)
-            </p>
+            <p>Altera o tema da aplicação (de light para dark, e vice-versa)</p>
           </div>
 
           <div class="card">

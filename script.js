@@ -172,21 +172,21 @@ function handleModalState() {
 function handleHistoryAccess() {
   handleModalVisibilityConflicts();
   modal.classList.add("history-modal");
-  modalTitle.textContent = "History";
+  modalTitle.textContent = "Histórico";
   historyModalContent.classList.remove("invisible");
 }
 
 function handleShortcutsAccess() {
   handleModalVisibilityConflicts();
   modal.classList.add("shortcuts-modal");
-  modalTitle.textContent = "Keyboard Shortcuts";
+  modalTitle.textContent = "Atalhos do Teclado";
   shortcutsModalContent.classList.remove("invisible");
 }
 
 function handlePersonalizationAccess() {
   handleModalVisibilityConflicts();
   modal.classList.add("personalization-modal");
-  modalTitle.textContent = "Personalization";
+  modalTitle.textContent = "Personalização";
   personalizationModalContent.classList.remove("invisible");
 }
 
@@ -775,7 +775,10 @@ function focalizeResult() {
   expressionOperators = [];
 
   if (!isNotCalculable) {
-    handleAddingOperationsOnHistory();
+    if (expressionInput.value && expressionResult.textContent) {
+      handleAddingOperationsOnHistory();
+    }
+
     setDefaultStylingClasses();
     expressionInput.value = expressionResult.textContent;
     expressionResult.textContent = "";
@@ -931,7 +934,8 @@ function handleCalculationResult(isInvalidExpression) {
       if (
         expression.indexOf("Bin(") === -1 &&
         expression.indexOf("Oct(") === -1 &&
-        expression.indexOf("Hex(") === -1
+        expression.indexOf("Hex(") === -1 &&
+        expression.indexOf("Fib(") === -1
       ) {
         result = formatExpressionResult(result);
       }
