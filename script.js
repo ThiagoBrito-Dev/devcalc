@@ -1,5 +1,6 @@
 const conversionMode = document.querySelector("#conversion-mode");
 const expressionInput = document.querySelector("input");
+const resultContainer = document.querySelector(".result-container");
 const expressionResult = document.querySelector("p");
 
 const optionsBox = document.querySelector(".options-box");
@@ -597,27 +598,28 @@ function handleValidExpressions(expression, number) {
 
 function formatNumbers(expression, number = "") {
   if (expression && expression != "-") {
-    const expressionArray = [...expression];
-
     if (currentNumber == "") {
-      firstPosition = expression.indexOf(number, expression.length - 1);
+      firstPosition = expressionInput.value.indexOf(
+        number,
+        expression.length - 1
+      );
     }
 
     currentNumber += number;
 
     if (
-      !expression.includes(",") &&
       currentNumber &&
-      !isNaN(Number(currentNumber))
+      !isNaN(Number(currentNumber)) &&
+      (!expression.includes(",") || !currentNumber.includes(","))
     ) {
       const formattedNumber = Number(currentNumber).toLocaleString("pt-BR");
-
-      addFormattedNumbersOnDisplay(expressionArray, formattedNumber);
+      addFormattedNumbersOnDisplay(formattedNumber);
     }
   }
 }
 
-function addFormattedNumbersOnDisplay(expressionArray, formattedNumber) {
+function addFormattedNumbersOnDisplay(formattedNumber) {
+  const expressionArray = [...expressionInput.value];
   const lastPosition = formattedNumber.length + 1;
 
   expressionArray.splice(firstPosition, lastPosition, formattedNumber);
@@ -782,7 +784,8 @@ function focalizeResult() {
     setDefaultStylingClasses();
     expressionInput.value = expressionResult.textContent;
     expressionResult.textContent = "";
-    currentNumber = "";
+    currentNumber = expressionInput.value;
+    firstPosition = 0;
     return;
   }
 
@@ -1013,13 +1016,15 @@ function formatExpressionResult(result) {
 
 function applyNewStylingClasses(result) {
   expressionInput.classList.add("has-transition");
+  resultContainer.classList.add("has-transition");
   expressionResult.classList.add("has-transition");
 
   if (result) {
     expressionInput.classList.add("has-result");
 
     expressionInput.classList.remove("has-transition");
-    expressionResult.classList.remove("invisible");
+    resultContainer.classList.remove("invisible");
+    resultContainer.classList.remove("has-transition");
     expressionResult.classList.remove("has-transition");
   }
 }
@@ -1031,9 +1036,9 @@ function showResult(result) {
 }
 
 function setDefaultStylingClasses() {
-  expressionResult.classList.add("invisible");
-
+  resultContainer.classList.add("invisible");
   expressionInput.classList.remove("has-result", "has-transition");
+  resultContainer.classList.remove("has-transition");
   expressionResult.classList.remove("has-transition");
 }
 
@@ -1093,7 +1098,6 @@ function deleteLastCharacter() {
 function handleNumbersArray(expression) {
   if (haveSeparateCalculations) {
     expression = handleSeparateCalculations(expression);
-    console.log("Expressão retornada: " + expression);
   }
 
   let firstCharIsAnOperator = false;
@@ -1506,7 +1510,6 @@ function getCurrentMode(openingParenthesisIndex, expression) {
       let currentChar = expression[index].replace("^", "**").replace("÷", "/");
 
       if (currentChar == "x" && !isNaN(Number(expression[index - 1]))) {
-        console.log(expression[index - 1]);
         currentChar = currentChar.replace("x", "*");
       }
 
