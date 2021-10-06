@@ -466,8 +466,8 @@ function toggleDevMode() {
   const actionsContainer = document.querySelector(
     ".expression-actions-container"
   );
-  const topContainer = document.querySelector(".dev-mode-top-container");
-  const sideContainer = document.querySelector(".dev-mode-side-container");
+  const topContainer = document.querySelector(".top-container");
+  const sideContainer = document.querySelector(".side-container");
 
   if (actionsContainer.classList.value.includes("invisible")) {
     conversionMode.textContent = "BIN";

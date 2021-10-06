@@ -22,7 +22,10 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="./styles/partials/calc-header.css" />
+    <link rel="stylesheet" href="./styles/partials/calc-body.css" />
+    <link rel="stylesheet" href="./styles/partials/modals.css" />
+    <link rel="stylesheet" href="./styles/global.css" />
   </head>
 
   <body
@@ -33,16 +36,14 @@
     <main>
       <header class="">
         <div class="expression-actions-container invisible">
-          <div>
-            <button
-              type="button"
-              id="result-mode"
-              aria-label="Alterar modo de resultado"
-              onclick="toggleResultMode()"
-            >
-              RAD
-            </button>
-          </div>
+          <button
+            type="button"
+            id="result-mode"
+            aria-label="Alterar modo de resultado"
+            onclick="toggleResultMode()"
+          >
+            RAD
+          </button>
           <div class="conversion-container">
             <button
               type="button"
@@ -96,8 +97,8 @@
           </div>
         </div>
       </header>
-      <section>
-        <div>
+      <section class="calc-body">
+        <div class="display">
           <input
             type="text"
             class=""
@@ -111,7 +112,7 @@
           </div>
         </div>
         <div class="buttons-wrapper">
-          <div class="dev-mode-top-container invisible">
+          <div class="top-container invisible">
             <div class="left-column-top-row">
               <div>
                 <button
@@ -183,24 +184,22 @@
               </div>
             </div>
             <div class="right-column-top-row">
-              <div>
-                <button
-                  type="button"
-                  class="colorized-button"
-                  aria-label="Adicionar operador de fatorial à expressão"
-                  onclick="handleAddingNumbersOrCharacters('!')"
-                >
-                  !
-                </button>
-                <button
-                  type="button"
-                  class="colorized-button"
-                  aria-label="Adicionar operador de raiz quadrada à expressão"
-                  onclick="handleAddingNumbersOrCharacters('√')"
-                >
-                  √
-                </button>
-              </div>
+              <button
+                type="button"
+                class="colorized-button"
+                aria-label="Adicionar operador de fatorial à expressão"
+                onclick="handleAddingNumbersOrCharacters('!')"
+              >
+                !
+              </button>
+              <button
+                type="button"
+                class="colorized-button"
+                aria-label="Adicionar operador de raiz quadrada à expressão"
+                onclick="handleAddingNumbersOrCharacters('√')"
+              >
+                √
+              </button>
             </div>
           </div>
           <div class="main-container">
@@ -356,49 +355,47 @@
               </button>
             </div>
           </div>
-          <div class="dev-mode-side-container invisible">
-            <div>
-              <button
-                type="button"
-                class="colorized-button"
-                aria-label="Adicionar marcação de cálculo de logaritmo"
-                onclick="handleAddingNumbersOrCharacters('Log(')"
-              >
-                log
-              </button>
-              <button
-                type="button"
-                class="colorized-button"
-                aria-label="Adicionar marcação de cálculo de logaritmo neperiano"
-                onclick="handleAddingNumbersOrCharacters('Ln(')"
-              >
-                ln
-              </button>
-              <button
-                type="button"
-                class="colorized-button"
-                aria-label="Adicionar marcação de cálculo da sequência de Fibonacci"
-                onclick="handleAddingNumbersOrCharacters('Fib(')"
-              >
-                fib
-              </button>
-              <button
-                type="button"
-                class="colorized-button"
-                aria-label="Adicionar símbolo de PI à expressão"
-                onclick="handleAddingNumbersOrCharacters('π')"
-              >
-                π
-              </button>
-              <button
-                type="button"
-                class="colorized-button"
-                aria-label="Adicionar símbolo do número de Euler à expressão"
-                onclick="handleAddingNumbersOrCharacters('e')"
-              >
-                e
-              </button>
-            </div>
+          <div class="side-container invisible">
+            <button
+              type="button"
+              class="colorized-button"
+              aria-label="Adicionar marcação de cálculo de logaritmo"
+              onclick="handleAddingNumbersOrCharacters('Log(')"
+            >
+              log
+            </button>
+            <button
+              type="button"
+              class="colorized-button"
+              aria-label="Adicionar marcação de cálculo de logaritmo neperiano"
+              onclick="handleAddingNumbersOrCharacters('Ln(')"
+            >
+              ln
+            </button>
+            <button
+              type="button"
+              class="colorized-button"
+              aria-label="Adicionar marcação de cálculo da sequência de Fibonacci"
+              onclick="handleAddingNumbersOrCharacters('Fib(')"
+            >
+              fib
+            </button>
+            <button
+              type="button"
+              class="colorized-button"
+              aria-label="Adicionar símbolo de PI à expressão"
+              onclick="handleAddingNumbersOrCharacters('π')"
+            >
+              π
+            </button>
+            <button
+              type="button"
+              class="colorized-button"
+              aria-label="Adicionar símbolo do número de Euler à expressão"
+              onclick="handleAddingNumbersOrCharacters('e')"
+            >
+              e
+            </button>
           </div>
         </div>
       </section>
@@ -406,9 +403,15 @@
 
     <div class="modal-overlay invisible">
       <section class="">
-        <header>
+        <header class="modal-header">
           <h2 id="modal-title"></h2>
-          <button type="button" onclick="handleModalState()">X</button>
+          <button
+            type="button"
+            aria-label="Fechar modal"
+            onclick="handleModalState()"
+          >
+            X
+          </button>
         </header>
 
         <div class="history-modal-content invisible"></div>
@@ -534,7 +537,7 @@
           <div class="table-container">
             <table>
               <caption>
-                Criação de tema personalizado
+                Tabela para criação de tema personalizado
               </caption>
 
               <thead>
@@ -550,9 +553,13 @@
                   <th scope="row">Cor primária 1</th>
                   <td>Aplicada ao fundo da calculadora</td>
                   <td class="current-color-data"></td>
-                  <td>
-                    <div>
-                      <input type="text" onclick="triggerColorInput(event)" />
+                  <td class="new-color-data">
+                    <div class="inputs-container">
+                      <input
+                        type="text"
+                        aria-label="Abrir menu de seleção de cores"
+                        onclick="triggerColorInput(event)"
+                      />
                       <input
                         type="color"
                         name="new-color"
@@ -566,9 +573,13 @@
                   <th scope="row">Cor primária 2</th>
                   <td>Aplicada ao texto do display da expressão</td>
                   <td class="current-color-data"></td>
-                  <td>
-                    <div>
-                      <input type="text" onclick="triggerColorInput(event)" />
+                  <td class="new-color-data">
+                    <div class="inputs-container">
+                      <input
+                        type="text"
+                        aria-label="Abrir menu de seleção de cores"
+                        onclick="triggerColorInput(event)"
+                      />
                       <input
                         type="color"
                         name="new-color"
@@ -582,9 +593,13 @@
                   <th scope="row">Cor primária 3</th>
                   <td>Aplicada ao fundo do display da expressão</td>
                   <td class="current-color-data"></td>
-                  <td>
-                    <div>
-                      <input type="text" onclick="triggerColorInput(event)" />
+                  <td class="new-color-data">
+                    <div class="inputs-container">
+                      <input
+                        type="text"
+                        aria-label="Abrir menu de seleção de cores"
+                        onclick="triggerColorInput(event)"
+                      />
                       <input
                         type="color"
                         name="new-color"
@@ -598,9 +613,13 @@
                   <th scope="row">Cor primária 4</th>
                   <td>Aplicada ao texto do resultado da expressão</td>
                   <td class="current-color-data"></td>
-                  <td>
-                    <div>
-                      <input type="text" onclick="triggerColorInput(event)" />
+                  <td class="new-color-data">
+                    <div class="inputs-container">
+                      <input
+                        type="text"
+                        aria-label="Abrir menu de seleção de cores"
+                        onclick="triggerColorInput(event)"
+                      />
                       <input
                         type="color"
                         name="new-color"
@@ -614,9 +633,13 @@
                   <th scope="row">Cor primária 5</th>
                   <td>Aplicada ao texto dos botões principais</td>
                   <td class="current-color-data"></td>
-                  <td>
-                    <div>
-                      <input type="text" onclick="triggerColorInput(event)" />
+                  <td class="new-color-data">
+                    <div class="inputs-container">
+                      <input
+                        type="text"
+                        aria-label="Abrir menu de seleção de cores"
+                        onclick="triggerColorInput(event)"
+                      />
                       <input
                         type="color"
                         name="new-color"
@@ -630,9 +653,13 @@
                   <th scope="row">Cor primária 6</th>
                   <td>Aplicada ao fundo dos botões padrão</td>
                   <td class="current-color-data"></td>
-                  <td>
-                    <div>
-                      <input type="text" onclick="triggerColorInput(event)" />
+                  <td class="new-color-data">
+                    <div class="inputs-container">
+                      <input
+                        type="text"
+                        aria-label="Abrir menu de seleção de cores"
+                        onclick="triggerColorInput(event)"
+                      />
                       <input
                         type="color"
                         name="new-color"
@@ -646,9 +673,13 @@
                   <th scope="row">Cor secundária 1</th>
                   <td>Aplicada aos textos dos botões superiores</td>
                   <td class="current-color-data"></td>
-                  <td>
-                    <div>
-                      <input type="text" onclick="triggerColorInput(event)" />
+                  <td class="new-color-data">
+                    <div class="inputs-container">
+                      <input
+                        type="text"
+                        aria-label="Abrir menu de seleção de cores"
+                        onclick="triggerColorInput(event)"
+                      />
                       <input
                         type="color"
                         name="new-color"
@@ -662,9 +693,13 @@
                   <th scope="row">Cor secundária 2</th>
                   <td>Aplicada ao fundo dos botões superiores</td>
                   <td class="current-color-data"></td>
-                  <td>
-                    <div>
-                      <input type="text" onclick="triggerColorInput(event)" />
+                  <td class="new-color-data">
+                    <div class="inputs-container">
+                      <input
+                        type="text"
+                        aria-label="Abrir menu de seleção de cores"
+                        onclick="triggerColorInput(event)"
+                      />
                       <input
                         type="color"
                         name="new-color"
@@ -678,9 +713,13 @@
                   <th scope="row">Cor secundária 3</th>
                   <td>Aplicada ao fundo dos botões (principais) especiais</td>
                   <td class="current-color-data"></td>
-                  <td>
-                    <div>
-                      <input type="text" onclick="triggerColorInput(event)" />
+                  <td class="new-color-data">
+                    <div class="inputs-container">
+                      <input
+                        type="text"
+                        aria-label="Abrir menu de seleção de cores"
+                        onclick="triggerColorInput(event)"
+                      />
                       <input
                         type="color"
                         name="new-color"
@@ -694,9 +733,13 @@
                   <th scope="row">Cor terciária 1</th>
                   <td>Aplicada às linhas de separação de sessões</td>
                   <td class="current-color-data"></td>
-                  <td>
-                    <div>
-                      <input type="text" onclick="triggerColorInput(event)" />
+                  <td class="new-color-data">
+                    <div class="inputs-container">
+                      <input
+                        type="text"
+                        aria-label="Abrir menu de seleção de cores"
+                        onclick="triggerColorInput(event)"
+                      />
                       <input
                         type="color"
                         name="new-color"
@@ -712,9 +755,13 @@
                     Aplicada ao efeito de animação dos botões da caixa de opções
                   </td>
                   <td class="current-color-data"></td>
-                  <td>
-                    <div>
-                      <input type="text" onclick="triggerColorInput(event)" />
+                  <td class="new-color-data">
+                    <div class="inputs-container">
+                      <input
+                        type="text"
+                        aria-label="Abrir menu de seleção de cores"
+                        onclick="triggerColorInput(event)"
+                      />
                       <input
                         type="color"
                         name="new-color"
@@ -728,9 +775,13 @@
                   <th scope="row">Cor terciária 3</th>
                   <td>Aplicada às bordas dos botões principais</td>
                   <td class="current-color-data"></td>
-                  <td>
-                    <div>
-                      <input type="text" onclick="triggerColorInput(event)" />
+                  <td class="new-color-data">
+                    <div class="inputs-container">
+                      <input
+                        type="text"
+                        aria-label="Abrir menu de seleção de cores"
+                        onclick="triggerColorInput(event)"
+                      />
                       <input
                         type="color"
                         name="new-color"
@@ -743,6 +794,7 @@
               </tbody>
             </table>
           </div>
+
           <div class="actions">
             <button type="button" onclick="applyDefaultColorValue()">
               Limpar
