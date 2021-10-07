@@ -14,9 +14,9 @@ body {
   --input-background: #454545;
   --p-text: #d5d5d5;
   --button-text: #f057d6;
-  --button-background: #ececec;
+  --button-background: #ececec; /* #292929 */
   --button-background-effect: #c5c5c5;
-  --colorized-button-background: #250050;
+  --colorized-button-background: #2a005a;
   --button-border: #977ac9;
 
   display: flex;
@@ -38,9 +38,9 @@ body {
   --input-text: #505050;
   --input-background: #f6f6f6;
   --p-text: #787878;
-  --button-text: #f329a6;
+  --button-text: #b113b1; /* #f329a6 */
   --button-background-effect: #606060;
-  --colorized-button-background: #01c0a0; /* #2e96f7 */
+  --colorized-button-background: #03ffff; /* #2e96f7 #01c0a0 */
   --button-border: #a1e7dd; /* #9fcff3 */
 }
 
