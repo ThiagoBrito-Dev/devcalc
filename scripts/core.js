@@ -72,6 +72,10 @@ export default class AppCore {
   }
 
   handleValidExpressions(expression, number) {
+    if (!appInterface) {
+      appInterface = new AppInterface();
+    }
+
     const numbersArray = this.getNumbersArray(expression);
 
     if (numbersArray) {
@@ -105,7 +109,9 @@ export default class AppCore {
   }
 
   formatNumbers(expression, number = "") {
-    appInterface = new AppInterface();
+    if (!appInterface) {
+      appInterface = new AppInterface();
+    }
 
     if (expression && expression != "-") {
       if (this.currentNumber == "") {
@@ -188,6 +194,10 @@ export default class AppCore {
       .replace(/\^/g, "**")
       .replace(/\x/g, "*")
       .replace(/\÷/g, "/");
+
+    if (!appInterface) {
+      appInterface = new AppInterface();
+    }
 
     if (!isInvalidExpression) {
       if (

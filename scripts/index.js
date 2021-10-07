@@ -84,7 +84,14 @@ numberButtons.forEach((button) => {
   button.addEventListener("click", function () {
     let number = this.textContent.trim();
 
-    if (number != "," && isNaN(Number(number))) {
+    if (
+      number != "," &&
+      number != "!" &&
+      number != "√" &&
+      number != "π" &&
+      number != "e" &&
+      isNaN(Number(number))
+    ) {
       number += "(";
       number = [...number];
       number[0] = number[0].toUpperCase();
