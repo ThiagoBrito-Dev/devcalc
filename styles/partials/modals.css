@@ -35,7 +35,7 @@ div.modal-overlay section::-webkit-scrollbar-thumb {
   margin-left: 8px;
 }
 
-section header.modal-header {
+section header#modal-header {
   position: sticky;
   z-index: 1;
   top: 0;
@@ -49,11 +49,11 @@ section header.modal-header {
   background-color: var(--input-background);
 }
 
-header.modal-header h2 {
+header#modal-header h2 {
   color: var(--calc-background);
 }
 
-header.modal-header button {
+header#modal-header button {
   font-size: 18px;
   background: transparent;
   color: var(--calc-background);
@@ -61,7 +61,7 @@ header.modal-header button {
   transition-duration: 75ms;
 }
 
-header.modal-header button:active {
+header#modal-header button:active {
   transform: scale(0.95);
 }
 
@@ -196,16 +196,16 @@ section.personalization-modal div.personalization-modal-content {
   align-items: center;
 }
 
-div.personalization-modal-content div.table-container {
+div.personalization-modal-content div#table-container {
   width: 100%;
   overflow-x: auto;
 }
 
-div.table-container::-webkit-scrollbar {
+div#table-container::-webkit-scrollbar {
   display: none;
 }
 
-div.table-container table {
+div#table-container table {
   width: 100%;
   min-width: 672.5px;
   padding: 8px 10px;
@@ -303,7 +303,7 @@ div.inputs-container input[type="color"] {
   border-width: 0;
 }
 
-div.personalization-modal-content div.actions {
+div.personalization-modal-content div#actions {
   display: flex;
   justify-content: center;
   gap: 6px;
@@ -312,7 +312,7 @@ div.personalization-modal-content div.actions {
   margin-top: 6px;
 }
 
-div.actions button {
+div#actions button {
   flex: 1;
   padding: 14px 12px;
 
@@ -325,12 +325,12 @@ div.actions button {
   transition-duration: 0.75s;
 }
 
-div.actions button:hover {
+div#actions button:hover {
   background: transparent;
   color: var(--calc-background);
   box-shadow: inset 0 0 0 2px var(--p-text);
 }
 
-div.actions button:active {
+div#actions button:active {
   transform: scale(0.9);
 }

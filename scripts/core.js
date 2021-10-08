@@ -4,8 +4,8 @@ let appInterface;
 
 export default class AppCore {
   constructor() {
-    this.expressionInput = document.querySelector("div.display input");
-    this.expressionResult = document.querySelector("div.result-container p");
+    this.expressionInput = document.querySelector("div#display input");
+    this.expressionResult = document.querySelector("div#result-container p");
 
     this.isNotCalculable = false;
     this.haveSeparateCalculations = false;
@@ -13,21 +13,6 @@ export default class AppCore {
     this.expressionOperators = [];
     this.currentNumber = "";
     this.firstPosition;
-  }
-
-  handleValidThemes(colorInputs) {
-    let isValidTheme = false;
-    let firstColor;
-
-    colorInputs.forEach((input, index) => {
-      if (index === 0) {
-        firstColor = input.value;
-      } else if (firstColor !== input.value) {
-        isValidTheme = true;
-      }
-    });
-
-    return isValidTheme;
   }
 
   checkIfCommaCanBeAdded(expression, number) {
@@ -137,6 +122,28 @@ export default class AppCore {
     }
   }
 
+  countParentheses(expression, getClosingIndex = false) {
+    let openingCount = 0;
+    let closingCount = 0;
+    let closingIndex;
+
+    for (let char in expression) {
+      if (expression[char] == "(") {
+        openingCount++;
+      } else if (expression[char] == ")") {
+        closingCount++;
+
+        if (getClosingIndex && !closingIndex && closingCount > openingCount) {
+          closingIndex = char;
+
+          return [openingCount, closingCount, closingIndex];
+        }
+      }
+    }
+
+    return [openingCount, closingCount];
+  }
+
   handleSignRule(lastChar, expressionArray, operator) {
     if (
       isNaN(Number(lastChar)) &&
@@ -158,6 +165,8 @@ export default class AppCore {
 
     return operator;
   }
+
+  //---
 
   triggerCalculation(expression, numbersArray) {
     const expressionArray = [...expression];
@@ -237,72 +246,10 @@ export default class AppCore {
     }
   }
 
-  calculateResult(numbersArray, number, operators, result) {
-    if (number > 0) {
-      const currentOperator = operators[number - 1];
-      let currentNumber = Number(numbersArray[number]);
-      result = Number(result);
-
-      switch (currentOperator) {
-        case "+":
-          result = result + currentNumber;
-          break;
-        case "-":
-          result = result - currentNumber;
-          break;
-        case "*":
-          if (numbersArray[number] === "") {
-            currentNumber = 1;
-          }
-
-          result = result * currentNumber;
-          break;
-        case "**":
-          if (numbersArray[number] === "") {
-            currentNumber = 1;
-          }
-
-          result = result ** currentNumber;
-          break;
-        case "/":
-          if (numbersArray[number] === "") {
-            currentNumber = 1;
-          }
-
-          result = result / currentNumber;
-          break;
-        case "%":
-          result = (currentNumber * result) / 100;
-          break;
-      }
-    } else {
-      result = numbersArray[number];
-    }
-
-    return result;
-  }
-
-  formatExpressionResult(result) {
-    const lastOperatorPosition = this.expressionOperators.length - 1;
-    const currentOperator = this.expressionOperators[lastOperatorPosition];
-
-    if (currentOperator == "**" && String(result).includes(".")) {
-      result = String(result).replace(".", ",");
-
-      const splittedResult = result.split(",");
-      splittedResult[0] = Number(splittedResult[0]).toLocaleString("pt-BR");
-
-      result = splittedResult.join(",");
-    } else {
-      result = Number(result).toLocaleString("pt-BR");
-    }
-
-    return result;
-  }
-
   handleNumbersArray(expression) {
     if (this.haveSeparateCalculations) {
       expression = this.handleSeparateCalculations(expression);
+      console.log("Expressão retornada: " + expression);
     }
 
     let firstCharIsAnOperator = false;
@@ -315,30 +262,10 @@ export default class AppCore {
     }
 
     const numbersArray = this.getNumbersArray(expression);
+    console.log("Array", numbersArray);
 
     if (firstCharIsAnOperator) {
       numbersArray[0] = firstChar + numbersArray[0];
-    }
-
-    return numbersArray;
-  }
-
-  getNumbersArray(splittedExpression, operators = this.expressionOperators) {
-    splittedExpression = String(splittedExpression);
-    let numbersArray = Array(splittedExpression);
-
-    for (let operator in operators) {
-      const currentOperator = operators[operator]
-        .replace("**", "^")
-        .replace("*", "x")
-        .replace("/", "÷");
-
-      splittedExpression = splittedExpression.split(currentOperator);
-      splittedExpression = splittedExpression.join(" ");
-    }
-
-    if (this.expressionInput.value.indexOf("Fib(") === -1) {
-      numbersArray = splittedExpression.split(" ");
     }
 
     return numbersArray;
@@ -505,6 +432,189 @@ export default class AppCore {
     return newExpression;
   }
 
+  getCurrentMode(openingParenthesisIndex, expression) {
+    let previousIndex = openingParenthesisIndex - 1;
+    const previousChar = expression[previousIndex];
+    let currentMode = "";
+
+    if (
+      previousChar != "(" &&
+      this.expressionOperators.indexOf(previousChar) === -1
+    ) {
+      for (let index = previousIndex; index > -1; index--) {
+        let currentChar = expression[index]
+          .replace("^", "**")
+          .replace("÷", "/");
+
+        if (currentChar == "x" && !isNaN(Number(expression[index - 1]))) {
+          currentChar = currentChar.replace("x", "*");
+        }
+
+        if (
+          !isNaN(Number(currentChar)) ||
+          currentChar == "+" ||
+          currentChar == "-" ||
+          currentChar == "*" ||
+          currentChar == "/" ||
+          currentChar == "%" ||
+          currentChar == "√"
+        ) {
+          break;
+        }
+
+        currentMode += expression[index];
+      }
+
+      currentMode = [...currentMode].reverse().join("");
+      return currentMode;
+    }
+  }
+
+  calculateUnaryMathOperators(expression) {
+    let newExpression = expression;
+
+    while (
+      newExpression.indexOf("√") !== -1 ||
+      newExpression.indexOf("!") !== -1
+    ) {
+      if (newExpression.indexOf("√") !== -1) {
+        const firstSquareRootIndex = newExpression.indexOf("√");
+        const nextIndex = firstSquareRootIndex + 1;
+
+        let lastSquareRootIndex = firstSquareRootIndex;
+        let matchString = "√";
+        let squareRootNumber = "";
+        let squareRootCount = 1;
+
+        if (newExpression[nextIndex] == "√") {
+          for (
+            let index = firstSquareRootIndex + 1;
+            index < newExpression.length;
+            index++
+          ) {
+            if (!isNaN(newExpression[index])) {
+              break;
+            }
+
+            matchString += "√";
+            lastSquareRootIndex++;
+            squareRootCount++;
+          }
+        }
+
+        for (
+          let index = lastSquareRootIndex + 1;
+          index < newExpression.length;
+          index++
+        ) {
+          if (!isNaN(Number(newExpression[index]))) {
+            squareRootNumber += newExpression[index];
+            continue;
+          }
+
+          break;
+        }
+
+        let result;
+
+        for (let index = squareRootCount; index > 0; index--) {
+          if (result) {
+            result = Math.sqrt(result);
+            continue;
+          }
+
+          result = Math.sqrt(squareRootNumber);
+        }
+
+        matchString += squareRootNumber;
+        newExpression = newExpression.replace(matchString, result);
+      }
+
+      if (newExpression.indexOf("!") !== -1) {
+        const exclamationIndex = newExpression.indexOf("!");
+        const nextIndex = exclamationIndex + 1;
+        let decreaseValue = 1;
+        let matchString = "!";
+
+        if (newExpression[nextIndex] == "!") {
+          matchString += "!";
+          decreaseValue = 2;
+        }
+
+        let factorialNumber = "";
+
+        for (let index = exclamationIndex - 1; index >= 0; index--) {
+          if (!isNaN(Number(newExpression[index]))) {
+            factorialNumber += newExpression[index];
+            continue;
+          }
+
+          break;
+        }
+
+        factorialNumber = [...factorialNumber].reverse().join("");
+        let result = Number(factorialNumber);
+
+        for (
+          let index = factorialNumber - decreaseValue;
+          index >= 1;
+          index -= decreaseValue
+        ) {
+          result *= index;
+        }
+
+        matchString = factorialNumber + matchString;
+        newExpression = newExpression.replace(matchString, result);
+      }
+    }
+
+    return newExpression;
+  }
+
+  getOperatorsArray(expression) {
+    const operators = [];
+
+    for (let char in expression) {
+      const currentChar = expression[char]
+        .replace("x", "*")
+        .replace("^", "**")
+        .replace("÷", "/");
+      const previousChar = expression[char - 1];
+
+      if (
+        !isNaN(Number(previousChar)) &&
+        (currentChar == "+" ||
+          currentChar == "-" ||
+          currentChar == "*" ||
+          currentChar == "**" ||
+          currentChar == "/" ||
+          currentChar == "%")
+      ) {
+        operators.push(currentChar);
+      }
+    }
+
+    return operators;
+  }
+
+  calculateConversions(currentMode, valueToConvert) {
+    let convertedValue;
+
+    switch (currentMode) {
+      case "Bin":
+        convertedValue = (valueToConvert >>> 0).toString(2);
+        break;
+      case "Oct":
+        convertedValue = Number(valueToConvert).toString(8);
+        break;
+      case "Hex":
+        convertedValue = Number(valueToConvert).toString(16).toUpperCase();
+        break;
+    }
+
+    return convertedValue;
+  }
+
   calculateMathFunctions(currentMode, value, operators = null) {
     const resultMode = document.querySelector("#result-mode");
     let calculationResult = value;
@@ -616,218 +726,97 @@ export default class AppCore {
     return calculationResult;
   }
 
-  calculateConversions(currentMode, valueToConvert) {
-    let convertedValue;
+  getNumbersArray(splittedExpression) {
+    let numbersArray = Array(splittedExpression);
 
-    switch (currentMode) {
-      case "Bin":
-        convertedValue = (valueToConvert >>> 0).toString(2);
-        break;
-      case "Oct":
-        convertedValue = Number(valueToConvert).toString(8);
-        break;
-      case "Hex":
-        convertedValue = Number(valueToConvert).toString(16).toUpperCase();
-        break;
+    if (this.expressionInput.value.indexOf("Fib(") === -1) {
+      numbersArray = splittedExpression
+        .replace(/[^0-9\+\-\x\÷\^\%\.]/g, "")
+        .replace(/[^0-9\.]/g, " ")
+        .split(" ");
     }
 
-    return convertedValue;
+    return numbersArray;
   }
 
-  calculateUnaryMathOperators(expression) {
-    let newExpression = expression;
+  calculateResult(numbersArray, number, operators, result) {
+    if (number > 0) {
+      const currentOperator = operators[number - 1];
+      let currentNumber = Number(numbersArray[number]);
+      result = Number(result);
 
-    while (
-      newExpression.indexOf("√") !== -1 ||
-      newExpression.indexOf("!") !== -1
-    ) {
-      if (newExpression.indexOf("√") !== -1) {
-        const firstSquareRootIndex = newExpression.indexOf("√");
-        const nextIndex = firstSquareRootIndex + 1;
-
-        let lastSquareRootIndex = firstSquareRootIndex;
-        let matchString = "√";
-        let squareRootNumber = "";
-        let squareRootCount = 1;
-
-        if (newExpression[nextIndex] == "√") {
-          for (
-            let index = firstSquareRootIndex + 1;
-            index < newExpression.length;
-            index++
-          ) {
-            if (!isNaN(newExpression[index])) {
-              break;
-            }
-
-            matchString += "√";
-            lastSquareRootIndex++;
-            squareRootCount++;
-          }
-        }
-
-        for (
-          let index = lastSquareRootIndex + 1;
-          index < newExpression.length;
-          index++
-        ) {
-          if (!isNaN(Number(newExpression[index]))) {
-            squareRootNumber += newExpression[index];
-            continue;
-          }
-
+      switch (currentOperator) {
+        case "+":
+          result = result + currentNumber;
           break;
-        }
-
-        let result;
-
-        for (let index = squareRootCount; index > 0; index--) {
-          if (result) {
-            result = Math.sqrt(result);
-            continue;
+        case "-":
+          result = result - currentNumber;
+          break;
+        case "*":
+          if (numbersArray[number] === "") {
+            currentNumber = 1;
           }
 
-          result = Math.sqrt(squareRootNumber);
-        }
-
-        matchString += squareRootNumber;
-        newExpression = newExpression.replace(matchString, result);
-      }
-
-      if (newExpression.indexOf("!") !== -1) {
-        const exclamationIndex = newExpression.indexOf("!");
-        const nextIndex = exclamationIndex + 1;
-        let decreaseValue = 1;
-        let matchString = "!";
-
-        if (newExpression[nextIndex] == "!") {
-          matchString += "!";
-          decreaseValue = 2;
-        }
-
-        let factorialNumber = "";
-
-        for (let index = exclamationIndex - 1; index >= 0; index--) {
-          if (!isNaN(Number(newExpression[index]))) {
-            factorialNumber += newExpression[index];
-            continue;
+          result = result * currentNumber;
+          break;
+        case "**":
+          if (numbersArray[number] === "") {
+            currentNumber = 1;
           }
 
+          result = result ** currentNumber;
           break;
-        }
+        case "/":
+          if (numbersArray[number] === "") {
+            currentNumber = 1;
+          }
 
-        factorialNumber = [...factorialNumber].reverse().join("");
-        let result = Number(factorialNumber);
-
-        for (
-          let index = factorialNumber - decreaseValue;
-          index >= 1;
-          index -= decreaseValue
-        ) {
-          result *= index;
-        }
-
-        matchString = factorialNumber + matchString;
-        newExpression = newExpression.replace(matchString, result);
-      }
-    }
-
-    return newExpression;
-  }
-
-  getCurrentMode(openingParenthesisIndex, expression) {
-    let previousIndex = openingParenthesisIndex - 1;
-    const previousChar = expression[previousIndex];
-    let currentMode = "";
-
-    if (
-      previousChar != "(" &&
-      this.expressionOperators.indexOf(previousChar) === -1
-    ) {
-      for (let index = previousIndex; index > -1; index--) {
-        let currentChar = expression[index]
-          .replace("^", "**")
-          .replace("÷", "/");
-
-        if (currentChar == "x" && !isNaN(Number(expression[index - 1]))) {
-          currentChar = currentChar.replace("x", "*");
-        }
-
-        if (
-          !isNaN(Number(currentChar)) ||
-          currentChar == "+" ||
-          currentChar == "-" ||
-          currentChar == "*" ||
-          currentChar == "/" ||
-          currentChar == "%" ||
-          currentChar == "√"
-        ) {
+          result = result / currentNumber;
           break;
-        }
-
-        currentMode += expression[index];
+        case "%":
+          result = (currentNumber * result) / 100;
+          break;
       }
-
-      currentMode = [...currentMode].reverse().join("");
-      return currentMode;
+    } else {
+      result = numbersArray[number];
     }
+
+    return result;
   }
 
-  countParentheses(expression, getClosingIndex = false) {
-    let openingCount = 0;
-    let closingCount = 0;
-    let closingIndex;
+  formatExpressionResult(result) {
+    const lastOperatorPosition = this.expressionOperators.length - 1;
+    const currentOperator = this.expressionOperators[lastOperatorPosition];
 
-    for (let char in expression) {
-      if (expression[char] == "(") {
-        openingCount++;
-      } else if (expression[char] == ")") {
-        closingCount++;
+    if (currentOperator == "**" && String(result).includes(".")) {
+      console.log("Chamou");
+      result = String(result).replace(".", ",");
 
-        if (getClosingIndex && !closingIndex && closingCount > openingCount) {
-          closingIndex = char;
+      const splittedResult = result.split(",");
+      splittedResult[0] = Number(splittedResult[0]).toLocaleString("pt-BR");
 
-          return [openingCount, closingCount, closingIndex];
-        }
-      }
+      result = splittedResult.join(",");
+    } else {
+      console.log(result);
+      result = Number(result).toLocaleString("pt-BR");
+      console.log(result);
     }
 
-    return [openingCount, closingCount];
+    return result;
   }
 
-  getOperatorsArray(expression) {
-    const operators = [];
+  validateTheme(colorInputs) {
+    let isValidTheme = false;
+    let firstColor;
 
-    for (let char in expression) {
-      const currentChar = expression[char]
-        .replace("x", "*")
-        .replace("^", "**")
-        .replace("÷", "/");
-      const previousChar = expression[char - 1];
-
-      if (
-        !isNaN(Number(previousChar)) &&
-        (currentChar == "+" ||
-          currentChar == "-" ||
-          currentChar == "*" ||
-          currentChar == "**" ||
-          currentChar == "/" ||
-          currentChar == "%")
-      ) {
-        operators.push(currentChar);
+    colorInputs.forEach((input, index) => {
+      if (index === 0) {
+        firstColor = input.value;
+      } else if (firstColor !== input.value) {
+        isValidTheme = true;
       }
-    }
+    });
 
-    return operators;
-  }
-
-  getNewCurrentNumberValue(expression) {
-    this.currentNumber = "";
-
-    for (let char in expression) {
-      if (expression[char] !== "." && char >= this.firstPosition) {
-        this.currentNumber += expression[char];
-      }
-    }
+    return isValidTheme;
   }
 }

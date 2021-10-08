@@ -5,7 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- <link rel="shortcut icon" href="assets/favicon.svg" type="image/svg"> -->
-
     <title>DevCalc</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -26,6 +25,8 @@
     <link rel="stylesheet" href="./styles/partials/calc-body.css" />
     <link rel="stylesheet" href="./styles/partials/modals.css" />
     <link rel="stylesheet" href="./styles/global.css" />
+
+    <script type="module" src="./scripts/index.js" defer></script>
   </head>
 
   <body class="">
@@ -39,7 +40,7 @@
           >
             RAD
           </button>
-          <div class="conversion-container">
+          <div id="conversion-container">
             <button
               type="button"
               id="conversion-mode"
@@ -50,15 +51,17 @@
             <i class="fas fa-angle-double-right"></i>
             <button
               type="button"
+              id="insert-conversion"
               aria-label="Inserir tipo de conversão à expressão"
             >
               INSERT
             </button>
           </div>
         </div>
-        <div class="interface-actions-container">
+        <div id="interface-actions-container">
           <button
             type="button"
+            id="switch-theme"
             class="interaction-button"
             aria-label="Trocar tema"
           >
@@ -66,23 +69,33 @@
           </button>
           <button
             type="button"
+            id="open-options-box"
             class="interaction-button"
             aria-label="Abrir caixa de opções"
           >
             <i id="options-icon" class="fas fa-ellipsis-v"></i>
           </button>
-          <div class="options-box invisible">
+          <div id="options-box" class="invisible">
             <h2>Opções</h2>
 
             <div>
-              <button type="button" aria-label="Abrir histórico de operações">
+              <button
+                type="button"
+                id="open-history"
+                aria-label="Abrir histórico de operações"
+              >
                 <span>Histórico</span>
               </button>
-              <button type="button" aria-label="Abrir página de atalhos">
+              <button
+                type="button"
+                id="open-shortcuts"
+                aria-label="Abrir página de atalhos"
+              >
                 <span>Atalhos</span>
               </button>
               <button
                 type="button"
+                id="open-personalization"
                 aria-label="Abrir página de criação de temas personalizados"
               >
                 <span>Personalizar</span>
@@ -91,8 +104,8 @@
           </div>
         </div>
       </header>
-      <section class="calc-body">
-        <div class="display">
+      <section id="calc-body">
+        <div id="display">
           <input
             type="text"
             class=""
@@ -101,38 +114,42 @@
             placeholder="0"
             readonly
           />
-          <div class="result-container invisible">
+          <div id="result-container" class="invisible">
             <p></p>
           </div>
         </div>
-        <div class="buttons-wrapper">
+        <div id="buttons-wrapper">
           <div class="top-container invisible">
             <div class="left-column-top-row">
               <div>
                 <button
                   type="button"
-                  class="colorized-button number"
+                  class="colorized-button expression-related"
+                  data-char="Sin("
                   aria-label="Adicionar marcação de cálculo de seno"
                 >
                   sin
                 </button>
                 <button
                   type="button"
-                  class="colorized-button number"
+                  class="colorized-button expression-related"
+                  data-char="Cos("
                   aria-label="Adicionar marcação de cálculo de cosseno"
                 >
                   cos
                 </button>
                 <button
                   type="button"
-                  class="colorized-button number"
+                  class="colorized-button expression-related"
+                  data-char="Tan("
                   aria-label="Adicionar marcação de cálculo de tangente"
                 >
                   tan
                 </button>
                 <button
                   type="button"
-                  class="colorized-button number"
+                  class="colorized-button expression-related"
+                  data-char="Hypot("
                   aria-label="Adicionar marcação de cálculo de hipotenusa"
                 >
                   hypot
@@ -141,28 +158,29 @@
               <div>
                 <button
                   type="button"
-                  class="colorized-button number"
+                  class="colorized-button expression-related"
                   aria-label="Adicionar fechamento de parênteses à expressão"
                 >
                   (
                 </button>
                 <button
                   type="button"
-                  class="colorized-button number"
+                  class="colorized-button expression-related"
                   aria-label="Adicionar abertura de parênteses à expressão"
                 >
                   )
                 </button>
                 <button
                   type="button"
-                  class="colorized-button operator"
+                  class="colorized-button expression-related"
+                  data-char="**"
                   aria-label="Adicionar operador de exponenciação à expressão"
                 >
                   ^
                 </button>
                 <button
                   type="button"
-                  class="colorized-button operator"
+                  class="colorized-button expression-related"
                   aria-label="Adicionar operador de porcentagem à expressão"
                 >
                   %
@@ -172,24 +190,25 @@
             <div class="right-column-top-row">
               <button
                 type="button"
-                class="colorized-button number"
+                class="colorized-button expression-related"
                 aria-label="Adicionar operador de fatorial à expressão"
               >
                 !
               </button>
               <button
                 type="button"
-                class="colorized-button number"
+                class="colorized-button expression-related"
                 aria-label="Adicionar operador de raiz quadrada à expressão"
               >
                 √
               </button>
             </div>
           </div>
-          <div class="main-container">
+          <div id="main-container">
             <div>
               <button
                 type="button"
+                id="clear-expression"
                 class="colorized-button"
                 aria-label="Limpar expressão"
               >
@@ -197,6 +216,7 @@
               </button>
               <button
                 type="button"
+                id="delete-last-char"
                 class="colorized-button colorized-icon-button"
                 aria-label="Apagar caractere anterior"
               >
@@ -204,6 +224,7 @@
               </button>
               <button
                 type="button"
+                id="dev-mode"
                 class="colorized-button"
                 aria-label="Ativar/desativar modo desenvolvedor"
               >
@@ -211,7 +232,8 @@
               </button>
               <button
                 type="button"
-                class="colorized-button operator"
+                class="colorized-button expression-related"
+                data-char="/"
                 aria-label="Adicionar sinal de divisão à expressão"
               >
                 ÷
@@ -220,28 +242,29 @@
             <div>
               <button
                 type="button"
-                class="number"
+                class="expression-related"
                 aria-label="Adicionar número 7 à expressão"
               >
                 7
               </button>
               <button
                 type="button"
-                class="number"
+                class="expression-related"
                 aria-label="Adicionar número 8 à expressão"
               >
                 8
               </button>
               <button
                 type="button"
-                class="number"
+                class="expression-related"
                 aria-label="Adicionar número 9 à expressão"
               >
                 9
               </button>
               <button
                 type="button"
-                class="colorized-button operator"
+                class="colorized-button expression-related"
+                data-char="*"
                 aria-label="Adicionar sinal de multiplicação à expressão"
               >
                 x
@@ -250,28 +273,28 @@
             <div>
               <button
                 type="button"
-                class="number"
+                class="expression-related"
                 aria-label="Adicionar número 4 à expressão"
               >
                 4
               </button>
               <button
                 type="button"
-                class="number"
+                class="expression-related"
                 aria-label="Adicionar número 5 à expressão"
               >
                 5
               </button>
               <button
                 type="button"
-                class="number"
+                class="expression-related"
                 aria-label="Adicionar número 6 à expressão"
               >
                 6
               </button>
               <button
                 type="button"
-                class="colorized-button operator"
+                class="colorized-button expression-related"
                 aria-label="Adicionar sinal de subtração à expressão"
               >
                 -
@@ -280,28 +303,28 @@
             <div>
               <button
                 type="button"
-                class="number"
+                class="expression-related"
                 aria-label="Adicionar número 1 à expressão"
               >
                 1
               </button>
               <button
                 type="button"
-                class="number"
+                class="expression-related"
                 aria-label="Adicionar número 2 à expressão"
               >
                 2
               </button>
               <button
                 type="button"
-                class="number"
+                class="expression-related"
                 aria-label="Adicionar número 3 à expressão"
               >
                 3
               </button>
               <button
                 type="button"
-                class="colorized-button operator"
+                class="colorized-button expression-related"
                 aria-label="Adicionar sinal de adição à expressão"
               >
                 +
@@ -310,23 +333,23 @@
             <div>
               <button
                 type="button"
-                class="number"
+                class="expression-related"
                 aria-label="Adicionar número 0 à expressão"
               >
                 0
               </button>
               <button
                 type="button"
-                class="number"
+                class="expression-related"
                 aria-label="Adicionar vírgula à expressão"
               >
                 ,
               </button>
               <button
                 type="button"
+                id="focalize-result"
                 class="colorized-button"
                 aria-label="Ampliar resultado da expressão"
-                onclick="focalizeResult()"
               >
                 =
               </button>
@@ -335,35 +358,38 @@
           <div class="side-container invisible">
             <button
               type="button"
-              class="colorized-button number"
+              data-char="Log("
+              class="colorized-button expression-related"
               aria-label="Adicionar marcação de cálculo de logaritmo"
             >
               log
             </button>
             <button
               type="button"
-              class="colorized-button number"
+              data-char="Ln("
+              class="colorized-button expression-related"
               aria-label="Adicionar marcação de cálculo de logaritmo neperiano"
             >
               ln
             </button>
             <button
               type="button"
-              class="colorized-button number"
+              data-char="Fib("
+              class="colorized-button expression-related"
               aria-label="Adicionar marcação de cálculo da sequência de Fibonacci"
             >
               fib
             </button>
             <button
               type="button"
-              class="colorized-button number"
+              class="colorized-button expression-related"
               aria-label="Adicionar símbolo de PI à expressão"
             >
               π
             </button>
             <button
               type="button"
-              class="colorized-button number"
+              class="colorized-button expression-related"
               aria-label="Adicionar símbolo do número de Euler à expressão"
             >
               e
@@ -375,7 +401,7 @@
 
     <div class="modal-overlay invisible">
       <section class="">
-        <header class="modal-header">
+        <header id="modal-header">
           <h2 id="modal-title"></h2>
           <button type="button" aria-label="Fechar modal">X</button>
         </header>
@@ -500,7 +526,7 @@
           </div>
         </div>
         <div class="personalization-modal-content invisible">
-          <div class="table-container">
+          <div id="table-container">
             <table>
               <caption>
                 Tabela para criação de tema personalizado
@@ -524,7 +550,6 @@
                       <input
                         type="text"
                         aria-label="Abrir menu de seleção de cores"
-                        onclick="triggerColorInput(event)"
                       />
                       <input
                         type="color"
@@ -544,7 +569,6 @@
                       <input
                         type="text"
                         aria-label="Abrir menu de seleção de cores"
-                        onclick="triggerColorInput(event)"
                       />
                       <input
                         type="color"
@@ -564,7 +588,6 @@
                       <input
                         type="text"
                         aria-label="Abrir menu de seleção de cores"
-                        onclick="triggerColorInput(event)"
                       />
                       <input
                         type="color"
@@ -584,7 +607,6 @@
                       <input
                         type="text"
                         aria-label="Abrir menu de seleção de cores"
-                        onclick="triggerColorInput(event)"
                       />
                       <input
                         type="color"
@@ -604,7 +626,6 @@
                       <input
                         type="text"
                         aria-label="Abrir menu de seleção de cores"
-                        onclick="triggerColorInput(event)"
                       />
                       <input
                         type="color"
@@ -624,7 +645,6 @@
                       <input
                         type="text"
                         aria-label="Abrir menu de seleção de cores"
-                        onclick="triggerColorInput(event)"
                       />
                       <input
                         type="color"
@@ -644,7 +664,6 @@
                       <input
                         type="text"
                         aria-label="Abrir menu de seleção de cores"
-                        onclick="triggerColorInput(event)"
                       />
                       <input
                         type="color"
@@ -664,7 +683,6 @@
                       <input
                         type="text"
                         aria-label="Abrir menu de seleção de cores"
-                        onclick="triggerColorInput(event)"
                       />
                       <input
                         type="color"
@@ -684,7 +702,6 @@
                       <input
                         type="text"
                         aria-label="Abrir menu de seleção de cores"
-                        onclick="triggerColorInput(event)"
                       />
                       <input
                         type="color"
@@ -704,7 +721,6 @@
                       <input
                         type="text"
                         aria-label="Abrir menu de seleção de cores"
-                        onclick="triggerColorInput(event)"
                       />
                       <input
                         type="color"
@@ -726,7 +742,6 @@
                       <input
                         type="text"
                         aria-label="Abrir menu de seleção de cores"
-                        onclick="triggerColorInput(event)"
                       />
                       <input
                         type="color"
@@ -746,7 +761,6 @@
                       <input
                         type="text"
                         aria-label="Abrir menu de seleção de cores"
-                        onclick="triggerColorInput(event)"
                       />
                       <input
                         type="color"
@@ -761,24 +775,31 @@
             </table>
           </div>
 
-          <div class="actions">
-            <button type="button" aria-label="Limpar cores selecionadas">
+          <div id="actions">
+            <button
+              type="button"
+              id="clear-colors"
+              aria-label="Limpar cores selecionadas"
+            >
               Limpar
             </button>
             <button
               type="button"
+              id="preview-theme"
               aria-label="Visualizar prévia do tema escolhido"
             >
               Visualizar
             </button>
-            <button type="button" aria-label="Salvar tema personalizado">
+            <button
+              type="button"
+              id="save-theme"
+              aria-label="Salvar tema personalizado"
+            >
               Salvar
             </button>
           </div>
         </div>
       </section>
     </div>
-
-    <script type="module" src="./scripts/index.js"></script>
   </body>
 </html>

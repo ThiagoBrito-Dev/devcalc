@@ -1,8 +1,8 @@
-main section.calc-body {
+main section#calc-body {
   padding: 12px 16px;
 }
 
-div.display input {
+div#display input {
   width: 210px;
   height: 52px;
   padding: 0 8px 0 4px;
@@ -19,28 +19,28 @@ div.display input {
   border-radius: 2px;
 }
 
-div.display input::placeholder {
+div#display input::placeholder {
   color: var(--input-text);
 }
 
-div.display input.stretch {
+div#display input.stretch {
   width: 100%;
 }
 
-div.display input.has-result {
+div#display input.has-result {
   height: 30.675px;
   border-radius: 2px 2px 0 0;
   padding: 4px 8px 0 0;
 }
 
-div.display div.result-container {
+div#display div#result-container {
   text-align: right;
   padding: 0 8px 2px 4px;
   background-color: var(--input-background);
   border-radius: 0 0 2px 2px;
 }
 
-div.result-container p {
+div#result-container p {
   max-width: 259px;
   color: var(--p-text);
 
@@ -50,7 +50,7 @@ div.result-container p {
   overflow-x: auto;
 }
 
-div.result-container p::-webkit-scrollbar {
+div#result-container p::-webkit-scrollbar {
   display: none;
 }
 
@@ -58,7 +58,7 @@ div.result-container p::-webkit-scrollbar {
   transition-duration: 0.25s;
 }
 
-section.calc-body div.buttons-wrapper {
+section#calc-body div#buttons-wrapper {
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-rows: auto 1fr;
@@ -68,11 +68,11 @@ section.calc-body div.buttons-wrapper {
   margin-top: 20px;
 }
 
-div.buttons-wrapper div {
+div#buttons-wrapper div {
   cursor: default;
 }
 
-div.buttons-wrapper button {
+div#buttons-wrapper button {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -84,20 +84,20 @@ div.buttons-wrapper button {
   transition-duration: 0.25s;
 }
 
-div.buttons-wrapper button.colorized-button {
+div#buttons-wrapper button.colorized-button {
   background-color: var(--colorized-button-background);
 }
 
-div.buttons-wrapper button.colorized-icon-button {
+div#buttons-wrapper button.colorized-icon-button {
   font-size: 19px;
 }
 
-div.buttons-wrapper button:hover {
+div#buttons-wrapper button:hover {
   filter: brightness(0.97);
   transform: scale(1.05);
 }
 
-div.buttons-wrapper button:active {
+div#buttons-wrapper button:active {
   transform: scale(0.95);
 }
 
@@ -115,7 +115,7 @@ div.top-container div.left-column-top-row div + div {
 }
 
 div.left-column-top-row button + button,
-div.main-container button + button {
+div#main-container button + button {
   margin-left: 2px;
 }
 
@@ -132,34 +132,34 @@ div.right-column-top-row,
   gap: 6px;
 }
 
-div.buttons-wrapper div.main-container {
+div#buttons-wrapper div#main-container {
   grid-area: main-container;
 }
 
-div.main-container div + div {
+div#main-container div + div {
   margin-top: 6px;
 }
 
-div.main-container div:first-child {
+div#main-container div:first-child {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-div.main-container div:first-child button {
+div#main-container div:first-child button {
   margin-left: 0;
 }
 
-div.main-container div:last-child button {
+div#main-container div:last-child button {
   box-shadow: 0 0 1.5px var(--button-border);
 }
 
-div.main-container div:last-child button:first-child {
+div#main-container div:last-child button:first-child {
   width: 48.55%;
   border-radius: 25px;
 }
 
-div.buttons-wrapper div.side-container {
+div#buttons-wrapper div.side-container {
   grid-area: side-container;
 
   margin-left: 6px;

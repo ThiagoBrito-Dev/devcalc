@@ -4,25 +4,42 @@ const appCore = new AppCore();
 
 export default class AppInterface {
   constructor() {
-    this.conversionMode = document.querySelector("#conversion-mode");
-    this.optionsBox = document.querySelector(".options-box");
-    this.resultContainer = document.querySelector(".result-container");
+    this.conversionMode = document.getElementById("conversion-mode");
+    this.optionsBox = document.getElementById("options-box");
+    this.resultContainer = document.getElementById("result-container");
 
-    this.modalOverlay = document.querySelector(".modal-overlay");
-    this.modal = document.querySelector(".modal-overlay section");
-    this.modalTitle = document.querySelector("#modal-title");
-    this.historyModalContent = document.querySelector(".history-modal-content");
+    this.modalOverlay = document.querySelector("div.modal-overlay");
+    this.modal = document.querySelector("div.modal-overlay section");
+    this.modalTitle = document.getElementById("modal-title");
+    this.historyModalContent = document.querySelector(
+      "div.history-modal-content"
+    );
     this.shortcutsModalContent = document.querySelector(
-      ".shortcuts-modal-content"
+      "div.shortcuts-modal-content"
     );
     this.personalizationModalContent = document.querySelector(
-      ".personalization-modal-content"
+      "div.personalization-modal-content"
     );
 
+    this.cssVariables = [
+      "--calc-background",
+      "--input-text",
+      "--input-background",
+      "--p-text",
+      "--button-text",
+      "--button-background",
+      "--mode-button-text",
+      "--mode-button-background",
+      "--colorized-button-background",
+      "--header-line",
+      "--button-background-effect",
+      "--button-border",
+    ];
+    this.isDevModeActivated = false;
     this.operations;
   }
 
-  initializeInterface() {
+  initialize() {
     this.operations = JSON.parse(localStorage.getItem("devcalc-history")) || [];
 
     if (this.operations.length) {
@@ -40,49 +57,49 @@ export default class AppInterface {
       userTheme !== "" && userTheme != "dark-theme" ? "style" : "class";
 
     document.body.setAttribute(attributeName, userTheme);
-    this.toggleThemeIcon(userTheme);
+    this.switchThemeIcon(userTheme);
     this.handleCurrentInputColor();
   }
 
-  handleKeyboardShortcuts(event) {
-    if (event.key !== " " && (event.key == "," || !isNaN(Number(event.key)))) {
-      this.addNumbersOnDisplay(appCore.expressionInput.value, event.key);
+  handleKeyboardShortcuts({ key }) {
+    if (key !== " " && (key == "," || !isNaN(Number(key)))) {
+      this.addNumbersOnDisplay(appCore.expressionInput.value, key);
     } else {
-      let key;
+      let operator;
 
-      switch (event.key) {
+      switch (key) {
         case "+":
-          key = event.key;
+          operator = key;
           break;
         case "-":
-          key = event.key;
+          operator = key;
           break;
         case "*":
-          key = event.key;
+          operator = key;
           break;
         case "^":
-          key = event.key;
+          operator = key;
           break;
         case "/":
-          key = event.key;
+          operator = key;
           break;
         case "%":
-          key = event.key;
+          operator = key;
           break;
       }
 
-      if (key) {
-        this.addOperatorsOnDisplay(key);
+      if (operator) {
+        this.addOperatorsOnDisplay(operator);
       } else {
-        switch (event.key) {
+        switch (key) {
           case "r":
             this.toggleResultMode();
             break;
           case "t":
-            this.toggleTheme();
+            this.switchTheme();
             break;
           case "l":
-            this.clearExpressions();
+            this.clearExpression();
             break;
           case "c":
             this.changeConversionMode();
@@ -140,8 +157,8 @@ export default class AppInterface {
     const expression = appCore.expressionInput.value;
     const resultMode = document.querySelector("#result-mode");
 
-    currentMode = resultMode.textContent;
-    resultMode.textContent = currentMode.includes("RAD") ? "GRAU" : "RAD";
+    const currentResultMode = resultMode.textContent;
+    resultMode.textContent = currentResultMode.includes("RAD") ? "GRAU" : "RAD";
 
     if (
       expression.indexOf("Sin(") !== -1 ||
@@ -156,15 +173,15 @@ export default class AppInterface {
     const modes = ["BIN", "OCT", "HEX"];
     const currentMode = this.conversionMode.textContent.trim();
 
-    for (let mode in modes) {
-      if (modes[mode] == currentMode) {
-        this.conversionMode.textContent = modes[++mode];
+    modes.forEach((mode, index) => {
+      if (mode === currentMode) {
+        this.conversionMode.textContent = modes[++index];
 
         if (this.conversionMode.textContent === "") {
           this.conversionMode.textContent = modes[0];
         }
       }
-    }
+    });
   }
 
   addConversionModeOnInput() {
@@ -172,10 +189,10 @@ export default class AppInterface {
     currentMode[0] = currentMode[0].toUpperCase();
     currentMode = currentMode.join("");
 
-    this.handleAddingNumbersOrCharacters(`${currentMode}(`);
+    this.handleInputData(`${currentMode}(`);
   }
 
-  toggleTheme() {
+  switchTheme() {
     this.applyNewStylingClasses();
     let currentTheme = "";
 
@@ -196,11 +213,11 @@ export default class AppInterface {
     }
 
     localStorage.setItem("devcalc-userDefaultTheme", currentTheme);
-    this.toggleThemeIcon(currentTheme);
+    this.switchThemeIcon(currentTheme);
     this.handleCurrentInputColor();
   }
 
-  toggleThemeIcon(theme) {
+  switchThemeIcon(theme) {
     const themeIcon = document.querySelector("#theme-icon");
     const iconClass =
       theme == "dark-theme"
@@ -213,20 +230,18 @@ export default class AppInterface {
   }
 
   handleOptionsBox() {
-    const body = document.querySelector("body");
-
-    if (this.optionBox.classList.value.includes("invisible")) {
-      this.optionBox.classList.remove("invisible");
+    if (this.optionsBox.classList.value.includes("invisible")) {
+      this.optionsBox.classList.remove("invisible");
       setTimeout(() => {
-        body.onclick = this.handleOptionsBox;
+        document.body.onclick = () => this.handleOptionsBox();
       }, 50);
     } else {
       this.optionsBox.classList.add("invisible");
-      body.onclick = null;
+      document.body.onclick = null;
     }
   }
 
-  clearExpressions() {
+  clearExpression() {
     appCore.expressionInput.value = "";
     appCore.expressionResult.textContent = "";
     appCore.currentNumber = "";
@@ -271,8 +286,10 @@ export default class AppInterface {
       }
 
       const lastChar = expression[expression.length - 1];
+      appCore.currentNumber = expression
+        .slice(appCore.firstPosition)
+        .replace(/\./g, "");
 
-      appCore.getNewCurrentNumberValue(expression);
       appCore.formatNumbers(expression);
       appCore.handleValidExpressions(expression, lastChar);
       this.handleFontSize(expression);
@@ -280,6 +297,8 @@ export default class AppInterface {
   }
 
   toggleDevMode() {
+    this.isDevModeActivated = !this.isDevModeActivated;
+
     const calcHeader = document.querySelector("main header");
     const actionsContainer = document.querySelector(
       ".expression-actions-container"
@@ -302,75 +321,20 @@ export default class AppInterface {
     this.handleFontSize(appCore.expressionInput.value);
   }
 
-  addOperatorsOnDisplay(operator) {
-    let expression = appCore.expressionInput.value;
-    const [openingCount, closingCount] = appCore.countParentheses(expression);
-
-    if (
-      (openingCount > closingCount &&
-        expression[expression.length - 1] != "(") ||
-      (expression.indexOf("Bin(") === -1 &&
-        expression.indexOf("Oct(") === -1 &&
-        expression.indexOf("Hex(") === -1 &&
-        expression.indexOf("Fib(") === -1)
-    ) {
-      let expressionArray = [...expression];
-      const lastChar = expression[expression.length - 1];
-
-      if (!expression) {
-        if (operator == "-") {
-          appCore.expressionInput.value += operator;
-        }
-      } else {
-        if (
-          expression.length > 1 ||
-          !isNaN(Number(lastChar)) ||
-          lastChar == "π" ||
-          lastChar == "e"
-        ) {
-          let cantAddOperators = false;
-
-          if (
-            (expression.indexOf("Log(") !== -1 &&
-              expression.indexOf("Log(") + 4 === expression.length) ||
-            (expression.indexOf("Ln(") !== -1 &&
-              expression.indexOf("Ln(" + 3 === expression.length))
-          ) {
-            cantAddOperators = true;
-          }
-
-          if (!cantAddOperators) {
-            operator = appCore.handleSignRule(
-              lastChar,
-              expressionArray,
-              operator
-            );
-
-            if (openingCount === closingCount) {
-              appCore.expressionOperators.push(operator);
-            }
-
-            expression = expressionArray.join("");
-            expression += operator
-              .replace("**", "^")
-              .replace("*", "x")
-              .replace("/", "÷");
-
-            appCore.expressionInput.value = expression;
-          }
-        }
-      }
-
-      appCore.currentNumber = "";
-      this.handleFontSize(expression);
-    }
-  }
-
-  handleAddingNumbersOrCharacters(char) {
+  handleInputData(char) {
     let expression = appCore.expressionInput.value.replace(/\./g, "");
 
     if (char == "," || !isNaN(Number(char))) {
       this.addNumbersOnDisplay(expression, char);
+    } else if (
+      char == "+" ||
+      char == "-" ||
+      char == "*" ||
+      char == "/" ||
+      char == "**" ||
+      char == "%"
+    ) {
+      this.addOperatorsOnDisplay(expression, char);
     } else {
       this.addCharactersOnDisplay(expression, char);
     }
@@ -417,6 +381,70 @@ export default class AppInterface {
       formattedNumber
     );
     appCore.expressionInput.value = expressionArray.join("");
+  }
+
+  addOperatorsOnDisplay(expression, operator) {
+    const [openingCount, closingCount] = appCore.countParentheses(expression);
+
+    if (
+      (openingCount > closingCount &&
+        expression[expression.length - 1] != "(") ||
+      (expression.indexOf("Bin(") === -1 &&
+        expression.indexOf("Oct(") === -1 &&
+        expression.indexOf("Hex(") === -1 &&
+        expression.indexOf("Fib(") === -1)
+    ) {
+      let expressionArray = [...expression];
+      const lastChar = expression[expression.length - 1];
+
+      if (!expression) {
+        if (operator == "-") {
+          appCore.expressionInput.value += operator;
+        }
+      } else {
+        if (
+          expression.length > 1 ||
+          !isNaN(Number(lastChar)) ||
+          lastChar == "π" ||
+          lastChar == "e"
+        ) {
+          console.log("Chamou");
+          let cantAddOperators = false;
+
+          if (
+            (expression.indexOf("Log(") !== -1 &&
+              expression.indexOf("Log(") + 4 === expression.length) ||
+            (expression.indexOf("Ln(") !== -1 &&
+              expression.indexOf("Ln(") + 3 === expression.length)
+          ) {
+            cantAddOperators = true;
+          }
+
+          if (!cantAddOperators) {
+            operator = appCore.handleSignRule(
+              lastChar,
+              expressionArray,
+              operator
+            );
+
+            if (openingCount === closingCount) {
+              appCore.expressionOperators.push(operator);
+            }
+
+            expression = expressionArray.join("");
+            expression += operator
+              .replace("**", "^")
+              .replace("*", "x")
+              .replace("/", "÷");
+
+            appCore.expressionInput.value = expression;
+          }
+        }
+      }
+
+      appCore.currentNumber = "";
+      this.handleFontSize(expression);
+    }
   }
 
   addCharactersOnDisplay(expression, inputChar) {
@@ -485,17 +513,9 @@ export default class AppInterface {
     }
   }
 
-  handleFontSize(expression) {
-    const conversionContainer = document.querySelector(".conversion-container");
-
-    if (!expression) {
-      expression = appCore.expressionInput.value;
-    }
-
+  handleFontSize(expression = "") {
     const fontSize = appCore.expressionInput.style.fontSize;
-    const breakpoint = conversionContainer.classList.value.includes("invisible")
-      ? 18
-      : 25;
+    const breakpoint = this.isDevModeActivated ? 25 : 18;
 
     if (expression.length >= breakpoint && fontSize != "16.5px") {
       appCore.expressionInput.style.fontSize = "16.5px";
@@ -513,7 +533,7 @@ export default class AppInterface {
     appCore.expressionResult.textContent = result;
   }
 
-  applyNewStylingClasses(result) {
+  applyNewStylingClasses(result = "") {
     appCore.expressionInput.classList.add("has-transition");
     this.resultContainer.classList.add("has-transition");
     appCore.expressionResult.classList.add("has-transition");
@@ -522,8 +542,7 @@ export default class AppInterface {
       appCore.expressionInput.classList.add("has-result");
 
       appCore.expressionInput.classList.remove("has-transition");
-      this.resultContainer.classList.remove("invisible");
-      this.resultContainer.classList.remove("has-transition");
+      this.resultContainer.classList.remove("invisible", "has-transition");
       appCore.expressionResult.classList.remove("has-transition");
     }
   }
@@ -536,10 +555,10 @@ export default class AppInterface {
         appCore.expressionInput.value &&
         appCore.expressionResult.textContent
       ) {
-        handleAddingOperationsOnHistory();
+        this.handleAddingOperationsOnHistory();
       }
 
-      setDefaultStylingClasses();
+      this.setDefaultStylingClasses();
       appCore.expressionInput.value = appCore.expressionResult.textContent;
       appCore.expressionResult.textContent = "";
       appCore.currentNumber = appCore.expressionInput.value;
@@ -673,37 +692,22 @@ export default class AppInterface {
   }
 
   handleCurrentInputColor() {
-    const cssVariables = [
-      "--calc-background", // primary
-      "--input-text", // primary
-      "--input-background", // primary
-      "--p-text", // primary
-      "--button-text", // primary
-      "--button-background", // primary
-      "--mode-button-text", // secondary
-      "--mode-button-background", // secondary
-      "--colorized-button-background", // secondary
-      "--header-line", // tertiary
-      "--button-background-effect", // tertiary
-      "--button-border", // tertiary
-    ];
     const bodyTheme = document.body.classList.value.includes("dark-theme")
       ? ".dark-theme"
       : "body";
 
-    cssVariables.forEach((variable, index) => {
+    this.cssVariables.forEach((variable, index) => {
       const currentColor = getComputedStyle(
         document.querySelector(bodyTheme)
       ).getPropertyValue(variable);
       const currentColorTableData = document.querySelector(
-        `table tbody tr:nth-child(${index + 1}) td.current-color-data`
+        `tbody tr:nth-child(${index + 1}) td.current-color-data`
       );
 
       const currentColorInput = document.createElement("input");
       currentColorInput.setAttribute("type", "text");
       currentColorInput.setAttribute("readonly", "true");
-      currentColorInput.classList.add("current-color");
-      currentColorInput.classList.add("has-transition");
+      currentColorInput.classList.add("current-color", "has-transition");
       currentColorInput.style.backgroundColor = currentColor;
 
       currentColorInput.addEventListener(
@@ -720,8 +724,9 @@ export default class AppInterface {
     });
   }
 
-  copyCurrentColorToNewColorField(event) {
-    const unformattedCurrentColor = event.target.style.backgroundColor;
+  copyCurrentColorToNewColorField({ target }) {
+    const currentColorInput = target;
+    const unformattedCurrentColor = currentColorInput.style.backgroundColor;
     const splittedCurrentColor = unformattedCurrentColor
       .replace(/[^0-9\,]/g, "")
       .split(",");
@@ -733,14 +738,15 @@ export default class AppInterface {
         colorChannelValue
       );
 
-      if (convertedColorChannelValue.length % 2 === 1) {
+      if (convertedColorChannelValue.length === 1) {
         convertedColorChannelValue = "0" + convertedColorChannelValue;
       }
 
       formattedCurrentColor += convertedColorChannelValue;
     });
 
-    const targetParentSibling = event.target.parentElement.nextElementSibling;
+    const targetParentSibling =
+      currentColorInput.parentElement.nextElementSibling;
     const fakeNewColorInput =
       targetParentSibling.querySelector("input[type='text']");
     const newColorInput = targetParentSibling.querySelector(
@@ -751,8 +757,8 @@ export default class AppInterface {
     newColorInput.value = formattedCurrentColor;
   }
 
-  triggerColorInput() {
-    const fakeColorInput = event.target;
+  triggerColorInput({ target }) {
+    const fakeColorInput = target;
     const colorInput = fakeColorInput.nextElementSibling;
 
     colorInput.click();
@@ -776,27 +782,12 @@ export default class AppInterface {
     this.modalOverlay.classList.add("invisible");
 
     const colorInputs = document.getElementsByName("new-color");
-    const cssVariables = [
-      "--calc-background",
-      "--input-text",
-      "--input-background",
-      "--p-text",
-      "--button-text",
-      "--button-background",
-      "--mode-button-text",
-      "--mode-button-background",
-      "--colorized-button-background",
-      "--header-line",
-      "--button-background-effect",
-      "--button-border",
-    ];
 
     colorInputs.forEach((input, index) => {
-      document.body.style.setProperty(cssVariables[index], input.value);
+      document.body.style.setProperty(this.cssVariables[index], input.value);
     });
 
-    console.log(this);
-    document.body.onmouseup = this.stopShowingPersonalizedThemePreview;
+    document.body.onmouseup = () => this.stopShowingPersonalizedThemePreview();
   }
 
   stopShowingPersonalizedThemePreview() {
@@ -813,36 +804,21 @@ export default class AppInterface {
 
   createPersonalizedTheme() {
     const colorInputs = document.getElementsByName("new-color");
-    const cssVariables = [
-      "--calc-background",
-      "--input-text",
-      "--input-background",
-      "--p-text",
-      "--button-text",
-      "--button-background",
-      "--mode-button-text",
-      "--mode-button-background",
-      "--colorized-button-background",
-      "--header-line",
-      "--button-background-effect",
-      "--button-border",
-    ];
-    const isValidTheme = handleValidThemes(colorInputs);
+    const isValidTheme = appCore.validateTheme(colorInputs);
 
     if (isValidTheme) {
       colorInputs.forEach((input, index) => {
-        document.body.style.setProperty(cssVariables[index], input.value);
+        document.body.style.setProperty(this.cssVariables[index], input.value);
       });
 
-      const themeIcon = document.querySelector("#theme-icon");
-      themeIcon.setAttribute("class", "fas fa-user-circle");
+      const currentTheme = document.body.getAttribute("style");
+
+      localStorage.setItem("devcalc-userCustomTheme", currentTheme);
+      localStorage.setItem("devcalc-userDefaultTheme", currentTheme);
+
+      this.switchThemeIcon(currentTheme);
       this.handleCurrentInputColor();
       this.applyDefaultColorValue();
-
-      localStorage.setItem(
-        "devcalc-userCustomTheme",
-        document.body.getAttribute("style")
-      );
     }
   }
 }
