@@ -285,13 +285,12 @@ export default class AppInterface {
         appCore.haveSeparateCalculations = false;
       }
 
-      const lastChar = expression[expression.length - 1];
       appCore.currentNumber = expression
         .slice(appCore.firstPosition)
         .replace(/\./g, "");
 
       appCore.formatNumbers(expression);
-      appCore.handleValidExpressions(expression, lastChar);
+      appCore.handleExpressions(expression);
       this.handleFontSize(expression);
     }
   }
@@ -322,7 +321,7 @@ export default class AppInterface {
   }
 
   handleInputData(char) {
-    let expression = appCore.expressionInput.value.replace(/\./g, "");
+    let expression = appCore.expressionInput.value;
 
     if (char == "," || !isNaN(Number(char))) {
       this.addNumbersOnDisplay(expression, char);
@@ -360,7 +359,7 @@ export default class AppInterface {
           expression = appCore.expressionInput.value.replace(/\./g, "");
 
           if (isNaN(Number(expression))) {
-            appCore.handleValidExpressions(expression, number);
+            appCore.handleExpressions(expression);
           }
         }
 
@@ -384,7 +383,7 @@ export default class AppInterface {
   }
 
   addOperatorsOnDisplay(expression, operator) {
-    const [openingCount, closingCount] = appCore.countParentheses(expression);
+    const { openingCount, closingCount } = appCore.countParentheses(expression);
 
     if (
       (openingCount > closingCount &&
@@ -408,10 +407,10 @@ export default class AppInterface {
           lastChar == "π" ||
           lastChar == "e"
         ) {
-          console.log("Chamou");
           let cantAddOperators = false;
 
           if (
+            expression.indexOf("Fib(") !== -1 ||
             (expression.indexOf("Log(") !== -1 &&
               expression.indexOf("Log(") + 4 === expression.length) ||
             (expression.indexOf("Ln(") !== -1 &&
@@ -449,7 +448,7 @@ export default class AppInterface {
 
   addCharactersOnDisplay(expression, inputChar) {
     const lastChar = expression[expression.length - 1];
-    const [openingCount, closingCount] = appCore.countParentheses(expression);
+    const { openingCount, closingCount } = appCore.countParentheses(expression);
 
     if (
       (openingCount > closingCount && !isNaN(Number(lastChar))) ||
@@ -504,11 +503,13 @@ export default class AppInterface {
         appCore.haveSeparateCalculations = true;
       }
 
-      if (inputChar == "!" || inputChar == "π" || inputChar == "e") {
+      if (
+        inputChar == "!" ||
+        (isNaN(Number(lastChar)) && (inputChar == "π" || inputChar == "e"))
+      ) {
         appCore.handleCalculationResult(false);
       }
 
-      appCore.currentNumber = "";
       this.handleFontSize(expression);
     }
   }
@@ -804,7 +805,7 @@ export default class AppInterface {
 
   createPersonalizedTheme() {
     const colorInputs = document.getElementsByName("new-color");
-    const isValidTheme = appCore.validateTheme(colorInputs);
+    const isValidTheme = appCore.validateThemes(colorInputs);
 
     if (isValidTheme) {
       colorInputs.forEach((input, index) => {
