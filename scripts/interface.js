@@ -165,7 +165,7 @@ export default class AppInterface {
       expression.indexOf("Cos(") !== -1 ||
       expression.indexOf("Tan(") !== -1
     ) {
-      appCore.handleCalculationResult(false);
+      appCore.handleCalculationResult(expression);
     }
   }
 
@@ -245,7 +245,7 @@ export default class AppInterface {
     appCore.expressionInput.value = "";
     appCore.expressionResult.textContent = "";
     appCore.currentNumber = "";
-    appCore.firstPosition = "";
+    appCore.firstCurrentNumberPosition = "";
     appCore.isNotCalculable = false;
     appCore.haveSeparateCalculations = false;
     appCore.expressionOperators = [];
@@ -286,7 +286,7 @@ export default class AppInterface {
       }
 
       appCore.currentNumber = expression
-        .slice(appCore.firstPosition)
+        .slice(appCore.firstCurrentNumberPosition)
         .replace(/\./g, "");
 
       appCore.formatNumbers(expression);
@@ -358,9 +358,7 @@ export default class AppInterface {
           appCore.expressionInput.value += number;
           expression = appCore.expressionInput.value.replace(/\./g, "");
 
-          if (isNaN(Number(expression))) {
-            appCore.handleExpressions(expression);
-          }
+          appCore.handleExpressions(expression);
         }
 
         appCore.formatNumbers(expression, number);
@@ -375,7 +373,7 @@ export default class AppInterface {
     const lastPosition = formattedNumber.length + 1;
 
     expressionArray.splice(
-      appCore.firstPosition,
+      appCore.firstCurrentNumberPosition,
       lastPosition,
       formattedNumber
     );
@@ -507,7 +505,7 @@ export default class AppInterface {
         inputChar == "!" ||
         (isNaN(Number(lastChar)) && (inputChar == "π" || inputChar == "e"))
       ) {
-        appCore.handleCalculationResult(false);
+        appCore.handleCalculationResult();
       }
 
       this.handleFontSize(expression);
@@ -563,7 +561,7 @@ export default class AppInterface {
       appCore.expressionInput.value = appCore.expressionResult.textContent;
       appCore.expressionResult.textContent = "";
       appCore.currentNumber = appCore.expressionInput.value;
-      appCore.firstPosition = 0;
+      appCore.firstCurrentNumberPosition = 0;
       return;
     }
 
