@@ -15,6 +15,27 @@ export default class AppCore {
     this.firstCurrentNumberPosition;
   }
 
+  updateCurrentNumberValue(expression) {
+    let currentNumber = "";
+
+    for (let index = expression.length - 1; index >= 0; index--) {
+      const currentChar = expression[index];
+
+      if (!isNaN(Number(currentChar))) {
+        currentNumber += currentChar;
+
+        if (index === 0) {
+          this.firstCurrentNumberPosition = 0;
+        }
+      } else if (currentChar != "." && currentChar != ",") {
+        this.firstCurrentNumberPosition = index + 1;
+        break;
+      }
+    }
+
+    this.currentNumber = [...currentNumber].reverse().join("");
+  }
+
   checkIfCommaCanBeAdded(expression, number) {
     const numbersArray = this.getNumbersArray(expression);
     const operators = this.getOperatorsArray(expression);
@@ -34,7 +55,7 @@ export default class AppCore {
         (operators.length === 2 && commaCount === 1)) &&
         number == ",") ||
       (lastNumber.indexOf("Hypot(") === -1 &&
-        lastNumber.includes(",") &&
+        lastNumber.includes(".") &&
         number == ",")
     ) {
       return false;
@@ -57,33 +78,20 @@ export default class AppCore {
 
   handleExpressions(expression) {
     if (isNaN(Number(expression))) {
-      expression = expression
-        .replace(/\^/g, "**")
-        .replace(/\x/g, "*")
-        .replace(/\÷/g, "/")
-        .replace(/\,/g, ".");
       const numbersArray = this.getNumbersArray(expression);
-
-      const lastNumberPosition = numbersArray.length - 1;
-      const lastNumber = numbersArray[lastNumberPosition].replace(",", ".");
+      const lastNumber = numbersArray[numbersArray.length - 1];
+      const lastChar = expression[expression.length - 1];
       const lastOperatorPosition = this.expressionOperators.length - 1;
       const currentOperator = this.expressionOperators[lastOperatorPosition];
-
-      let penultimateChar = expression[expression.length - 2];
-
-      if (penultimateChar) {
-        penultimateChar = penultimateChar
-          .replace("x", "*")
-          .replace("^", "**")
-          .replace("÷", "/");
-      }
 
       if (
         (currentOperator == "/" &&
           lastNumber !== "" &&
-          Number(lastNumber) === 0) ||
+          Number(lastNumber) === 0 &&
+          lastChar != "!") ||
         lastNumber == "√(" ||
-        !lastNumber.replace(/\√/g, "")
+        (lastNumber.indexOf("√") !== -1 && !lastNumber.replace(/\√/g, "")) ||
+        numbersArray[1] === ""
       ) {
         appInterface.setDefaultStylingClasses();
         this.isNotCalculable = true;
@@ -137,7 +145,7 @@ export default class AppCore {
 
       if (
         this.currentNumber &&
-        (!expression.includes(",") || !this.currentNumber.includes(","))
+        (!expression.includes(".") || !this.currentNumber.includes("."))
       ) {
         const formattedNumber = Number(this.currentNumber).toLocaleString(
           "pt-BR"
@@ -185,29 +193,33 @@ export default class AppCore {
     return operator;
   }
 
-  handleCalculationResult(expression = this.expressionInput.value) {
+  handleCalculationResult(expression) {
     const numbersArray = this.handleNumbersArray(expression);
-    let result = this.calculateResult(numbersArray, this.expressionOperators);
 
-    if (
-      expression.indexOf("Bin(") === -1 &&
-      expression.indexOf("Oct(") === -1 &&
-      expression.indexOf("Hex(") === -1 &&
-      expression.indexOf("Fib(") === -1
-    ) {
-      result = this.formatExpressionResult(result);
+    if (!this.isNotCalculable) {
+      let result = this.calculateResult(numbersArray, this.expressionOperators);
+
+      if (
+        expression.indexOf("Bin(") === -1 &&
+        expression.indexOf("Oct(") === -1 &&
+        expression.indexOf("Hex(") === -1 &&
+        expression.indexOf("Fib(") === -1
+      ) {
+        result = this.formatExpressionResult(result);
+      }
+
+      if (!appInterface) {
+        appInterface = new AppInterface();
+      }
+
+      appInterface.showResult(result);
     }
-
-    if (!appInterface) {
-      appInterface = new AppInterface();
-    }
-
-    appInterface.showResult(result);
   }
 
   handleNumbersArray(expression) {
     if (this.haveSeparateCalculations) {
       expression = this.handleSeparateCalculations(expression);
+      console.log("Expressão retornada: " + expression);
     }
 
     let firstCharIsAnOperator = false;
@@ -242,6 +254,7 @@ export default class AppCore {
 
     let openingParenthesisCount = 0;
     let closingParenthesisCount = 0;
+    let count = 0;
 
     while (newExpression.indexOf("(") !== -1) {
       const firstOpeningParenthesisIndex = newExpression.indexOf("(");
@@ -361,12 +374,19 @@ export default class AppCore {
 
         newExpression = newExpression.replace(partOfExpression, result);
       }
+
+      if (count === 1) {
+        break;
+      }
+
+      count++;
     }
 
     if (
       newExpression.indexOf("√") !== -1 ||
       newExpression.indexOf("!") !== -1
     ) {
+      console.log("Chamou");
       newExpression = this.calculateUnaryMathOperators(newExpression);
     }
 
@@ -448,9 +468,13 @@ export default class AppCore {
         ) {
           const currentChar = newExpression[index];
 
-          if (!isNaN(Number(currentChar))) {
-            squareRootNumber += newExpression[index];
+          if (!isNaN(Number(currentChar)) || currentChar == ".") {
+            squareRootNumber += currentChar;
             continue;
+          }
+
+          if (currentChar == "-") {
+            this.isNotCalculable = true;
           }
 
           break;
@@ -501,6 +525,13 @@ export default class AppCore {
           break;
         }
 
+        matchString = factorialNumber + matchString;
+
+        if (Number(factorialNumber) === 0) {
+          newExpression = newExpression.replace(matchString, 1);
+          return newExpression;
+        }
+
         factorialNumber = [...factorialNumber].reverse().join("");
         let result = Number(factorialNumber);
 
@@ -512,7 +543,6 @@ export default class AppCore {
           result *= index;
         }
 
-        matchString = factorialNumber + matchString;
         newExpression = newExpression.replace(matchString, result);
       }
     }
@@ -524,19 +554,14 @@ export default class AppCore {
     const operators = [];
 
     for (let char in expression) {
-      const currentChar = expression[char]
-        .replace("x", "*")
-        .replace("^", "**")
-        .replace("÷", "/");
+      const currentChar = expression[char];
       const previousChar = expression[char - 1];
 
-      // create a function that will validate the operators;
       if (
         !isNaN(Number(previousChar)) &&
         (currentChar == "+" ||
           currentChar == "-" ||
           currentChar == "*" ||
-          currentChar == "**" ||
           currentChar == "/" ||
           currentChar == "%")
       ) {
@@ -733,8 +758,8 @@ export default class AppCore {
 
   formatExpressionResult(result) {
     result = !String(result).includes(".")
-      ? result.toLocaleString("pt-BR")
-      : result.toLocaleString("pt-BR", {
+      ? Number(result).toLocaleString("pt-BR")
+      : Number(result).toLocaleString("pt-BR", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 10,
         });

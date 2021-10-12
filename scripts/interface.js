@@ -257,20 +257,22 @@ export default class AppInterface {
   deleteLastCharacter() {
     if (appCore.expressionInput.value) {
       let expression = appCore.expressionInput.value;
-      const expressionArray = [...expression];
-      const lastPositions = [
-        expressionArray.length - 1,
-        appCore.expressionOperators.length - 1,
-      ];
+      let expressionArray = [...expression];
 
-      const lastExpressionChar = expressionArray[lastPositions[0]]
+      const lastChar = expressionArray[expressionArray.length - 1]
         .replace("x", "*")
         .replace("^", "**")
         .replace("÷", "/");
-      const lastOperator = appCore.expressionOperators[lastPositions[1]];
+      const currentOperator =
+        appCore.expressionOperators[appCore.expressionOperators.length - 1];
+      let currentNumberUpdateNeeded = true;
 
-      if (lastExpressionChar == lastOperator) {
+      if (lastChar == currentOperator) {
         appCore.expressionOperators.pop();
+      }
+
+      if (isNaN(Number(lastChar))) {
+        currentNumberUpdateNeeded = false;
       }
 
       expressionArray.pop();
@@ -285,13 +287,20 @@ export default class AppInterface {
         appCore.haveSeparateCalculations = false;
       }
 
-      appCore.currentNumber = expression
-        .slice(appCore.firstCurrentNumberPosition)
-        .replace(/\./g, "");
+      if (currentNumberUpdateNeeded) {
+        appCore.updateCurrentNumberValue(expression);
+      }
+
+      expression = expression
+        .replace(/\^/g, "**")
+        .replace(/\x/g, "*")
+        .replace(/\÷/g, "/")
+        .replace(/\./g, "")
+        .replace(/\,/g, ".");
 
       appCore.formatNumbers(expression);
       appCore.handleExpressions(expression);
-      this.handleFontSize(expression);
+      this.handleFontSize();
     }
   }
 
@@ -317,23 +326,27 @@ export default class AppInterface {
     sideContainer.classList.toggle("invisible");
 
     appCore.expressionInput.classList.remove("has-transition");
-    this.handleFontSize(appCore.expressionInput.value);
+    this.handleFontSize();
   }
 
   handleInputData(char) {
-    let expression = appCore.expressionInput.value;
+    let expression = appCore.expressionInput.value
+      .replace(/\^/g, "**")
+      .replace(/\x/g, "*")
+      .replace(/\÷/g, "/")
+      .replace(/\./g, "")
+      .replace(/\,/g, ".");
 
     if (char == "," || !isNaN(Number(char))) {
       this.addNumbersOnDisplay(expression, char);
     } else if (
+      char.includes("*") ||
       char == "+" ||
       char == "-" ||
-      char == "*" ||
       char == "/" ||
-      char == "**" ||
       char == "%"
     ) {
-      this.addOperatorsOnDisplay(expression, char);
+      this.addOperatorsOnDisplay(char);
     } else {
       this.addCharactersOnDisplay(expression, char);
     }
@@ -356,15 +369,16 @@ export default class AppInterface {
 
         if (canBe) {
           appCore.expressionInput.value += number;
-          expression = appCore.expressionInput.value.replace(/\./g, "");
 
+          number = number.replace(",", ".");
+          expression += number;
+
+          appCore.formatNumbers(expression, number);
           appCore.handleExpressions(expression);
         }
-
-        appCore.formatNumbers(expression, number);
       }
 
-      this.handleFontSize(appCore.expressionInput.value);
+      this.handleFontSize();
     }
   }
 
@@ -380,19 +394,20 @@ export default class AppInterface {
     appCore.expressionInput.value = expressionArray.join("");
   }
 
-  addOperatorsOnDisplay(expression, operator) {
+  addOperatorsOnDisplay(operator) {
+    let expression = appCore.expressionInput.value;
+    const lastChar = expression[expression.length - 1];
     const { openingCount, closingCount } = appCore.countParentheses(expression);
 
     if (
-      (openingCount > closingCount &&
-        expression[expression.length - 1] != "(") ||
-      (expression.indexOf("Bin(") === -1 &&
-        expression.indexOf("Oct(") === -1 &&
-        expression.indexOf("Hex(") === -1 &&
-        expression.indexOf("Fib(") === -1)
+      lastChar != "(" &&
+      !appCore.isNotCalculable &&
+      expression.indexOf("Bin(") === -1 &&
+      expression.indexOf("Oct(") === -1 &&
+      expression.indexOf("Hex(") === -1 &&
+      expression.indexOf("Fib(") === -1
     ) {
       let expressionArray = [...expression];
-      const lastChar = expression[expression.length - 1];
 
       if (!expression) {
         if (operator == "-") {
@@ -440,7 +455,7 @@ export default class AppInterface {
       }
 
       appCore.currentNumber = "";
-      this.handleFontSize(expression);
+      this.handleFontSize();
     }
   }
 
@@ -449,16 +464,20 @@ export default class AppInterface {
     const { openingCount, closingCount } = appCore.countParentheses(expression);
 
     if (
-      (openingCount > closingCount && !isNaN(Number(lastChar))) ||
       (openingCount > closingCount &&
         !isNaN(Number(lastChar)) &&
         inputChar != "(") ||
+      (openingCount > closingCount && lastChar == ")" && inputChar == ")") ||
       (isNaN(Number(lastChar)) &&
         lastChar != ")" &&
+        lastChar != "π" &&
+        lastChar != "e" &&
+        lastChar != "!" &&
         inputChar != ")" &&
         inputChar != "!") ||
       ((!isNaN(Number(lastChar)) || lastChar == ")") && inputChar == "!") ||
-      (lastChar == "!" && (inputChar == ")" || inputChar == "!"))
+      (lastChar == "!" &&
+        ((openingCount > closingCount && inputChar == ")") || inputChar == "!"))
     ) {
       const penultimateChar = expression[expression.length - 2];
 
@@ -494,6 +513,7 @@ export default class AppInterface {
       }
 
       appCore.expressionInput.value += inputChar;
+      expression += inputChar;
     }
 
     if (appCore.expressionInput.value) {
@@ -505,14 +525,15 @@ export default class AppInterface {
         inputChar == "!" ||
         (isNaN(Number(lastChar)) && (inputChar == "π" || inputChar == "e"))
       ) {
-        appCore.handleCalculationResult();
+        appCore.handleExpressions(expression);
       }
 
-      this.handleFontSize(expression);
+      this.handleFontSize();
     }
   }
 
-  handleFontSize(expression = "") {
+  handleFontSize() {
+    const expression = appCore.expressionInput.value;
     const fontSize = appCore.expressionInput.style.fontSize;
     const breakpoint = this.isDevModeActivated ? 25 : 18;
 
