@@ -41,13 +41,17 @@ div#display div#result-container {
 }
 
 div#result-container p {
-  max-width: 259px;
+  max-width: 198px;
   color: var(--p-text);
 
   cursor: default;
   white-space: nowrap;
   border-radius: 8px;
   overflow-x: auto;
+}
+
+div#result-container p.stretch {
+  max-width: 259px;
 }
 
 div#result-container p::-webkit-scrollbar {

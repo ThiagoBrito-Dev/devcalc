@@ -48,11 +48,7 @@ export default class AppInterface {
       });
     }
 
-    let userTheme = localStorage.getItem("devcalc-userDefaultTheme");
-    if (userTheme === null) {
-      userTheme = "";
-    }
-
+    let userTheme = localStorage.getItem("devcalc-userDefaultTheme") || "";
     const attributeName =
       userTheme !== "" && userTheme != "dark-theme" ? "style" : "class";
 
@@ -92,22 +88,16 @@ export default class AppInterface {
         this.addOperatorsOnDisplay(operator);
       } else {
         switch (key) {
-          case "r":
-            this.toggleResultMode();
-            break;
-          case "t":
+          case "q":
             this.switchTheme();
             break;
-          case "l":
+          case "d":
             this.clearExpression();
-            break;
-          case "c":
-            this.changeConversionMode();
             break;
           case "o":
             this.handleOptionsBox();
             break;
-          case "h":
+          case "r":
             if (
               this.historyModalContent.classList.value.includes("invisible")
             ) {
@@ -123,7 +113,7 @@ export default class AppInterface {
             }
 
             break;
-          case "p":
+          case "m":
             if (
               this.personalizationModalContent.classList.value.includes(
                 "invisible"
@@ -147,6 +137,59 @@ export default class AppInterface {
             break;
           case "Enter":
             this.focalizeResult();
+            break;
+        }
+      }
+
+      if (this.isDevModeActivated) {
+        switch (key) {
+          case "b":
+            this.changeConversionMode();
+            break;
+          case "v":
+            this.toggleResultMode();
+            break;
+          case "i":
+            this.handleAddingConversionModeOnInput();
+            break;
+          case "(":
+            this.handleInputData("(");
+            break;
+          case ")":
+            this.handleInputData(")");
+            break;
+          case "f":
+            this.handleInputData("Fib(");
+            break;
+          case "n":
+            this.handleInputData("Ln(");
+            break;
+          case "e":
+            this.handleInputData("e");
+            break;
+          case "!":
+            this.handleInputData("!");
+            break;
+          case ";":
+            this.handleInputData("√");
+            break;
+          case "s":
+            this.handleInputData("Sin(");
+            break;
+          case "l":
+            this.handleInputData("Log(");
+            break;
+          case "p":
+            this.handleInputData("π");
+            break;
+          case "c":
+            this.handleInputData("Cos(");
+            break;
+          case "t":
+            this.handleInputData("Tan(");
+            break;
+          case "h":
+            this.handleInputData("Hypot(");
             break;
         }
       }
@@ -184,7 +227,7 @@ export default class AppInterface {
     });
   }
 
-  addConversionModeOnInput() {
+  handleAddingConversionModeOnInput() {
     let currentMode = [...this.conversionMode.textContent.trim().toLowerCase()];
     currentMode[0] = currentMode[0].toUpperCase();
     currentMode = currentMode.join("");
@@ -259,6 +302,8 @@ export default class AppInterface {
       let expression = appCore.expressionInput.value;
       let expressionArray = [...expression];
 
+      const { openingCount, closingCount } =
+        appCore.countParentheses(expression);
       const lastChar = expressionArray[expressionArray.length - 1]
         .replace("x", "*")
         .replace("^", "**")
@@ -267,7 +312,7 @@ export default class AppInterface {
         appCore.expressionOperators[appCore.expressionOperators.length - 1];
       let currentNumberUpdateNeeded = true;
 
-      if (lastChar == currentOperator) {
+      if (openingCount === closingCount && lastChar == currentOperator) {
         appCore.expressionOperators.pop();
       }
 
@@ -298,6 +343,10 @@ export default class AppInterface {
         .replace(/\./g, "")
         .replace(/\,/g, ".");
 
+      if (expression.includes("He")) {
+        expression = expression.replace("*", "x");
+      }
+
       appCore.formatNumbers(expression);
       appCore.handleExpressions(expression);
       this.handleFontSize();
@@ -323,6 +372,7 @@ export default class AppInterface {
     actionsContainer.classList.toggle("invisible");
     actionsContainer.classList.toggle("space-between");
     appCore.expressionInput.classList.toggle("stretch");
+    appCore.expressionResult.classList.toggle("stretch");
     sideContainer.classList.toggle("invisible");
 
     appCore.expressionInput.classList.remove("has-transition");
@@ -336,6 +386,10 @@ export default class AppInterface {
       .replace(/\÷/g, "/")
       .replace(/\./g, "")
       .replace(/\,/g, ".");
+
+    if (expression.includes("He")) {
+      expression = expression.replace("*", "x");
+    }
 
     if (char == "," || !isNaN(Number(char))) {
       this.addNumbersOnDisplay(expression, char);
@@ -477,19 +531,22 @@ export default class AppInterface {
         inputChar != "!") ||
       ((!isNaN(Number(lastChar)) || lastChar == ")") && inputChar == "!") ||
       (lastChar == "!" &&
-        ((openingCount > closingCount && inputChar == ")") || inputChar == "!"))
+        ((openingCount > closingCount && inputChar == ")") ||
+          inputChar == "!")) ||
+      ((lastChar == "π" || lastChar == "e") &&
+        openingCount > closingCount &&
+        inputChar == ")")
     ) {
       const penultimateChar = expression[expression.length - 2];
 
       if (
-        inputChar == "Bin(" ||
-        inputChar == "Oct(" ||
-        inputChar == "Hex(" ||
-        inputChar == "Fib("
+        inputChar != ")" &&
+        (expression.indexOf("Bin(") !== -1 ||
+          expression.indexOf("Oct(") !== -1 ||
+          expression.indexOf("Hex(") !== -1 ||
+          expression.indexOf("Fib(") !== -1)
       ) {
-        if (expression) {
-          return;
-        }
+        return;
       }
 
       if (
@@ -522,7 +579,7 @@ export default class AppInterface {
       }
 
       if (
-        inputChar == "!" ||
+        (lastChar != "(" && inputChar == "!") ||
         (isNaN(Number(lastChar)) && (inputChar == "π" || inputChar == "e"))
       ) {
         appCore.handleExpressions(expression);
@@ -568,25 +625,40 @@ export default class AppInterface {
   }
 
   focalizeResult() {
-    appCore.expressionOperators = [];
+    const expression = appCore.expressionInput.value;
+    const lastChar = expression[expression.length - 1];
+    const { openingCount, closingCount } = appCore.countParentheses(expression);
 
-    if (!appCore.isNotCalculable) {
-      if (
-        appCore.expressionInput.value &&
-        appCore.expressionResult.textContent
-      ) {
-        this.handleAddingOperationsOnHistory();
+    if (
+      openingCount === closingCount &&
+      (!isNaN(Number(lastChar)) ||
+        lastChar == ")" ||
+        lastChar == "!" ||
+        lastChar == "π" ||
+        lastChar == "e")
+    ) {
+      appCore.expressionOperators = [];
+
+      if (!appCore.isNotCalculable) {
+        if (expression && appCore.expressionResult.textContent) {
+          this.handleAddingOperationsOnHistory();
+        }
+
+        this.setDefaultStylingClasses();
+        appCore.expressionInput.value = appCore.expressionResult.textContent;
+        appCore.expressionResult.textContent = "";
+        appCore.currentNumber = expression;
+        appCore.firstCurrentNumberPosition = 0;
+
+        return;
       }
 
-      this.setDefaultStylingClasses();
-      appCore.expressionInput.value = appCore.expressionResult.textContent;
-      appCore.expressionResult.textContent = "";
-      appCore.currentNumber = appCore.expressionInput.value;
-      appCore.firstCurrentNumberPosition = 0;
-      return;
+      appCore.expressionInput.value = "Expressão inválida";
+    } else {
+      alert(
+        "Desculpe, mas, para que o resultado seja ampliado, a expressão deve ser finalizada!"
+      );
     }
-
-    appCore.expressionInput.value = "Expressão inválida";
   }
 
   setDefaultStylingClasses() {

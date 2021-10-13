@@ -21,19 +21,21 @@ export default class AppCore {
     for (let index = expression.length - 1; index >= 0; index--) {
       const currentChar = expression[index];
 
-      if (!isNaN(Number(currentChar))) {
+      if (!isNaN(Number(currentChar)) || currentChar == ",") {
         currentNumber += currentChar;
 
         if (index === 0) {
           this.firstCurrentNumberPosition = 0;
         }
-      } else if (currentChar != "." && currentChar != ",") {
+      } else if (currentChar != ".") {
         this.firstCurrentNumberPosition = index + 1;
         break;
       }
     }
 
-    this.currentNumber = [...currentNumber].reverse().join("");
+    this.currentNumber = [...currentNumber.replace(",", ".")]
+      .reverse()
+      .join("");
   }
 
   checkIfCommaCanBeAdded(expression, number) {
@@ -42,11 +44,22 @@ export default class AppCore {
 
     const lastNumberPosition = numbersArray.length - 1;
     const lastNumber = numbersArray[lastNumberPosition];
+    let currentMathFunction;
+
+    if (this.handleSeparateCalculations) {
+      const openingParenthesisIndex =
+        expression.length - (lastNumber.length + 1);
+
+      currentMathFunction = this.getCurrentMathFunction(
+        openingParenthesisIndex,
+        expression
+      );
+    }
 
     let commaCount;
 
-    if (lastNumber.indexOf("Hypot(") !== -1) {
-      commaCount = this.countCommas(lastNumber);
+    if (currentMathFunction == "Hypot") {
+      commaCount = this.countCommas(lastNumber.replace(/\./g, ","));
     }
 
     if (
@@ -54,9 +67,7 @@ export default class AppCore {
         (operators.length === 1 && commaCount === 2) ||
         (operators.length === 2 && commaCount === 1)) &&
         number == ",") ||
-      (lastNumber.indexOf("Hypot(") === -1 &&
-        lastNumber.includes(".") &&
-        number == ",")
+      (!commaCount && lastNumber.includes(".") && number == ",")
     ) {
       return false;
     }
@@ -81,28 +92,57 @@ export default class AppCore {
       const numbersArray = this.getNumbersArray(expression);
       const lastNumber = numbersArray[numbersArray.length - 1];
       const lastChar = expression[expression.length - 1];
-      const lastOperatorPosition = this.expressionOperators.length - 1;
-      const currentOperator = this.expressionOperators[lastOperatorPosition];
+      const currentOperator =
+        this.expressionOperators[this.expressionOperators.length - 1];
+      let hasDomainError = false;
+
+      if (expression.indexOf("(") !== -1) {
+        let openingParenthesisIndex;
+
+        for (let index = expression.length - 1; index >= 0; index--) {
+          const currentChar = expression[index];
+
+          if (currentChar == "(") {
+            openingParenthesisIndex = index;
+            break;
+          }
+        }
+
+        const currentMathFunction = this.getCurrentMathFunction(
+          openingParenthesisIndex,
+          expression
+        );
+
+        if (
+          (currentMathFunction == "Log" || currentMathFunction == "Ln") &&
+          Number(lastNumber) === 0
+        ) {
+          hasDomainError = true;
+        }
+
+        if (lastNumber.includes("Fib(")) {
+          const startIndex = lastNumber.indexOf("(") + 1;
+          const fibonacciValue = lastNumber.slice(startIndex);
+
+          if (Number(fibonacciValue) === 0) {
+            hasDomainError = true;
+          }
+        }
+      }
 
       if (
         (currentOperator == "/" &&
           lastNumber !== "" &&
           Number(lastNumber) === 0 &&
           lastChar != "!") ||
-        lastNumber == "√(" ||
-        (lastNumber.indexOf("√") !== -1 && !lastNumber.replace(/\√/g, "")) ||
-        numbersArray[1] === ""
+        hasDomainError
       ) {
         appInterface.setDefaultStylingClasses();
         this.isNotCalculable = true;
       } else {
         this.isNotCalculable = false;
 
-        const isValidExpression = this.validateExpressions(
-          expression,
-          currentOperator,
-          numbersArray
-        );
+        const isValidExpression = this.validateExpressions(numbersArray);
 
         if (isValidExpression) {
           this.handleCalculationResult(expression);
@@ -114,13 +154,14 @@ export default class AppCore {
     }
   }
 
-  validateExpressions(expression, currentOperator, numbersArray) {
-    const splittedExpression = expression.split(currentOperator);
-
+  validateExpressions(numbersArray) {
+    // make a better validation
     if (
-      numbersArray.length === 2 &&
-      !numbersArray[1] &&
-      !splittedExpression[1]
+      (numbersArray.length === 2 &&
+        !this.haveSeparateCalculations &&
+        numbersArray[1] === "") ||
+      (this.haveSeparateCalculations &&
+        numbersArray[numbersArray.length - 1] === "")
     ) {
       return false;
     }
@@ -222,19 +263,45 @@ export default class AppCore {
       console.log("Expressão retornada: " + expression);
     }
 
-    let firstCharIsAnOperator = false;
-    let firstChar;
+    const negativeSignalsPositions = [];
 
-    if (expression && expression[0] == "-") {
-      expression = expression.slice(1);
-      firstCharIsAnOperator = true;
-      firstChar = "-";
+    if (expression.indexOf("-") !== -1) {
+      for (let char in expression) {
+        const currentChar = expression[char];
+        const previousChar = expression[char - 1];
+
+        if (
+          currentChar == "-" &&
+          (!previousChar ||
+            (previousChar != "(" &&
+              previousChar != ")" &&
+              isNaN(Number(previousChar))))
+        ) {
+          negativeSignalsPositions.push(char);
+        }
+      }
     }
 
-    const numbersArray = this.getNumbersArray(expression);
+    if (negativeSignalsPositions.length) {
+      expression = [...expression];
 
-    if (firstCharIsAnOperator) {
-      numbersArray[0] = firstChar + numbersArray[0];
+      negativeSignalsPositions.forEach((signal, index) => {
+        expression.splice(signal - index, 1);
+      });
+
+      expression = expression.join("");
+    }
+
+    let numbersArray = this.getNumbersArray(expression);
+
+    if (negativeSignalsPositions.length) {
+      const expressionArray = [...numbersArray.join(" ")];
+
+      negativeSignalsPositions.forEach((signal, index) => {
+        expressionArray.splice(signal, 0, "-");
+      });
+
+      numbersArray = expressionArray.join("").split(" ");
     }
 
     return numbersArray;
@@ -254,7 +321,6 @@ export default class AppCore {
 
     let openingParenthesisCount = 0;
     let closingParenthesisCount = 0;
-    let count = 0;
 
     while (newExpression.indexOf("(") !== -1) {
       const firstOpeningParenthesisIndex = newExpression.indexOf("(");
@@ -374,19 +440,12 @@ export default class AppCore {
 
         newExpression = newExpression.replace(partOfExpression, result);
       }
-
-      if (count === 1) {
-        break;
-      }
-
-      count++;
     }
 
     if (
       newExpression.indexOf("√") !== -1 ||
       newExpression.indexOf("!") !== -1
     ) {
-      console.log("Chamou");
       newExpression = this.calculateUnaryMathOperators(newExpression);
     }
 
@@ -406,10 +465,6 @@ export default class AppCore {
     ) {
       for (let index = previousIndex; index >= 0; index--) {
         let currentChar = expression[index];
-
-        if (expression.includes("He")) {
-          currentChar = currentChar.replace("*", "x");
-        }
 
         if (
           currentChar == "+" ||
@@ -679,7 +734,7 @@ export default class AppCore {
           for (let index = 1; index < value; index++) {
             let nextNumber = previousNumber + currentNumber;
 
-            result += `, ${nextNumber}`;
+            result += `, ${" " + String(nextNumber)}`;
             previousNumber = currentNumber;
             currentNumber = nextNumber;
           }
@@ -692,13 +747,16 @@ export default class AppCore {
     return calculationResult;
   }
 
-  getNumbersArray(expression, operators = this.expressionOperators) {
-    if (operators.length && expression.indexOf("Fib(") === -1) {
+  getNumbersArray(expression) {
+    if (
+      this.expressionInput.value.indexOf("Fib(") === -1 &&
+      this.expressionInput.value.indexOf("Hex(") === -1
+    ) {
       expression = expression.replace(/\*\*/g, "^");
 
       const numbersArray = expression
-        .replace(/[^0-9\+\-\*\/\^\%\.\,]/g, "")
-        .replace(/[^0-9\.\,]/g, " ")
+        .replace(/[^0-9\+\-\*\/\^\%\.\,\π\e]/g, "")
+        .replace(/[^0-9\.\,\π\e]/g, " ")
         .split(" ");
 
       return numbersArray;
@@ -745,6 +803,10 @@ export default class AppCore {
             result /= currentNumber;
             break;
           case "%":
+            if (number === "") {
+              currentNumber = 100;
+            }
+
             result = (currentNumber * result) / 100;
             break;
         }
