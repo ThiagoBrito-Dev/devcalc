@@ -30,7 +30,7 @@ div#display input.stretch {
 div#display input.has-result {
   height: 30.675px;
   border-radius: 2px 2px 0 0;
-  padding: 4px 8px 0 0;
+  padding-top: 4px;
 }
 
 div#display div#result-container {
