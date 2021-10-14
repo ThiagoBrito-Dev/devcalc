@@ -155,7 +155,6 @@ export default class AppCore {
   }
 
   validateExpressions(numbersArray) {
-    // make a better validation
     if (
       (numbersArray.length === 2 &&
         !this.haveSeparateCalculations &&
@@ -260,50 +259,9 @@ export default class AppCore {
   handleNumbersArray(expression) {
     if (this.haveSeparateCalculations) {
       expression = this.handleSeparateCalculations(expression);
-      console.log("Expressão retornada: " + expression);
-    }
-
-    const negativeSignalsPositions = [];
-
-    if (expression.indexOf("-") !== -1) {
-      for (let char in expression) {
-        const currentChar = expression[char];
-        const previousChar = expression[char - 1];
-
-        if (
-          currentChar == "-" &&
-          (!previousChar ||
-            (previousChar != "(" &&
-              previousChar != ")" &&
-              isNaN(Number(previousChar))))
-        ) {
-          negativeSignalsPositions.push(char);
-        }
-      }
-    }
-
-    if (negativeSignalsPositions.length) {
-      expression = [...expression];
-
-      negativeSignalsPositions.forEach((signal, index) => {
-        expression.splice(signal - index, 1);
-      });
-
-      expression = expression.join("");
     }
 
     let numbersArray = this.getNumbersArray(expression);
-
-    if (negativeSignalsPositions.length) {
-      const expressionArray = [...numbersArray.join(" ")];
-
-      negativeSignalsPositions.forEach((signal, index) => {
-        expressionArray.splice(signal, 0, "-");
-      });
-
-      numbersArray = expressionArray.join("").split(" ");
-    }
-
     return numbersArray;
   }
 
@@ -446,7 +404,33 @@ export default class AppCore {
       newExpression.indexOf("√") !== -1 ||
       newExpression.indexOf("!") !== -1
     ) {
-      newExpression = this.calculateUnaryMathOperators(newExpression);
+      const unaryOperatorIndex = newExpression.indexOf("√");
+      let canCalculate = true;
+
+      if (unaryOperatorIndex !== -1) {
+        const nextIndex = unaryOperatorIndex + 1;
+        const nextChar = newExpression[nextIndex];
+
+        if (nextChar == "√") {
+          for (let index = nextIndex; index < newExpression.length; index++) {
+            const currentChar = newExpression[index];
+            const previousChar = newExpression[index - 1];
+
+            if (previousChar == "√" && currentChar == "-") {
+              canCalculate = false;
+            }
+          }
+        } else if (nextChar == "-") {
+          canCalculate = false;
+        }
+      }
+
+      if (canCalculate) {
+        this.isNotCalculable = false;
+        newExpression = this.calculateUnaryMathOperators(newExpression);
+      } else {
+        this.isNotCalculable = true;
+      }
     }
 
     return newExpression;
@@ -528,10 +512,6 @@ export default class AppCore {
             continue;
           }
 
-          if (currentChar == "-") {
-            this.isNotCalculable = true;
-          }
-
           break;
         }
 
@@ -571,8 +551,13 @@ export default class AppCore {
 
         for (let index = exclamationIndex - 1; index >= 0; index--) {
           const currentChar = newExpression[index];
+          const previousChar = newExpression[index - 1];
 
-          if (!isNaN(Number(currentChar))) {
+          if (
+            !isNaN(Number(currentChar)) ||
+            currentChar == "." ||
+            (currentChar == "-" && (!previousChar || previousChar == "("))
+          ) {
             factorialNumber += newExpression[index];
             continue;
           }
@@ -580,25 +565,30 @@ export default class AppCore {
           break;
         }
 
-        matchString = factorialNumber + matchString;
+        factorialNumber = Number([...factorialNumber].reverse().join(""));
+        matchString = String(factorialNumber) + matchString;
 
-        if (Number(factorialNumber) === 0) {
+        if (factorialNumber === 0) {
           newExpression = newExpression.replace(matchString, 1);
           return newExpression;
+        } else if (!String(factorialNumber).includes(".")) {
+          const startValue = Math.abs(factorialNumber);
+          let result = factorialNumber;
+
+          for (
+            let index = startValue - decreaseValue;
+            index >= 1;
+            index -= decreaseValue
+          ) {
+            result *= index;
+          }
+
+          newExpression = newExpression.replace(matchString, result);
+        } else {
+          appInterface.setDefaultStylingClasses();
+          this.isNotCalculable = true;
+          break;
         }
-
-        factorialNumber = [...factorialNumber].reverse().join("");
-        let result = Number(factorialNumber);
-
-        for (
-          let index = factorialNumber - decreaseValue;
-          index >= 1;
-          index -= decreaseValue
-        ) {
-          result *= index;
-        }
-
-        newExpression = newExpression.replace(matchString, result);
       }
     }
 
@@ -748,21 +738,74 @@ export default class AppCore {
   }
 
   getNumbersArray(expression) {
+    let numbersArray = [expression];
+    const negativeSignalsPositions = [];
+    let addPosition;
+
+    if (expression.indexOf("-") !== -1) {
+      for (let char in expression) {
+        const currentChar = expression[char];
+        const previousChar = expression[char - 1];
+
+        if (
+          currentChar == "-" &&
+          (!previousChar ||
+            (previousChar != ")" && isNaN(Number(previousChar))))
+        ) {
+          addPosition = char;
+
+          if (previousChar == "(" || previousChar == "√") {
+            let charToBeIgnored = 0;
+
+            for (let index = char - 1; index >= 0; index--) {
+              const currentChar = expression[index];
+
+              if (currentChar == "(" || currentChar == "√") {
+                charToBeIgnored++;
+              }
+            }
+
+            addPosition -= charToBeIgnored;
+          }
+
+          negativeSignalsPositions.push(char);
+        }
+      }
+    }
+
+    if (negativeSignalsPositions.length) {
+      expression = [...expression];
+
+      negativeSignalsPositions.forEach((signal, index) => {
+        expression.splice(signal - index, 1);
+      });
+
+      expression = expression.join("");
+    }
+
     if (
       this.expressionInput.value.indexOf("Fib(") === -1 &&
       this.expressionInput.value.indexOf("Hex(") === -1
     ) {
       expression = expression.replace(/\*\*/g, "^");
 
-      const numbersArray = expression
+      numbersArray = expression
         .replace(/[^0-9\+\-\*\/\^\%\.\,\π\e]/g, "")
         .replace(/[^0-9\.\,\π\e]/g, " ")
         .split(" ");
-
-      return numbersArray;
     }
 
-    return [expression]; // Must be an Array
+    if (negativeSignalsPositions.length) {
+      const expressionArray = [...numbersArray.join(" ")];
+
+      negativeSignalsPositions.forEach(() => {
+        expressionArray.splice(addPosition, 0, "-");
+      });
+
+      numbersArray = expressionArray.join("").split(" ");
+    }
+
+    return numbersArray; // Must be an Array
   }
 
   calculateResult(numbersArray, operators) {

@@ -57,74 +57,36 @@ export default class AppInterface {
     this.handleCurrentInputColor();
   }
 
-  handleKeyboardShortcuts({ key }) {
+  handleKeyboardShortcuts({ altKey, key }) {
     if (key !== " " && (key == "," || !isNaN(Number(key)))) {
-      this.addNumbersOnDisplay(appCore.expressionInput.value, key);
+      this.handleInputData(key);
     } else {
       let operator;
 
-      switch (key) {
-        case "+":
-          operator = key;
-          break;
-        case "-":
-          operator = key;
-          break;
-        case "*":
-          operator = key;
-          break;
-        case "^":
-          operator = key;
-          break;
-        case "/":
-          operator = key;
-          break;
-        case "%":
-          operator = key;
-          break;
+      if (
+        key == "+" ||
+        key == "-" ||
+        key == "*" ||
+        key == "/" ||
+        key == "^" ||
+        key == "%"
+      ) {
+        operator = key.replace("^", "**");
       }
 
       if (operator) {
         this.addOperatorsOnDisplay(operator);
       } else {
         switch (key) {
-          case "q":
-            this.switchTheme();
-            break;
-          case "d":
-            this.clearExpression();
-            break;
           case "o":
             this.handleOptionsBox();
-            break;
-          case "r":
-            if (
-              this.historyModalContent.classList.value.includes("invisible")
-            ) {
-              this.handleHistoryAccess();
-            }
-
             break;
           case "a":
             if (
               this.shortcutsModalContent.classList.value.includes("invisible")
             ) {
               this.handleShortcutsAccess();
-            }
-
-            break;
-          case "m":
-            if (
-              this.personalizationModalContent.classList.value.includes(
-                "invisible"
-              )
-            ) {
-              this.handlePersonalizationAccess();
-            }
-
-            break;
-          case "Escape":
-            if (!this.modalOverlay.classList.value.includes("invisible")) {
+            } else {
               this.handleModalState();
             }
 
@@ -141,12 +103,50 @@ export default class AppInterface {
         }
       }
 
-      if (this.isDevModeActivated) {
+      if (altKey) {
         switch (key) {
-          case "b":
-            this.changeConversionMode();
+          case "t":
+            this.switchTheme();
             break;
-          case "v":
+          case "l":
+            this.clearExpression();
+            break;
+          case "h":
+            if (
+              this.historyModalContent.classList.value.includes("invisible")
+            ) {
+              this.handleHistoryAccess();
+            } else {
+              this.handleModalState();
+            }
+
+            break;
+          case "p":
+            if (
+              this.personalizationModalContent.classList.value.includes(
+                "invisible"
+              )
+            ) {
+              this.handlePersonalizationAccess();
+            } else {
+              this.handleModalState();
+            }
+
+            break;
+        }
+
+        if (this.isDevModeActivated) {
+          switch (key) {
+            case "c":
+              this.changeConversionMode();
+              break;
+          }
+        }
+      }
+
+      if (this.isDevModeActivated && !altKey) {
+        switch (key) {
+          case "r":
             this.toggleResultMode();
             break;
           case "i":
@@ -158,29 +158,8 @@ export default class AppInterface {
           case ")":
             this.handleInputData(")");
             break;
-          case "f":
-            this.handleInputData("Fib(");
-            break;
-          case "n":
-            this.handleInputData("Ln(");
-            break;
-          case "e":
-            this.handleInputData("e");
-            break;
-          case "!":
-            this.handleInputData("!");
-            break;
-          case ";":
-            this.handleInputData("√");
-            break;
           case "s":
             this.handleInputData("Sin(");
-            break;
-          case "l":
-            this.handleInputData("Log(");
-            break;
-          case "p":
-            this.handleInputData("π");
             break;
           case "c":
             this.handleInputData("Cos(");
@@ -190,6 +169,27 @@ export default class AppInterface {
             break;
           case "h":
             this.handleInputData("Hypot(");
+            break;
+          case "!":
+            this.handleInputData("!");
+            break;
+          case ";":
+            this.handleInputData("√");
+            break;
+          case "l":
+            this.handleInputData("Log(");
+            break;
+          case "n":
+            this.handleInputData("Ln(");
+            break;
+          case "f":
+            this.handleInputData("Fib(");
+            break;
+          case "p":
+            this.handleInputData("π");
+            break;
+          case "e":
+            this.handleInputData("e");
             break;
         }
       }
@@ -325,6 +325,7 @@ export default class AppInterface {
       appCore.expressionInput.value = expression;
 
       if (
+        !expression.replace(/[^aA-zZ]/g, "") &&
         expression.indexOf("(") === -1 &&
         expression.indexOf("!") === -1 &&
         expression.indexOf("√") === -1
@@ -451,60 +452,61 @@ export default class AppInterface {
   addOperatorsOnDisplay(operator) {
     let expression = appCore.expressionInput.value;
     const lastChar = expression[expression.length - 1];
+    const penultimateChar = expression[expression.length - 2];
     const { openingCount, closingCount } = appCore.countParentheses(expression);
 
     if (
-      lastChar != "(" &&
+      lastChar != "√" &&
       !appCore.isNotCalculable &&
       expression.indexOf("Bin(") === -1 &&
       expression.indexOf("Oct(") === -1 &&
       expression.indexOf("Hex(") === -1 &&
-      expression.indexOf("Fib(") === -1
+      expression.indexOf("Fib(") === -1 &&
+      (!lastChar || lastChar.replace(/[aA-zZ]/g, ""))
     ) {
       let expressionArray = [...expression];
 
-      if (!expression) {
+      if (!expression || lastChar == "(") {
         if (operator == "-") {
           appCore.expressionInput.value += operator;
         }
-      } else {
+      } else if (
+        expression.length > 1 ||
+        !isNaN(Number(lastChar)) ||
+        lastChar == "π" ||
+        lastChar == "e"
+      ) {
+        let cantAddOperators = false;
+
         if (
-          expression.length > 1 ||
-          !isNaN(Number(lastChar)) ||
-          lastChar == "π" ||
-          lastChar == "e"
+          expression.indexOf("Fib(") !== -1 ||
+          (expression.indexOf("Log(") !== -1 &&
+            expression.indexOf("Log(") + 4 === expression.length) ||
+          (expression.indexOf("Ln(") !== -1 &&
+            expression.indexOf("Ln(") + 3 === expression.length) ||
+          (lastChar == "-" && penultimateChar == "(")
         ) {
-          let cantAddOperators = false;
+          cantAddOperators = true;
+        }
 
-          if (
-            expression.indexOf("Fib(") !== -1 ||
-            (expression.indexOf("Log(") !== -1 &&
-              expression.indexOf("Log(") + 4 === expression.length) ||
-            (expression.indexOf("Ln(") !== -1 &&
-              expression.indexOf("Ln(") + 3 === expression.length)
-          ) {
-            cantAddOperators = true;
+        if (!cantAddOperators) {
+          operator = appCore.handleSignRule(
+            lastChar,
+            expressionArray,
+            operator
+          );
+
+          if (openingCount === closingCount) {
+            appCore.expressionOperators.push(operator);
           }
 
-          if (!cantAddOperators) {
-            operator = appCore.handleSignRule(
-              lastChar,
-              expressionArray,
-              operator
-            );
+          expression = expressionArray.join("");
+          expression += operator
+            .replace("**", "^")
+            .replace("*", "x")
+            .replace("/", "÷");
 
-            if (openingCount === closingCount) {
-              appCore.expressionOperators.push(operator);
-            }
-
-            expression = expressionArray.join("");
-            expression += operator
-              .replace("**", "^")
-              .replace("*", "x")
-              .replace("/", "÷");
-
-            appCore.expressionInput.value = expression;
-          }
+          appCore.expressionInput.value = expression;
         }
       }
 
@@ -522,17 +524,20 @@ export default class AppInterface {
         !isNaN(Number(lastChar)) &&
         inputChar != "(") ||
       (openingCount > closingCount && lastChar == ")" && inputChar == ")") ||
+      !lastChar ||
       (isNaN(Number(lastChar)) &&
-        lastChar != ")" &&
-        lastChar != "π" &&
-        lastChar != "e" &&
-        lastChar != "!" &&
-        inputChar != ")" &&
+        (lastChar == "+" ||
+          lastChar == "-" ||
+          lastChar == "*" ||
+          lastChar == "/" ||
+          lastChar == "%" ||
+          (lastChar == "(" && inputChar != ")")) &&
         inputChar != "!") ||
       ((!isNaN(Number(lastChar)) || lastChar == ")") && inputChar == "!") ||
       (lastChar == "!" &&
         ((openingCount > closingCount && inputChar == ")") ||
           inputChar == "!")) ||
+      (lastChar == "√" && inputChar != "!") ||
       ((lastChar == "π" || lastChar == "e") &&
         openingCount > closingCount &&
         inputChar == ")")

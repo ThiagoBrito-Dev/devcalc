@@ -14,7 +14,8 @@ const conversionModeBtn = document.getElementById("conversion-mode");
 conversionModeBtn.onclick = () => appInterface.changeConversionMode();
 
 const insertConversionBtn = document.getElementById("insert-conversion");
-insertConversionBtn.onclick = () => appInterface.addConversionModeOnInput();
+insertConversionBtn.onclick = () =>
+  appInterface.handleAddingConversionModeOnInput();
 
 const switchThemeBtn = document.getElementById("switch-theme");
 switchThemeBtn.onclick = () => appInterface.switchTheme();
