@@ -465,31 +465,32 @@ export default class AppInterface {
       (!lastChar || lastChar.replace(/[aA-zZ]/g, ""))
     ) {
       let expressionArray = [...expression];
+      let cantAddOperators = false;
 
-      if (!expression || lastChar == "(") {
-        if (operator == "-") {
-          appCore.expressionInput.value += operator;
-        }
-      } else if (
-        expression.length > 1 ||
-        !isNaN(Number(lastChar)) ||
-        lastChar == "π" ||
-        lastChar == "e"
+      if (
+        expression.indexOf("Fib(") !== -1 ||
+        (expression.indexOf("Log(") !== -1 &&
+          expression.indexOf("Log(") + 4 === expression.length) ||
+        (expression.indexOf("Ln(") !== -1 &&
+          expression.indexOf("Ln(") + 3 === expression.length) ||
+        ((lastChar == "-" || lastChar == "(") &&
+          (penultimateChar == "(" || penultimateChar == "-"))
       ) {
-        let cantAddOperators = false;
+        cantAddOperators = true;
+      }
 
+      if (!cantAddOperators) {
         if (
-          expression.indexOf("Fib(") !== -1 ||
-          (expression.indexOf("Log(") !== -1 &&
-            expression.indexOf("Log(") + 4 === expression.length) ||
-          (expression.indexOf("Ln(") !== -1 &&
-            expression.indexOf("Ln(") + 3 === expression.length) ||
-          (lastChar == "-" && penultimateChar == "(")
+          (!expression && operator == "-") ||
+          (operator == "-" && lastChar == "(")
         ) {
-          cantAddOperators = true;
-        }
-
-        if (!cantAddOperators) {
+          appCore.expressionInput.value += operator;
+        } else if (
+          expression.length > 1 ||
+          !isNaN(Number(lastChar)) ||
+          lastChar == "π" ||
+          lastChar == "e"
+        ) {
           operator = appCore.handleSignRule(
             lastChar,
             expressionArray,
@@ -508,15 +509,16 @@ export default class AppInterface {
 
           appCore.expressionInput.value = expression;
         }
-      }
 
-      appCore.currentNumber = "";
-      this.handleFontSize();
+        appCore.currentNumber = "";
+        this.handleFontSize();
+      }
     }
   }
 
   addCharactersOnDisplay(expression, inputChar) {
     const lastChar = expression[expression.length - 1];
+    const penultimateChar = expression[expression.length - 2];
     const { openingCount, closingCount } = appCore.countParentheses(expression);
 
     if (
@@ -524,15 +526,20 @@ export default class AppInterface {
         !isNaN(Number(lastChar)) &&
         inputChar != "(") ||
       (openingCount > closingCount && lastChar == ")" && inputChar == ")") ||
-      !lastChar ||
-      (isNaN(Number(lastChar)) &&
+      (!lastChar && inputChar != "!") ||
+      (inputChar == "(" &&
+        (lastChar == "n" ||
+          lastChar == "s" ||
+          lastChar == "t" ||
+          lastChar == "g" ||
+          lastChar == "b")) ||
+      (lastChar == "(" && inputChar != "!" && inputChar != ")") ||
+      (inputChar != "!" &&
         (lastChar == "+" ||
-          lastChar == "-" ||
+          (lastChar == "-" && penultimateChar != "(") ||
           lastChar == "*" ||
           lastChar == "/" ||
-          lastChar == "%" ||
-          (lastChar == "(" && inputChar != ")")) &&
-        inputChar != "!") ||
+          lastChar == "%")) ||
       ((!isNaN(Number(lastChar)) || lastChar == ")") && inputChar == "!") ||
       (lastChar == "!" &&
         ((openingCount > closingCount && inputChar == ")") ||
@@ -542,7 +549,15 @@ export default class AppInterface {
         openingCount > closingCount &&
         inputChar == ")")
     ) {
-      const penultimateChar = expression[expression.length - 2];
+      if (
+        expression &&
+        (inputChar == "Bin(" ||
+          inputChar == "Oct(" ||
+          inputChar == "Hex(" ||
+          inputChar == "Fib(")
+      ) {
+        return;
+      }
 
       if (
         inputChar != ")" &&
@@ -562,10 +577,10 @@ export default class AppInterface {
       }
 
       if (
+        !isNaN(Number(lastChar)) &&
         inputChar != "(" &&
         inputChar != ")" &&
-        inputChar != "!" &&
-        !isNaN(Number(lastChar))
+        inputChar != "!"
       ) {
         return;
       }
@@ -584,8 +599,12 @@ export default class AppInterface {
       }
 
       if (
-        (lastChar != "(" && inputChar == "!") ||
-        (isNaN(Number(lastChar)) && (inputChar == "π" || inputChar == "e"))
+        expression.indexOf("!") !== -1 ||
+        (((lastChar &&
+          isNaN(Number(lastChar)) &&
+          lastChar.replace(/[aA-zZ]/g, "")) ||
+          !lastChar) &&
+          (inputChar == "π" || inputChar == "e"))
       ) {
         appCore.handleExpressions(expression);
       }

@@ -88,6 +88,7 @@ export default class AppCore {
   }
 
   handleExpressions(expression) {
+    console.log("Chamou");
     if (isNaN(Number(expression))) {
       const numbersArray = this.getNumbersArray(expression);
       const lastNumber = numbersArray[numbersArray.length - 1];
@@ -151,6 +152,9 @@ export default class AppCore {
           appInterface.setDefaultStylingClasses();
         }
       }
+    } else {
+      this.expressionResult.textContent = "";
+      appInterface.setDefaultStylingClasses();
     }
   }
 
@@ -160,7 +164,8 @@ export default class AppCore {
         !this.haveSeparateCalculations &&
         numbersArray[1] === "") ||
       (this.haveSeparateCalculations &&
-        numbersArray[numbersArray.length - 1] === "")
+        (numbersArray[numbersArray.length - 1] === "" ||
+          numbersArray[numbersArray.length - 1] == "-"))
     ) {
       return false;
     }
