@@ -9,14 +9,14 @@ body {
   --calc-background: #f5f5f5;
   --mode-button-text: #404040;
   --mode-button-background: #dfdfdf;
-  --header-line: #e6e6e6;
+  --header-line: #e0e0e0;
   --input-text: #f0f0f0;
   --input-background: #454545;
   --p-text: #d5d5d5;
-  --button-text: #f057d6;
-  --button-background: #ececec; /* #292929 */
+  --button-text: #5eddd3;
+  --button-background: #303030;
   --button-background-effect: #c5c5c5;
-  --colorized-button-background: #2a005a;
+  --colorized-button-background: #8f278a;
   --button-border: #977ac9;
 
   display: flex;
@@ -59,10 +59,11 @@ body::-webkit-scrollbar-track {
   --input-text: #505050;
   --input-background: #f6f6f6;
   --p-text: #787878;
-  --button-text: #b113b1; /* #f329a6 */
+  --button-text: #b113b1;
+  --button-background: #ededed;
   --button-background-effect: #606060;
-  --colorized-button-background: #03ffff; /* #2e96f7 #01c0a0 */
-  --button-border: #a1e7dd; /* #9fcff3 */
+  --colorized-button-background: #03ffff;
+  --button-border: #a1e7dd;
 }
 
 button {

@@ -3,7 +3,7 @@ main section#calc-body {
 }
 
 div#display input {
-  width: 210px;
+  width: 226.75px;
   height: 52px;
   padding: 0 8px 0 4px;
 
@@ -41,7 +41,7 @@ div#display div#result-container {
 }
 
 div#result-container p {
-  max-width: 198px;
+  max-width: 214.75px;
   color: var(--p-text);
 
   cursor: default;
@@ -51,7 +51,7 @@ div#result-container p {
 }
 
 div#result-container p.stretch {
-  max-width: 259px;
+  max-width: 279px;
 }
 
 div#result-container p::-webkit-scrollbar {
@@ -77,15 +77,22 @@ div#buttons-wrapper div {
 }
 
 div#buttons-wrapper button {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   box-shadow: 0 0 2px var(--button-border);
 
   font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+
   color: var(--button-text);
   background-color: var(--button-background);
   transition-duration: 0.25s;
+}
+
+div#buttons-wrapper button.letter-spacing {
+  letter-spacing: 0.75px;
 }
 
 div#buttons-wrapper button.colorized-button {

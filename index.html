@@ -9,8 +9,10 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
 
@@ -124,7 +126,7 @@
               <div>
                 <button
                   type="button"
-                  class="colorized-button expression-related"
+                  class="colorized-button letter-spacing expression-related"
                   data-char="Sin("
                   aria-label="Adicionar marcação de cálculo de seno"
                 >
@@ -132,7 +134,7 @@
                 </button>
                 <button
                   type="button"
-                  class="colorized-button expression-related"
+                  class="colorized-button letter-spacing expression-related"
                   data-char="Cos("
                   aria-label="Adicionar marcação de cálculo de cosseno"
                 >
@@ -140,7 +142,7 @@
                 </button>
                 <button
                   type="button"
-                  class="colorized-button expression-related"
+                  class="colorized-button letter-spacing expression-related"
                   data-char="Tan("
                   aria-label="Adicionar marcação de cálculo de tangente"
                 >
@@ -148,7 +150,7 @@
                 </button>
                 <button
                   type="button"
-                  class="colorized-button expression-related"
+                  class="colorized-button letter-spacing expression-related"
                   data-char="Hypot("
                   aria-label="Adicionar marcação de cálculo de hipotenusa"
                 >
@@ -225,7 +227,7 @@
               <button
                 type="button"
                 id="dev-mode"
-                class="colorized-button"
+                class="colorized-button letter-spacing"
                 aria-label="Ativar/desativar modo desenvolvedor"
               >
                 DEV
@@ -359,7 +361,7 @@
             <button
               type="button"
               data-char="Log("
-              class="colorized-button expression-related"
+              class="colorized-button letter-spacing expression-related"
               aria-label="Adicionar marcação de cálculo de logaritmo"
             >
               log
@@ -367,7 +369,7 @@
             <button
               type="button"
               data-char="Ln("
-              class="colorized-button expression-related"
+              class="colorized-button letter-spacing expression-related"
               aria-label="Adicionar marcação de cálculo de logaritmo neperiano"
             >
               ln
@@ -375,7 +377,7 @@
             <button
               type="button"
               data-char="Fib("
-              class="colorized-button expression-related"
+              class="colorized-button letter-spacing expression-related"
               aria-label="Adicionar marcação de cálculo da sequência de Fibonacci"
             >
               fib
@@ -444,6 +446,82 @@
           </div>
 
           <div class="card">
+            <button>(</button>
+            <p>Insere uma abertura de parênteses ao display da expressão</p>
+          </div>
+
+          <div class="card">
+            <button>)</button>
+            <p>Insere um fechamento de parênteses ao display da expressão</p>
+          </div>
+
+          <div class="card">
+            <button>!</button>
+            <p>Adiciona marcador para cálculos de fatorial e duplo fatorial</p>
+          </div>
+
+          <div class="card">
+            <button>;</button>
+            <p>Adiciona marcador para cálculos de raiz quadrada</p>
+          </div>
+
+          <div class="card">
+            <button>S</button>
+            <p>Adiciona função para cálculo de seno ao display da expressão</p>
+          </div>
+
+          <div class="card">
+            <button>C</button>
+            <p>
+              Adiciona função para cálculo de cosseno ao display da expressão
+            </p>
+          </div>
+
+          <div class="card">
+            <button>T</button>
+            <p>
+              Adiciona função para cálculo de tangente ao display da expressão
+            </p>
+          </div>
+
+          <div class="card">
+            <button>H</button>
+            <p>
+              Adiciona função para cálculo da hipotenusa de um triângulo
+              retângulo (note que a função receberá dois valores, um para o
+              cateto oposto, e outro para a cateto adjacente, os quais devem ser
+              separados por vírgula)
+            </p>
+          </div>
+
+          <div class="card">
+            <button>L</button>
+            <p>
+              Adiciona função para cálculo de logaritmo ao display da expressão
+            </p>
+          </div>
+
+          <div class="card">
+            <button>N</button>
+            <p>
+              Adiciona função para cálculo de logaritmo neperiano ao display da
+              expressão
+            </p>
+          </div>
+
+          <div class="card">
+            <button>P</button>
+            <p>Adiciona o símbolo de PI (π) ao display da expressão</p>
+          </div>
+
+          <div class="card">
+            <button>P</button>
+            <p>
+              Adiciona o símbolo do Número de Euler (e) ao display da expressão
+            </p>
+          </div>
+
+          <div class="card">
             <button>SHIFT + SCROLL</button>
             <p>
               Manipula a área de visão de expressões que excedem o tamanho do
@@ -460,20 +538,20 @@
           </div>
 
           <div class="card">
-            <button>T</button>
+            <button>ALT + T</button>
             <p>Altera o tema da aplicação (de light para dark, e vice-versa)</p>
           </div>
 
           <div class="card">
-            <button>L</button>
+            <button>ALT + L</button>
             <p>Realiza a limpeza completa do display da expressão</p>
           </div>
 
           <div class="card">
-            <button>C</button>
+            <button>ALT + C</button>
             <p>
-              Altera o tipo de conversão numérica que será inserido no display
-              da expressão
+              Altera o tipo de conversão (de bases numéricas) que será inserido
+              no display da expressão
             </p>
           </div>
 
@@ -483,7 +561,7 @@
           </div>
 
           <div class="card">
-            <button>H</button>
+            <button>ALT + H</button>
             <p>Acessa o histórico de operações e resultados da aplicação</p>
           </div>
 
@@ -493,7 +571,7 @@
           </div>
 
           <div class="card">
-            <button>P</button>
+            <button>ALT + P</button>
             <p>Acessa a página de personalização do tema da aplicação</p>
           </div>
 
@@ -506,7 +584,7 @@
           </div>
 
           <div class="card">
-            <button>LEFT ALT</button>
+            <button>RIGHT ALT</button>
             <p>
               Ativa/desativa o modo de desenvolvedor (calculadora científica)
             </p>
