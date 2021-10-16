@@ -88,7 +88,6 @@ export default class AppCore {
   }
 
   handleExpressions(expression) {
-    console.log("Chamou");
     if (isNaN(Number(expression))) {
       const numbersArray = this.getNumbersArray(expression);
       const lastNumber = numbersArray[numbersArray.length - 1];
@@ -164,8 +163,8 @@ export default class AppCore {
         !this.haveSeparateCalculations &&
         numbersArray[1] === "") ||
       (this.haveSeparateCalculations &&
-        (numbersArray[numbersArray.length - 1] === "" ||
-          numbersArray[numbersArray.length - 1] == "-"))
+        numbersArray.length === 1 &&
+        numbersArray[0] === "")
     ) {
       return false;
     }
@@ -745,12 +744,13 @@ export default class AppCore {
   getNumbersArray(expression) {
     let numbersArray = [expression];
     const negativeSignalsPositions = [];
-    let addPosition;
+    const negativeSignalsAddPositions = [];
 
     if (expression.indexOf("-") !== -1) {
       for (let char in expression) {
         const currentChar = expression[char];
         const previousChar = expression[char - 1];
+        let addPosition;
 
         if (
           currentChar == "-" &&
@@ -774,6 +774,7 @@ export default class AppCore {
           }
 
           negativeSignalsPositions.push(char);
+          negativeSignalsAddPositions.push(addPosition);
         }
       }
     }
@@ -803,14 +804,14 @@ export default class AppCore {
     if (negativeSignalsPositions.length) {
       const expressionArray = [...numbersArray.join(" ")];
 
-      negativeSignalsPositions.forEach(() => {
-        expressionArray.splice(addPosition, 0, "-");
+      negativeSignalsAddPositions.forEach((position) => {
+        expressionArray.splice(position, 0, "-");
       });
 
       numbersArray = expressionArray.join("").split(" ");
     }
 
-    return numbersArray; // Must be an Array
+    return numbersArray;
   }
 
   calculateResult(numbersArray, operators) {

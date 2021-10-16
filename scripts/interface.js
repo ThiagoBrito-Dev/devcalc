@@ -36,6 +36,7 @@ export default class AppInterface {
       "--button-border",
     ];
     this.isDevModeActivated = false;
+    this.hasExpressionInvalidMessage = false;
     this.operations;
   }
 
@@ -285,12 +286,13 @@ export default class AppInterface {
   }
 
   clearExpression() {
+    this.hasExpressionInvalidMessage = false;
+    appCore.isNotCalculable = false;
+    appCore.haveSeparateCalculations = false;
     appCore.expressionInput.value = "";
     appCore.expressionResult.textContent = "";
     appCore.currentNumber = "";
     appCore.firstCurrentNumberPosition = "";
-    appCore.isNotCalculable = false;
-    appCore.haveSeparateCalculations = false;
     appCore.expressionOperators = [];
 
     this.setDefaultStylingClasses();
@@ -301,56 +303,60 @@ export default class AppInterface {
     if (appCore.expressionInput.value) {
       let expression = appCore.expressionInput.value;
       let expressionArray = [...expression];
-
-      const { openingCount, closingCount } =
-        appCore.countParentheses(expression);
       const lastChar = expressionArray[expressionArray.length - 1]
         .replace("x", "*")
         .replace("^", "**")
         .replace("÷", "/");
-      const currentOperator =
-        appCore.expressionOperators[appCore.expressionOperators.length - 1];
-      let currentNumberUpdateNeeded = true;
-
-      if (openingCount === closingCount && lastChar == currentOperator) {
-        appCore.expressionOperators.pop();
-      }
-
-      if (isNaN(Number(lastChar))) {
-        currentNumberUpdateNeeded = false;
-      }
 
       expressionArray.pop();
       expression = expressionArray.join("");
       appCore.expressionInput.value = expression;
 
-      if (
-        !expression.replace(/[^aA-zZ]/g, "") &&
-        expression.indexOf("(") === -1 &&
-        expression.indexOf("!") === -1 &&
-        expression.indexOf("√") === -1
-      ) {
-        appCore.haveSeparateCalculations = false;
+      if (!this.hasExpressionInvalidMessage) {
+        const { openingCount, closingCount } =
+          appCore.countParentheses(expression);
+        const currentOperator =
+          appCore.expressionOperators[appCore.expressionOperators.length - 1];
+        let currentNumberUpdateNeeded = true;
+
+        if (openingCount === closingCount && lastChar == currentOperator) {
+          appCore.expressionOperators.pop();
+        }
+
+        if (isNaN(Number(lastChar))) {
+          currentNumberUpdateNeeded = false;
+        }
+
+        if (
+          expression.replace(/[^aA-zZ]/g, "") &&
+          expression.indexOf("(") === -1 &&
+          expression.indexOf("!") === -1 &&
+          expression.indexOf("√") === -1
+        ) {
+          appCore.haveSeparateCalculations = false;
+        }
+
+        if (currentNumberUpdateNeeded) {
+          appCore.updateCurrentNumberValue(expression);
+        }
+
+        expression = expression
+          .replace(/\^/g, "**")
+          .replace(/\x/g, "*")
+          .replace(/\÷/g, "/")
+          .replace(/\./g, "")
+          .replace(/\,/g, ".");
+
+        if (expression.includes("He")) {
+          expression = expression.replace("*", "x");
+        }
+
+        appCore.formatNumbers(expression);
+        appCore.handleExpressions(expression);
+        this.handleFontSize();
       }
-
-      if (currentNumberUpdateNeeded) {
-        appCore.updateCurrentNumberValue(expression);
-      }
-
-      expression = expression
-        .replace(/\^/g, "**")
-        .replace(/\x/g, "*")
-        .replace(/\÷/g, "/")
-        .replace(/\./g, "")
-        .replace(/\,/g, ".");
-
-      if (expression.includes("He")) {
-        expression = expression.replace("*", "x");
-      }
-
-      appCore.formatNumbers(expression);
-      appCore.handleExpressions(expression);
-      this.handleFontSize();
+    } else {
+      this.hasExpressionInvalidMessage = false;
     }
   }
 
@@ -392,6 +398,19 @@ export default class AppInterface {
       expression = expression.replace("*", "x");
     }
 
+    if (
+      this.hasExpressionInvalidMessage &&
+      !char.includes("*") &&
+      char != "+" &&
+      char != "/" &&
+      char != "%"
+    ) {
+      this.hasExpressionInvalidMessage = false;
+      appCore.isNotCalculable = false;
+      appCore.expressionInput.value = "";
+      expression = "";
+    }
+
     if (char == "," || !isNaN(Number(char))) {
       this.addNumbersOnDisplay(expression, char);
     } else if (
@@ -401,8 +420,11 @@ export default class AppInterface {
       char == "/" ||
       char == "%"
     ) {
+      if (char != "-") {
+      }
+
       this.addOperatorsOnDisplay(char);
-    } else {
+    } else if (isNaN(Number(char))) {
       this.addCharactersOnDisplay(expression, char);
     }
   }
@@ -439,13 +461,19 @@ export default class AppInterface {
 
   addFormattedNumbersOnDisplay(formattedNumber) {
     const expressionArray = [...appCore.expressionInput.value];
-    const lastPosition = formattedNumber.length + 1;
+    const lastNumber = expressionArray
+      .join("")
+      .slice(appCore.firstCurrentNumberPosition);
+    const lastPosition = lastNumber.includes(".")
+      ? formattedNumber.length + 1
+      : formattedNumber.length;
 
     expressionArray.splice(
       appCore.firstCurrentNumberPosition,
       lastPosition,
       formattedNumber
     );
+
     appCore.expressionInput.value = expressionArray.join("");
   }
 
@@ -473,8 +501,20 @@ export default class AppInterface {
           expression.indexOf("Log(") + 4 === expression.length) ||
         (expression.indexOf("Ln(") !== -1 &&
           expression.indexOf("Ln(") + 3 === expression.length) ||
-        ((lastChar == "-" || lastChar == "(") &&
-          (penultimateChar == "(" || penultimateChar == "-"))
+        ((lastChar == "+" ||
+          lastChar == "-" ||
+          lastChar == "x" ||
+          lastChar == "^" ||
+          lastChar == "÷" ||
+          lastChar == "%" ||
+          lastChar == "(") &&
+          (penultimateChar == "(" ||
+            penultimateChar == "+" ||
+            penultimateChar == "-" ||
+            penultimateChar == "x" ||
+            penultimateChar == "^" ||
+            penultimateChar == "÷" ||
+            penultimateChar == "%"))
       ) {
         cantAddOperators = true;
       }
@@ -672,12 +712,13 @@ export default class AppInterface {
         appCore.expressionInput.value = appCore.expressionResult.textContent;
         appCore.expressionResult.textContent = "";
         appCore.currentNumber = expression;
-        appCore.firstCurrentNumberPosition = 0;
-
-        return;
+      } else {
+        appCore.expressionInput.value = "Expressão inválida";
+        appCore.currentNumber = "";
+        this.hasExpressionInvalidMessage = true;
       }
 
-      appCore.expressionInput.value = "Expressão inválida";
+      appCore.firstCurrentNumberPosition = 0;
     } else {
       alert(
         "Desculpe, mas, para que o resultado seja ampliado, a expressão deve ser finalizada!"
