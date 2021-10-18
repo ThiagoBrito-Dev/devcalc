@@ -13,8 +13,8 @@
 }
 
 div.modal-overlay section {
-  width: 282px;
-  max-height: 320px;
+  width: 310px;
+  max-height: 350px;
   overflow-y: auto;
   overflow-x: hidden;
 
@@ -114,7 +114,8 @@ div.operations-info div + div {
 }
 
 div.operations-info div p {
-  max-width: 84.5px;
+  max-width: 108px;
+  letter-spacing: 0.5px;
   white-space: nowrap;
   overflow-x: auto;
   border-radius: 8px;
@@ -133,8 +134,8 @@ div.operations-info div p:last-of-type {
 
 -> SHORTCUTS MODAL */
 div.modal-overlay section.shortcuts-modal {
-  width: min(1025px, 96.5%);
-  max-height: 425px;
+  width: min(1050px, 96%);
+  max-height: 432px;
 }
 
 .shortcuts-modal-content {
@@ -149,7 +150,7 @@ div.shortcuts-modal-content div.card {
   flex-direction: column;
   align-items: center;
 
-  width: 230px;
+  width: 235.5px;
   height: 160px;
   padding: 16px;
   overflow-y: auto;
@@ -193,7 +194,7 @@ div.card p {
 -> PERSONALIZATION MODAL */
 div.modal-overlay section.personalization-modal {
   width: min(96.5%, 800px);
-  max-height: 436px;
+  max-height: 434px;
 }
 
 section.personalization-modal div.personalization-modal-content {
@@ -268,7 +269,7 @@ tbody tr td:nth-child(3) {
 }
 
 tbody tr td input[type="text"] {
-  border: 2px dashed var(--button-text);
+  border: 2px dashed var(--colorized-button-background);
   border-radius: 50%;
 }
 

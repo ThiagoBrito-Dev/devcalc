@@ -14,10 +14,10 @@ body {
   --input-background: #454545;
   --p-text: #d5d5d5;
   --button-text: #5eddd3;
-  --button-background: #303030;
+  --button-background: #353535;
   --button-background-effect: #c5c5c5;
   --colorized-button-background: #8f278a;
-  --button-border: #977ac9;
+  --button-border: #9845cf;
 
   display: flex;
   justify-content: center;
