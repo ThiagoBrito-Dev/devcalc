@@ -127,7 +127,7 @@ div.operations-info div p::-webkit-scrollbar {
 }
 
 div.operations-info div p:last-of-type {
-  opacity: 0.8;
+  opacity: 0.85;
   margin-top: 2px;
 }
 /* END OF HISTORY MODAL

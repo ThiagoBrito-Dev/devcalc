@@ -38,7 +38,7 @@ export default function AppInterface() {
   this.hasExpressionInvalidMessage = false;
   this.operations;
 }
-//
+
 AppInterface.prototype.initialize = function () {
   this.operations = JSON.parse(localStorage.getItem("devcalc-history")) || [];
 
@@ -53,10 +53,10 @@ AppInterface.prototype.initialize = function () {
     userTheme !== "" && userTheme != "dark-theme" ? "style" : "class";
 
   document.body.setAttribute(attributeName, userTheme);
-  switchThemeIcon(userTheme);
+  changeThemeIcon(userTheme);
   this.handleCurrentInputColor();
 };
-//
+
 AppInterface.prototype.handleKeyboardShortcuts = function ({ altKey, key }) {
   if (key !== " " && (key == "," || !isNaN(Number(key)))) {
     this.handleInputData(key);
@@ -75,17 +75,17 @@ AppInterface.prototype.handleKeyboardShortcuts = function ({ altKey, key }) {
     }
 
     if (operator) {
-      this.addOperatorsOnDisplay(operator);
+      addOperatorsOnDisplay(operator);
     } else {
       switch (key) {
         case "o":
-          this.handleOptionsBox();
+          this.handleOptionsBoxState();
           break;
         case "a":
           if (
             this.shortcutsModalContent.classList.value.includes("invisible")
           ) {
-            this.handleShortcutsAccess();
+            this.handleAccessingShortcutsModal();
           } else {
             this.handleModalState();
           }
@@ -106,14 +106,14 @@ AppInterface.prototype.handleKeyboardShortcuts = function ({ altKey, key }) {
     if (altKey) {
       switch (key) {
         case "t":
-          this.switchTheme();
+          this.changeTheme();
           break;
         case "l":
-          this.clearExpression();
+          this.handleDisplayCleaning();
           break;
         case "h":
           if (this.historyModalContent.classList.value.includes("invisible")) {
-            this.handleHistoryAccess();
+            this.handleAccessingHistoryModal();
           } else {
             this.handleModalState();
           }
@@ -125,7 +125,7 @@ AppInterface.prototype.handleKeyboardShortcuts = function ({ altKey, key }) {
               "invisible"
             )
           ) {
-            this.handlePersonalizationAccess();
+            this.handleAccessingPersonalizationModal();
           } else {
             this.handleModalState();
           }
@@ -136,7 +136,7 @@ AppInterface.prototype.handleKeyboardShortcuts = function ({ altKey, key }) {
       if (this.isDevModeActivated) {
         switch (key) {
           case "c":
-            this.changeConversionMode();
+            this.changeNumberBaseConversion();
             break;
         }
       }
@@ -148,7 +148,7 @@ AppInterface.prototype.handleKeyboardShortcuts = function ({ altKey, key }) {
           this.toggleResultMode();
           break;
         case "i":
-          this.handleAddingConversionModeOnInput();
+          this.handleAddingNumberBaseConversionOnInput();
           break;
         case "(":
           this.handleInputData("(");
@@ -193,7 +193,7 @@ AppInterface.prototype.handleKeyboardShortcuts = function ({ altKey, key }) {
     }
   }
 };
-//
+
 AppInterface.prototype.toggleResultMode = function () {
   const expression = appCore.expressionInput.value;
   const resultMode = document.querySelector("#result-mode");
@@ -209,8 +209,8 @@ AppInterface.prototype.toggleResultMode = function () {
     appCore.handleCalculationResult(expression);
   }
 };
-//
-AppInterface.prototype.changeConversionMode = function () {
+
+AppInterface.prototype.changeNumberBaseConversion = function () {
   const modes = ["BIN", "OCT", "HEX"];
   const currentMode = this.conversionMode.textContent.trim();
 
@@ -224,16 +224,16 @@ AppInterface.prototype.changeConversionMode = function () {
     }
   });
 };
-//
-AppInterface.prototype.handleAddingConversionModeOnInput = function () {
+
+AppInterface.prototype.handleAddingNumberBaseConversionOnInput = function () {
   let currentMode = [...this.conversionMode.textContent.trim().toLowerCase()];
   currentMode[0] = currentMode[0].toUpperCase();
   currentMode = currentMode.join("");
 
   this.handleInputData(`${currentMode}(`);
 };
-//
-AppInterface.prototype.switchTheme = function () {
+
+AppInterface.prototype.changeTheme = function () {
   this.applyNewStylingClasses();
   let currentTheme = "";
 
@@ -254,11 +254,11 @@ AppInterface.prototype.switchTheme = function () {
   }
 
   localStorage.setItem("devcalc-userDefaultTheme", currentTheme);
-  switchThemeIcon(currentTheme);
+  changeThemeIcon(currentTheme);
   this.handleCurrentInputColor();
 };
 
-function switchThemeIcon(theme) {
+function changeThemeIcon(theme) {
   const themeIcon = document.querySelector("#theme-icon");
   const iconClass =
     theme == "dark-theme"
@@ -269,20 +269,20 @@ function switchThemeIcon(theme) {
 
   themeIcon.setAttribute("class", iconClass);
 }
-//
-AppInterface.prototype.handleOptionsBox = function () {
+
+AppInterface.prototype.handleOptionsBoxState = function () {
   if (this.optionsBox.classList.value.includes("invisible")) {
     this.optionsBox.classList.remove("invisible");
     setTimeout(() => {
-      document.body.onclick = () => this.handleOptionsBox();
+      document.body.onclick = () => this.handleOptionsBoxState();
     }, 50);
   } else {
     this.optionsBox.classList.add("invisible");
     document.body.onclick = null;
   }
 };
-//
-AppInterface.prototype.clearExpression = function () {
+
+AppInterface.prototype.handleDisplayCleaning = function () {
   this.hasExpressionInvalidMessage = false;
   appCore.isNotCalculable = false;
   appCore.haveSeparateCalculations = false;
@@ -295,7 +295,7 @@ AppInterface.prototype.clearExpression = function () {
   this.setDefaultStylingClasses();
   this.handleFontSize();
 };
-//
+
 AppInterface.prototype.deleteLastCharacter = function () {
   if (appCore.expressionInput.value) {
     let expression = appCore.expressionInput.value;
@@ -325,10 +325,12 @@ AppInterface.prototype.deleteLastCharacter = function () {
       }
 
       if (
-        expression.replace(/[^aA-zZ]/g, "") &&
         expression.indexOf("(") === -1 &&
         expression.indexOf("!") === -1 &&
-        expression.indexOf("√") === -1
+        expression.indexOf("√") === -1 &&
+        expression.indexOf("π") === -1 &&
+        expression.indexOf("e") === -1 &&
+        appCore.haveSeparateCalculations
       ) {
         appCore.haveSeparateCalculations = false;
       }
@@ -356,7 +358,7 @@ AppInterface.prototype.deleteLastCharacter = function () {
     this.hasExpressionInvalidMessage = false;
   }
 };
-//
+
 AppInterface.prototype.toggleDevMode = function () {
   this.isDevModeActivated = !this.isDevModeActivated;
 
@@ -382,7 +384,7 @@ AppInterface.prototype.toggleDevMode = function () {
   appCore.expressionInput.classList.remove("has-transition");
   this.handleFontSize();
 };
-//
+
 AppInterface.prototype.handleInputData = function (char) {
   let expression = appCore.expressionInput.value
     .replace(/\^/g, "**")
@@ -409,18 +411,16 @@ AppInterface.prototype.handleInputData = function (char) {
   }
 
   if (char == "," || !isNaN(Number(char))) {
-    const isValidInputNumber = this.validateInputNumbers(expression, char);
+    const isValid = appCore.validateNumbersInsertion(expression, char);
 
-    if (isValidInputNumber) {
+    if (isValid) {
       let canAddCurrentChar = true;
 
       if (char == ",") {
         canAddCurrentChar = appCore.checkIfCommaCanBeAdded(expression, char);
       }
 
-      if (canAddCurrentChar) {
-        this.addNumbersOnDisplay(expression, char);
-      }
+      canAddCurrentChar && addNumbersOnDisplay(expression, char);
     }
   } else if (
     char.includes("*") ||
@@ -431,31 +431,25 @@ AppInterface.prototype.handleInputData = function (char) {
   ) {
     const expression = appCore.expressionInput.value;
     const lastChar = expression[expression.length - 1];
-
-    const isValidInputOperator = this.validateInputOperators(
-      expression,
-      lastChar
-    );
-
-    if (isValidInputOperator) {
-      const canBeAdded = this.checkIfOperatorsCanBeAdded(expression, lastChar);
-
-      if (canBeAdded) {
-        this.addOperatorsOnDisplay(expression, lastChar, char);
-        appCore.currentNumber = "";
-      }
-    }
-  } else if (isNaN(Number(char))) {
-    const lastChar = expression[expression.length - 1];
-    const isValidInputChar = this.validateInputCharacters(
+    const isValid = appCore.validateOperatorsInsertion(
       expression,
       lastChar,
       char
     );
 
-    if (isValidInputChar) {
-      this.addCharactersOnDisplay(expression, lastChar, char);
+    if (isValid) {
+      addOperatorsOnDisplay(expression, lastChar, char);
+      appCore.currentNumber = "";
     }
+  } else if (isNaN(Number(char))) {
+    const lastChar = expression[expression.length - 1];
+    const isValid = appCore.validateCharactersInsertion(
+      expression,
+      lastChar,
+      char
+    );
+
+    isValid && addCharactersOnDisplay(expression, lastChar, char);
   }
 
   const newExpression = appCore.expressionInput.value
@@ -470,31 +464,15 @@ AppInterface.prototype.handleInputData = function (char) {
   }
 };
 
-AppInterface.prototype.validateInputNumbers = function (expression, number) {
-  const lastChar = expression[expression.length - 1];
-
-  if (
-    lastChar != ")" &&
-    lastChar != "!" &&
-    lastChar != "π" &&
-    lastChar != "e" &&
-    (number != "," || (expression.length >= 1 && !isNaN(Number(lastChar))))
-  ) {
-    return true;
-  }
-
-  return false;
-};
-
-AppInterface.prototype.addNumbersOnDisplay = function (expression, number) {
+function addNumbersOnDisplay(expression, number) {
   appCore.expressionInput.value += number;
   number = number.replace(",", ".");
   expression += number;
 
   appCore.formatNumbers(expression, number);
   appCore.handleExpressions(expression);
-};
-//
+}
+
 AppInterface.prototype.addFormattedNumbersOnDisplay = function (
   formattedNumber
 ) {
@@ -515,71 +493,8 @@ AppInterface.prototype.addFormattedNumbersOnDisplay = function (
   appCore.expressionInput.value = expressionArray.join("");
 };
 
-AppInterface.prototype.validateInputOperators = function (
-  expression,
-  lastChar
-) {
-  if (
-    (lastChar != "√" &&
-      lastChar != "(" &&
-      !appCore.isNotCalculable &&
-      expression.indexOf("Bin(") === -1 &&
-      expression.indexOf("Oct(") === -1 &&
-      expression.indexOf("Hex(") === -1 &&
-      expression.indexOf("Fib(") === -1 &&
-      ((lastChar && lastChar.replace(/[aA-zZ]/g, "")) ||
-        lastChar == "^" ||
-        lastChar == "x")) ||
-    (lastChar == "(" && operator == "-")
-  ) {
-    return true;
-  }
-
-  return false;
-};
-
-AppInterface.prototype.checkIfOperatorsCanBeAdded = function (
-  expression,
-  lastChar
-) {
-  const penultimateChar = expression[expression.length - 2];
-
-  if (
-    expression.indexOf("Fib(") !== -1 ||
-    (expression.indexOf("Log(") !== -1 &&
-      expression.indexOf("Log(") + 4 === expression.length) ||
-    (expression.indexOf("Ln(") !== -1 &&
-      expression.indexOf("Ln(") + 3 === expression.length) ||
-    ((lastChar == "+" ||
-      lastChar == "-" ||
-      lastChar == "x" ||
-      lastChar == "^" ||
-      lastChar == "÷" ||
-      lastChar == "%" ||
-      lastChar == "(") &&
-      (penultimateChar == "(" ||
-        penultimateChar == "+" ||
-        penultimateChar == "-" ||
-        penultimateChar == "x" ||
-        penultimateChar == "^" ||
-        penultimateChar == "÷" ||
-        penultimateChar == "%"))
-  ) {
-    return false;
-  }
-
-  return true;
-};
-
-AppInterface.prototype.addOperatorsOnDisplay = function (
-  expression,
-  lastChar,
-  operator
-) {
-  if (
-    (!expression && operator == "-") ||
-    (operator == "-" && lastChar == "(")
-  ) {
+function addOperatorsOnDisplay(expression, lastChar, operator) {
+  if (!expression || lastChar == "(") {
     appCore.expressionInput.value += operator;
   } else if (
     expression.length > 1 ||
@@ -589,8 +504,7 @@ AppInterface.prototype.addOperatorsOnDisplay = function (
   ) {
     const { openingCount, closingCount } = appCore.countParentheses(expression);
     let expressionArray = [...expression];
-
-    operator = appCore.handleSignRule(lastChar, expressionArray, operator);
+    operator = appCore.handleSignRules(lastChar, expressionArray, operator);
 
     if (openingCount === closingCount) {
       appCore.expressionOperators.push(operator);
@@ -604,95 +518,9 @@ AppInterface.prototype.addOperatorsOnDisplay = function (
 
     appCore.expressionInput.value = expression;
   }
-};
+}
 
-AppInterface.prototype.validateInputCharacters = function (
-  expression,
-  lastChar,
-  inputChar
-) {
-  const { openingCount, closingCount } = appCore.countParentheses(expression);
-  const penultimateChar = expression[expression.length - 2];
-
-  if (
-    (openingCount > closingCount &&
-      !isNaN(Number(lastChar)) &&
-      inputChar != "(") ||
-    (openingCount > closingCount && lastChar == ")" && inputChar == ")") ||
-    (!lastChar && inputChar != "!") ||
-    (inputChar == "(" &&
-      (lastChar == "n" ||
-        lastChar == "s" ||
-        lastChar == "t" ||
-        lastChar == "g" ||
-        lastChar == "b")) ||
-    (lastChar == "(" && inputChar != "!" && inputChar != ")") ||
-    (inputChar != "!" &&
-      (lastChar == "+" ||
-        (lastChar == "-" && penultimateChar != "(") ||
-        lastChar == "*" ||
-        lastChar == "/" ||
-        lastChar == "%")) ||
-    ((!isNaN(Number(lastChar)) || lastChar == ")") && inputChar == "!") ||
-    (lastChar == "!" &&
-      ((openingCount > closingCount && inputChar == ")") ||
-        inputChar == "!")) ||
-    (lastChar == "√" && inputChar != "!") ||
-    ((lastChar == "π" || lastChar == "e") &&
-      openingCount > closingCount &&
-      inputChar == ")")
-  ) {
-    if (
-      expression &&
-      (inputChar == "Bin(" ||
-        inputChar == "Oct(" ||
-        inputChar == "Hex(" ||
-        inputChar == "Fib(")
-    ) {
-      return false;
-    }
-
-    if (
-      inputChar != ")" &&
-      (expression.indexOf("Bin(") !== -1 ||
-        expression.indexOf("Oct(") !== -1 ||
-        expression.indexOf("Hex(") !== -1 ||
-        expression.indexOf("Fib(") !== -1)
-    ) {
-      return false;
-    }
-
-    if (
-      (lastChar == "π" && (inputChar == "π" || inputChar == "e")) ||
-      (lastChar == "e" && (inputChar == "e" || inputChar == "π"))
-    ) {
-      return false;
-    }
-
-    if (
-      !isNaN(Number(lastChar)) &&
-      inputChar != "(" &&
-      inputChar != ")" &&
-      inputChar != "!"
-    ) {
-      return false;
-    }
-
-    if (penultimateChar == "!" && lastChar == "!" && inputChar == "!") {
-      return false;
-    }
-
-    return true;
-  }
-
-  return false;
-};
-
-AppInterface.prototype.addCharactersOnDisplay = function (
-  expression,
-  lastChar,
-  inputChar
-) {
+function addCharactersOnDisplay(expression, lastChar, inputChar) {
   appCore.expressionInput.value += inputChar;
   expression += inputChar;
 
@@ -712,7 +540,7 @@ AppInterface.prototype.addCharactersOnDisplay = function (
       appCore.handleExpressions(expression);
     }
   }
-};
+}
 
 AppInterface.prototype.handleFontSize = function () {
   const expression = appCore.expressionInput.value;
@@ -729,7 +557,7 @@ AppInterface.prototype.handleFontSize = function () {
     appCore.expressionInput.style.fontSize = "20px";
   }
 };
-//
+
 AppInterface.prototype.showResult = function (result) {
   this.applyNewStylingClasses(result);
   appCore.expressionResult.textContent = result;
@@ -748,7 +576,7 @@ AppInterface.prototype.applyNewStylingClasses = function (result = "") {
     appCore.expressionResult.classList.remove("has-transition");
   }
 };
-//
+
 AppInterface.prototype.focalizeResult = function () {
   const expression = appCore.expressionInput.value;
   const lastChar = expression[expression.length - 1];
@@ -786,7 +614,7 @@ AppInterface.prototype.focalizeResult = function () {
     );
   }
 };
-//
+
 AppInterface.prototype.setDefaultStylingClasses = function () {
   this.resultContainer.classList.add("invisible");
   appCore.expressionInput.classList.remove("has-result", "has-transition");
@@ -801,7 +629,7 @@ AppInterface.prototype.clearModal = function () {
   this.shortcutsModalContent.classList.add("invisible");
   this.personalizationModalContent.classList.add("invisible");
 };
-//
+
 AppInterface.prototype.handleModalState = function () {
   if (!this.modalOverlay.classList.value.includes("invisible")) {
     this.clearModal();
@@ -816,11 +644,11 @@ AppInterface.prototype.handleModalVisibilityConflicts = function () {
     : this.handleModalState();
 
   if (!this.optionsBox.classList.value.includes("invisible")) {
-    this.handleOptionsBox();
+    this.handleOptionsBoxState();
   }
 };
-//
-AppInterface.prototype.handleHistoryAccess = function () {
+
+AppInterface.prototype.handleAccessingHistoryModal = function () {
   this.handleModalVisibilityConflicts();
   this.modal.classList.add("history-modal");
   this.modalTitle.textContent = "Histórico";
@@ -847,7 +675,7 @@ AppInterface.prototype.handleAddingOperationsOnHistory = function (
     localStorage.setItem("devcalc-history", JSON.stringify(this.operations));
   }
 
-  let operationInfo = this.createOperationInfo(operationData);
+  let operationInfo = createOperationInfo(operationData);
 
   if (
     index === 0 ||
@@ -887,7 +715,7 @@ AppInterface.prototype.createContentElements = function (
   this.historyModalContent.appendChild(contentContainer);
 };
 
-AppInterface.prototype.createOperationInfo = function (operationData) {
+function createOperationInfo(operationData) {
   const operationInfo = document.createElement("div");
 
   const performedExpression = document.createElement("p");
@@ -899,16 +727,16 @@ AppInterface.prototype.createOperationInfo = function (operationData) {
   operationInfo.appendChild(performedExpression);
   operationInfo.appendChild(expressionResult);
   return operationInfo;
-};
-//
-AppInterface.prototype.handleShortcutsAccess = function () {
+}
+
+AppInterface.prototype.handleAccessingShortcutsModal = function () {
   this.handleModalVisibilityConflicts();
   this.modal.classList.add("shortcuts-modal");
   this.modalTitle.textContent = "Atalhos do Teclado";
   this.shortcutsModalContent.classList.remove("invisible");
 };
-//
-AppInterface.prototype.handlePersonalizationAccess = function () {
+
+AppInterface.prototype.handleAccessingPersonalizationModal = function () {
   this.handleModalVisibilityConflicts();
   this.modal.classList.add("personalization-modal");
   this.modalTitle.textContent = "Personalização";
@@ -936,7 +764,7 @@ AppInterface.prototype.handleCurrentInputColor = function () {
 
     currentColorInput.addEventListener(
       "dblclick",
-      this.copyCurrentColorToNewColorField
+      copyCurrentColorValueToNewColorValue
     );
 
     currentColorTableData.childNodes.length
@@ -948,7 +776,7 @@ AppInterface.prototype.handleCurrentInputColor = function () {
   });
 };
 
-AppInterface.prototype.copyCurrentColorToNewColorField = function ({ target }) {
+function copyCurrentColorValueToNewColorValue({ target }) {
   const currentColorInput = target;
   const unformattedCurrentColor = currentColorInput.style.backgroundColor;
   const splittedCurrentColor = unformattedCurrentColor
@@ -957,7 +785,7 @@ AppInterface.prototype.copyCurrentColorToNewColorField = function ({ target }) {
   let formattedCurrentColor = "#";
 
   splittedCurrentColor.forEach((colorChannelValue) => {
-    let convertedColorChannelValue = appCore.calculateConversions(
+    let convertedColorChannelValue = appCore.calculateNumberBaseConversions(
       "Hex",
       colorChannelValue
     );
@@ -979,8 +807,8 @@ AppInterface.prototype.copyCurrentColorToNewColorField = function ({ target }) {
 
   fakeNewColorInput.style.backgroundColor = formattedCurrentColor;
   newColorInput.value = formattedCurrentColor;
-};
-//
+}
+
 AppInterface.prototype.triggerColorInput = function ({ target }) {
   const fakeColorInput = target;
   const colorInput = fakeColorInput.nextElementSibling;
@@ -990,7 +818,7 @@ AppInterface.prototype.triggerColorInput = function ({ target }) {
     fakeColorInput.style.backgroundColor = colorInput.value;
   });
 };
-//
+
 AppInterface.prototype.applyDefaultColorValue = function () {
   const colorInputs = document.getElementsByName("new-color");
 
@@ -1001,7 +829,7 @@ AppInterface.prototype.applyDefaultColorValue = function () {
     input.value = "#000000";
   });
 };
-//
+
 AppInterface.prototype.showPersonalizedThemePreview = function () {
   this.modalOverlay.classList.add("invisible");
 
@@ -1025,7 +853,7 @@ AppInterface.prototype.stopShowingPersonalizedThemePreview = function () {
     document.body.setAttribute("style", userTheme);
   }
 };
-//
+
 AppInterface.prototype.createPersonalizedTheme = function () {
   const colorInputs = document.getElementsByName("new-color");
   const isValidTheme = appCore.validateThemes(colorInputs);
@@ -1040,7 +868,7 @@ AppInterface.prototype.createPersonalizedTheme = function () {
     localStorage.setItem("devcalc-userCustomTheme", currentTheme);
     localStorage.setItem("devcalc-userDefaultTheme", currentTheme);
 
-    switchThemeIcon(currentTheme);
+    changeThemeIcon(currentTheme);
     this.handleCurrentInputColor();
     this.applyDefaultColorValue();
   }

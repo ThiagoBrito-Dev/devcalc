@@ -11,34 +11,35 @@ const resultModeBtn = document.getElementById("result-mode");
 resultModeBtn.onclick = appInterface.toggleResultMode;
 
 const conversionModeBtn = document.getElementById("conversion-mode");
-conversionModeBtn.onclick = () => appInterface.changeConversionMode();
+conversionModeBtn.onclick = () => appInterface.changeNumberBaseConversion();
 
 const insertConversionBtn = document.getElementById("insert-conversion");
 insertConversionBtn.onclick = () =>
-  appInterface.handleAddingConversionModeOnInput();
+  appInterface.handleAddingNumberBaseConversionOnInput();
 
 const switchThemeBtn = document.getElementById("switch-theme");
-switchThemeBtn.onclick = () => appInterface.switchTheme();
+switchThemeBtn.onclick = () => appInterface.changeTheme();
 
 // OPTIONS BOX EVENTS --------------------------------------------------
 const openOptionsBoxBtn = document.getElementById("open-options-box");
-openOptionsBoxBtn.onclick = () => appInterface.handleOptionsBox();
+openOptionsBoxBtn.onclick = () => appInterface.handleOptionsBoxState();
 
 const openHistoryModalBtn = document.getElementById("open-history");
-openHistoryModalBtn.onclick = () => appInterface.handleHistoryAccess();
+openHistoryModalBtn.onclick = () => appInterface.handleAccessingHistoryModal();
 
 const openShortcutsModalBtn = document.getElementById("open-shortcuts");
-openShortcutsModalBtn.onclick = () => appInterface.handleShortcutsAccess();
+openShortcutsModalBtn.onclick = () =>
+  appInterface.handleAccessingShortcutsModal();
 
 const openPersonalizationModalBtn = document.getElementById(
   "open-personalization"
 );
 openPersonalizationModalBtn.onclick = () =>
-  appInterface.handlePersonalizationAccess();
+  appInterface.handleAccessingPersonalizationModal();
 
 // CALCULATOR BODY BUTTONS EVENTS --------------------------------------
 const clearExpressionBtn = document.getElementById("clear-expression");
-clearExpressionBtn.onclick = () => appInterface.clearExpression();
+clearExpressionBtn.onclick = () => appInterface.handleDisplayCleaning();
 
 const deleteLastCharBtn = document.getElementById("delete-last-char");
 deleteLastCharBtn.onclick = () => appInterface.deleteLastCharacter();
