@@ -5,6 +5,7 @@ const appInterface = new AppInterface();
 export default function AppCore() {
   this.expressionInput = document.querySelector("div#display input");
   this.expressionResult = document.querySelector("div#result-container p");
+  this.operatorsExample = ["+", "-", "*", "/", "**", "%"];
 
   this.isNotCalculable = false;
   this.haveSeparateCalculations = false;
@@ -80,21 +81,15 @@ AppCore.prototype.validateOperatorsInsertion = function (
       (expression.indexOf("Log(") !== -1 &&
         expression.indexOf("Log(") + 4 === expression.length) ||
       (expression.indexOf("Ln(") !== -1 &&
-        expression.indexOf("Ln(") + 3 === expression.length) ||
-      ((lastChar == "+" ||
-        lastChar == "-" ||
-        lastChar == "x" ||
-        lastChar == "^" ||
-        lastChar == "÷" ||
-        lastChar == "%" ||
-        lastChar == "(") &&
-        (penultimateChar == "(" ||
-          penultimateChar == "+" ||
-          penultimateChar == "-" ||
-          penultimateChar == "x" ||
-          penultimateChar == "^" ||
-          penultimateChar == "÷" ||
-          penultimateChar == "%"))
+        expression.indexOf("Ln(") + 3 === expression.length)
+    ) {
+      return false;
+    }
+
+    if (
+      penultimateChar &&
+      (penultimateChar == "-" || penultimateChar == "(") &&
+      (lastChar == "(" || lastChar == "-")
     ) {
       return false;
     }
@@ -132,6 +127,9 @@ AppCore.prototype.validateCharactersInsertion = function (
         lastChar == "*" ||
         lastChar == "/" ||
         lastChar == "%")) ||
+    (lastChar == "-" &&
+      penultimateChar == "(" &&
+      (inputChar == "π" || inputChar == "e")) ||
     ((!isNaN(Number(lastChar)) || lastChar == ")") && inputChar == "!") ||
     (lastChar == "!" &&
       ((openingCount > closingCount && inputChar == ")") ||
@@ -141,6 +139,10 @@ AppCore.prototype.validateCharactersInsertion = function (
       openingCount > closingCount &&
       inputChar == ")")
   ) {
+    if (inputChar == ")" && this.operatorsExample.indexOf(lastChar) !== -1) {
+      return false;
+    }
+
     if (
       expression &&
       (inputChar == "Bin(" ||
@@ -161,23 +163,11 @@ AppCore.prototype.validateCharactersInsertion = function (
       return false;
     }
 
-    if (
-      (lastChar == "π" && (inputChar == "π" || inputChar == "e")) ||
-      (lastChar == "e" && (inputChar == "e" || inputChar == "π"))
-    ) {
-      return false;
-    }
-
-    if (
-      !isNaN(Number(lastChar)) &&
-      inputChar != "(" &&
-      inputChar != ")" &&
-      inputChar != "!"
-    ) {
-      return false;
-    }
-
     if (penultimateChar == "!" && lastChar == "!" && inputChar == "!") {
+      return false;
+    }
+
+    if (this.isNotCalculable && inputChar == "!" && lastChar == ")") {
       return false;
     }
 
@@ -189,7 +179,7 @@ AppCore.prototype.validateCharactersInsertion = function (
 
 AppCore.prototype.checkIfCommaCanBeAdded = function (expression, number) {
   const numbersArray = this.getNumbersArray(expression);
-  const operators = getOperatorsArray(expression);
+  const operators = this.getOperatorsArray(expression);
   const lastNumberPosition = numbersArray.length - 1;
   const lastNumber = numbersArray[lastNumberPosition];
   let currentMathFunction;
@@ -410,15 +400,24 @@ AppCore.prototype.handleCalculationResult = function (expression) {
     let result = calculateResult(numbersArray, this.expressionOperators);
 
     if (
-      expression.indexOf("Bin(") === -1 &&
-      expression.indexOf("Oct(") === -1 &&
-      expression.indexOf("Hex(") === -1 &&
-      expression.indexOf("Fib(") === -1
+      !isNaN(result) ||
+      expression.includes("Fib(") ||
+      expression.includes("Hex(")
     ) {
-      result = formatExpressionResult(result);
-    }
+      if (
+        expression.indexOf("Bin(") === -1 &&
+        expression.indexOf("Oct(") === -1 &&
+        expression.indexOf("Hex(") === -1 &&
+        expression.indexOf("Fib(") === -1
+      ) {
+        result = formatExpressionResult(result);
+      }
 
-    appInterface.showResult(result);
+      appInterface.showResult(result);
+    } else {
+      appInterface.setDefaultStylingClasses();
+      this.isNotCalculable = true;
+    }
   }
 };
 
@@ -508,7 +507,7 @@ AppCore.prototype.handleSeparateCalculations = function (expression) {
       );
     }
 
-    const operators = getOperatorsArray(expressionPartContent);
+    const operators = this.getOperatorsArray(expressionPartContent);
 
     if (!operators.length) {
       if (currentMathFunction) {
@@ -617,11 +616,7 @@ AppCore.prototype.getCurrentMathFunction = function (
       let currentChar = expression[index];
 
       if (
-        currentChar == "+" ||
-        currentChar == "-" ||
-        currentChar == "*" ||
-        currentChar == "/" ||
-        currentChar == "%" ||
+        this.operatorsExample.indexOf(currentChar) !== -1 ||
         currentChar == "√"
       ) {
         break;
@@ -761,7 +756,7 @@ AppCore.prototype.calculateUnaryMathOperators = function (expression) {
   return newExpression;
 };
 
-function getOperatorsArray(expression) {
+AppCore.prototype.getOperatorsArray = function (expression) {
   const operators = [];
 
   for (let char in expression) {
@@ -770,18 +765,21 @@ function getOperatorsArray(expression) {
 
     if (
       !isNaN(Number(previousChar)) &&
-      (currentChar == "+" ||
-        currentChar == "-" ||
-        currentChar == "*" ||
-        currentChar == "/" ||
-        currentChar == "%")
+      this.operatorsExample.indexOf(currentChar) !== -1
     ) {
-      operators.push(currentChar);
+      const nextChar = expression[Number(char) + 1];
+      let operator = currentChar;
+
+      if (nextChar == "*") {
+        operator += "*";
+      }
+
+      operators.push(operator);
     }
   }
 
   return operators;
-}
+};
 
 AppCore.prototype.calculateNumberBaseConversions = function (
   currentMode,
@@ -817,6 +815,14 @@ AppCore.prototype.calculateMathFunctions = function (
     (currentMode == "Sin" || currentMode == "Cos" || currentMode == "Tan")
   ) {
     value *= Math.PI / 180;
+  }
+
+  if (
+    String(value).includes("-") &&
+    (currentMode == "Log" || currentMode == "Ln")
+  ) {
+    this.isNotCalculable = true;
+    return;
   }
 
   switch (currentMode) {
@@ -948,7 +954,7 @@ function extractNegativeSignsFromExpression(expression) {
       ) {
         addPosition = char;
 
-        if (previousChar == "(" || previousChar == "√") {
+        if (previousChar == "(" || previousChar == "√" || previousChar == "*") {
           let charToBeIgnored = 0;
 
           for (let index = char - 1; index >= 0; index--) {
@@ -957,7 +963,8 @@ function extractNegativeSignsFromExpression(expression) {
 
             if (
               (currentChar == "(" && previousChar == "(") ||
-              (currentChar == "√" && previousChar == "√")
+              (currentChar == "√" && previousChar == "√") ||
+              (currentChar == "*" && previousChar == "*")
             ) {
               charToBeIgnored++;
             }

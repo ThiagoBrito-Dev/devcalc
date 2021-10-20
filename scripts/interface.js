@@ -1,7 +1,7 @@
 import AppCore from "./core.js";
 
 const appCore = new AppCore();
-
+// 3
 export default function AppInterface() {
   this.conversionMode = document.getElementById("conversion-mode");
   this.optionsBox = document.getElementById("options-box");
@@ -36,6 +36,7 @@ export default function AppInterface() {
   ];
   this.isDevModeActivated = false;
   this.hasExpressionInvalidMessage = false;
+  this.hasFibonacciResult = false;
   this.operations;
 }
 
@@ -62,20 +63,14 @@ AppInterface.prototype.handleKeyboardShortcuts = function ({ altKey, key }) {
     this.handleInputData(key);
   } else {
     let operator;
+    key = key.replace("^", "**");
 
-    if (
-      key == "+" ||
-      key == "-" ||
-      key == "*" ||
-      key == "/" ||
-      key == "^" ||
-      key == "%"
-    ) {
-      operator = key.replace("^", "**");
+    if (appCore.operatorsExample.indexOf(key) !== -1) {
+      operator = key;
     }
 
     if (operator) {
-      addOperatorsOnDisplay(operator);
+      this.handleInputData(operator);
     } else {
       switch (key) {
         case "o":
@@ -398,69 +393,72 @@ AppInterface.prototype.handleInputData = function (char) {
   }
 
   if (
-    this.hasExpressionInvalidMessage &&
-    !char.includes("*") &&
-    char != "+" &&
-    char != "/" &&
-    char != "%"
+    char != "!" &&
+    char != "," &&
+    char != ")" &&
+    (appCore.operatorsExample.indexOf(char) === -1 || char == "-")
   ) {
-    this.hasExpressionInvalidMessage = false;
-    appCore.isNotCalculable = false;
-    appCore.expressionInput.value = "";
-    expression = "";
-  }
-
-  if (char == "," || !isNaN(Number(char))) {
-    const isValid = appCore.validateNumbersInsertion(expression, char);
-
-    if (isValid) {
-      let canAddCurrentChar = true;
-
-      if (char == ",") {
-        canAddCurrentChar = appCore.checkIfCommaCanBeAdded(expression, char);
-      }
-
-      canAddCurrentChar && addNumbersOnDisplay(expression, char);
+    if (this.hasExpressionInvalidMessage) {
+      this.hasExpressionInvalidMessage = false;
+      appCore.isNotCalculable = false;
+      appCore.expressionInput.value = "";
+      expression = "";
     }
-  } else if (
-    char.includes("*") ||
-    char == "+" ||
-    char == "-" ||
-    char == "/" ||
-    char == "%"
-  ) {
-    const expression = appCore.expressionInput.value;
-    const lastChar = expression[expression.length - 1];
-    const isValid = appCore.validateOperatorsInsertion(
-      expression,
-      lastChar,
-      char
-    );
-
-    if (isValid) {
-      addOperatorsOnDisplay(expression, lastChar, char);
+    if (this.hasFibonacciResult) {
+      this.hasFibonacciResult = false;
+      appCore.expressionInput.value = "";
       appCore.currentNumber = "";
+      expression = "";
     }
-  } else if (isNaN(Number(char))) {
-    const lastChar = expression[expression.length - 1];
-    const isValid = appCore.validateCharactersInsertion(
-      expression,
-      lastChar,
-      char
-    );
-
-    isValid && addCharactersOnDisplay(expression, lastChar, char);
   }
 
-  const newExpression = appCore.expressionInput.value
-    .replace("^", "**")
-    .replace("x", "*")
-    .replace("÷", "/")
-    .replace(/\./g, "")
-    .replace(/\,/g, ".");
+  if (!this.hasFibonacciResult) {
+    if (char == "," || !isNaN(Number(char))) {
+      const isValid = appCore.validateNumbersInsertion(expression, char);
 
-  if (expression !== newExpression) {
-    this.handleFontSize();
+      if (isValid) {
+        let canAddCurrentChar = true;
+
+        if (char == ",") {
+          canAddCurrentChar = appCore.checkIfCommaCanBeAdded(expression, char);
+        }
+
+        canAddCurrentChar && addNumbersOnDisplay(expression, char);
+      }
+    } else if (appCore.operatorsExample.indexOf(char) !== -1) {
+      const expression = appCore.expressionInput.value;
+      const lastChar = expression[expression.length - 1];
+      const isValid = appCore.validateOperatorsInsertion(
+        expression,
+        lastChar,
+        char
+      );
+
+      if (isValid) {
+        addOperatorsOnDisplay(expression, lastChar, char);
+        appCore.currentNumber = "";
+      }
+    } else if (isNaN(Number(char))) {
+      const lastChar = expression[expression.length - 1];
+      const isValid = appCore.validateCharactersInsertion(
+        expression,
+        lastChar,
+        char
+      );
+
+      isValid && addCharactersOnDisplay(expression, lastChar, char);
+    }
+
+    const newExpression = appCore.expressionInput.value
+      .replace("^", "**")
+      .replace("x", "*")
+      .replace("÷", "/")
+      .replace(/\./g, "")
+      .replace(/\,/g, ".");
+
+    if (expression !== newExpression) {
+      this.handleFontSize();
+    }
   }
 };
 
@@ -480,8 +478,16 @@ AppInterface.prototype.addFormattedNumbersOnDisplay = function (
   const lastNumber = expressionArray
     .join("")
     .slice(appCore.firstCurrentNumberPosition);
+  let hasLeftZeros = false;
+
+  if (lastNumber.replace(/\./g, "") !== formattedNumber.replace(/\./g, "")) {
+    hasLeftZeros = true;
+  }
+
   const lastPosition = lastNumber.includes(".")
     ? formattedNumber.length + 1
+    : hasLeftZeros
+    ? lastNumber.length
     : formattedNumber.length;
 
   expressionArray.splice(
@@ -595,6 +601,10 @@ AppInterface.prototype.focalizeResult = function () {
     if (!appCore.isNotCalculable) {
       if (expression && appCore.expressionResult.textContent) {
         this.handleAddingOperationsOnHistory();
+      }
+
+      if (expression.includes("Fib(")) {
+        this.hasFibonacciResult = true;
       }
 
       this.setDefaultStylingClasses();
