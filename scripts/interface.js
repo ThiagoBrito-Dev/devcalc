@@ -1,7 +1,7 @@
 import AppCore from "./core.js";
 
 const appCore = new AppCore();
-// 3
+
 export default function AppInterface() {
   this.conversionMode = document.getElementById("conversion-mode");
   this.optionsBox = document.getElementById("options-box");
@@ -36,7 +36,7 @@ export default function AppInterface() {
   ];
   this.isDevModeActivated = false;
   this.hasExpressionInvalidMessage = false;
-  this.hasFibonacciResult = false;
+  this.resultCantBeContinued = false;
   this.operations;
 }
 
@@ -92,14 +92,14 @@ AppInterface.prototype.handleKeyboardShortcuts = function ({ altKey, key }) {
         case "Backspace":
           this.deleteLastCharacter();
           break;
-        case "Enter":
-          this.focalizeResult();
-          break;
       }
     }
 
     if (altKey) {
       switch (key) {
+        case "Enter":
+          this.focalizeResult();
+          break;
         case "t":
           this.changeTheme();
           break;
@@ -190,18 +190,24 @@ AppInterface.prototype.handleKeyboardShortcuts = function ({ altKey, key }) {
 };
 
 AppInterface.prototype.toggleResultMode = function () {
-  const expression = appCore.expressionInput.value;
-  const resultMode = document.querySelector("#result-mode");
+  const expression = appCore.expressionInput.value
+    .replace(/\^/g, "**")
+    .replace(/\x/g, "*")
+    .replace(/\÷/g, "/")
+    .replace(/\./g, "")
+    .replace(/\,/g, ".");
 
+  const resultMode = document.getElementById("result-mode");
   const currentResultMode = resultMode.textContent;
   resultMode.textContent = currentResultMode.includes("RAD") ? "GRAU" : "RAD";
+  appCore.isNotCalculable = false;
 
   if (
     expression.indexOf("Sin(") !== -1 ||
     expression.indexOf("Cos(") !== -1 ||
     expression.indexOf("Tan(") !== -1
   ) {
-    appCore.handleCalculationResult(expression);
+    appCore.handleExpressions(expression);
   }
 };
 
@@ -254,7 +260,7 @@ AppInterface.prototype.changeTheme = function () {
 };
 
 function changeThemeIcon(theme) {
-  const themeIcon = document.querySelector("#theme-icon");
+  const themeIcon = document.getElementById("theme-icon");
   const iconClass =
     theme == "dark-theme"
       ? "fas fa-sun"
@@ -404,15 +410,15 @@ AppInterface.prototype.handleInputData = function (char) {
       appCore.expressionInput.value = "";
       expression = "";
     }
-    if (this.hasFibonacciResult) {
-      this.hasFibonacciResult = false;
+    if (this.resultCantBeContinued) {
+      this.resultCantBeContinued = false;
       appCore.expressionInput.value = "";
       appCore.currentNumber = "";
       expression = "";
     }
   }
 
-  if (!this.hasFibonacciResult) {
+  if (!this.resultCantBeContinued) {
     if (char == "," || !isNaN(Number(char))) {
       const isValid = appCore.validateNumbersInsertion(expression, char);
 
@@ -603,8 +609,13 @@ AppInterface.prototype.focalizeResult = function () {
         this.handleAddingOperationsOnHistory();
       }
 
-      if (expression.includes("Fib(")) {
-        this.hasFibonacciResult = true;
+      if (
+        expression.includes("Fib(") ||
+        expression.includes("Bin(") ||
+        expression.includes("Oct(") ||
+        expression.includes("Hex(")
+      ) {
+        this.resultCantBeContinued = true;
       }
 
       this.setDefaultStylingClasses();
@@ -643,6 +654,10 @@ AppInterface.prototype.clearModal = function () {
 AppInterface.prototype.handleModalState = function () {
   if (!this.modalOverlay.classList.value.includes("invisible")) {
     this.clearModal();
+
+    this.isDevModeActivated
+      ? document.getElementById("result-mode").focus()
+      : document.getElementById("theme-icon").parentElement.focus();
   }
 
   this.modalOverlay.classList.toggle("invisible");
@@ -656,6 +671,8 @@ AppInterface.prototype.handleModalVisibilityConflicts = function () {
   if (!this.optionsBox.classList.value.includes("invisible")) {
     this.handleOptionsBoxState();
   }
+
+  this.modalTitle.nextElementSibling.focus();
 };
 
 AppInterface.prototype.handleAccessingHistoryModal = function () {
@@ -729,9 +746,11 @@ function createOperationInfo(operationData) {
   const operationInfo = document.createElement("div");
 
   const performedExpression = document.createElement("p");
+  performedExpression.setAttribute("aria-label", "Expressão");
   performedExpression.textContent = operationData.expression;
 
   const expressionResult = document.createElement("p");
+  expressionResult.setAttribute("aria-label", "Resultado");
   expressionResult.textContent = operationData.result;
 
   operationInfo.appendChild(performedExpression);
@@ -772,10 +791,8 @@ AppInterface.prototype.handleCurrentInputColor = function () {
     currentColorInput.classList.add("current-color", "has-transition");
     currentColorInput.style.backgroundColor = currentColor;
 
-    currentColorInput.addEventListener(
-      "dblclick",
-      copyCurrentColorValueToNewColorValue
-    );
+    currentColorInput.ondblclick = copyCurrentColorValueToNewColorValue;
+    currentColorInput.onkeyup = copyCurrentColorValueToNewColorValue;
 
     currentColorTableData.childNodes.length
       ? currentColorTableData.replaceChild(
@@ -786,47 +803,51 @@ AppInterface.prototype.handleCurrentInputColor = function () {
   });
 };
 
-function copyCurrentColorValueToNewColorValue({ target }) {
-  const currentColorInput = target;
-  const unformattedCurrentColor = currentColorInput.style.backgroundColor;
-  const splittedCurrentColor = unformattedCurrentColor
-    .replace(/[^0-9\,]/g, "")
-    .split(",");
-  let formattedCurrentColor = "#";
+function copyCurrentColorValueToNewColorValue({ target, key }) {
+  if (!key || key == "Enter") {
+    const currentColorInput = target;
+    const unformattedCurrentColor = currentColorInput.style.backgroundColor;
+    const splittedCurrentColor = unformattedCurrentColor
+      .replace(/[^0-9\,]/g, "")
+      .split(",");
+    let formattedCurrentColor = "#";
 
-  splittedCurrentColor.forEach((colorChannelValue) => {
-    let convertedColorChannelValue = appCore.calculateNumberBaseConversions(
-      "Hex",
-      colorChannelValue
+    splittedCurrentColor.forEach((colorChannelValue) => {
+      let convertedColorChannelValue = appCore.calculateNumberBaseConversions(
+        "Hex",
+        colorChannelValue
+      );
+
+      if (convertedColorChannelValue.length === 1) {
+        convertedColorChannelValue = "0" + convertedColorChannelValue;
+      }
+
+      formattedCurrentColor += convertedColorChannelValue;
+    });
+
+    const targetParentSibling =
+      currentColorInput.parentElement.nextElementSibling;
+    const fakeNewColorInput =
+      targetParentSibling.querySelector("input[type='text']");
+    const newColorInput = targetParentSibling.querySelector(
+      "input[type='color']"
     );
 
-    if (convertedColorChannelValue.length === 1) {
-      convertedColorChannelValue = "0" + convertedColorChannelValue;
-    }
-
-    formattedCurrentColor += convertedColorChannelValue;
-  });
-
-  const targetParentSibling =
-    currentColorInput.parentElement.nextElementSibling;
-  const fakeNewColorInput =
-    targetParentSibling.querySelector("input[type='text']");
-  const newColorInput = targetParentSibling.querySelector(
-    "input[type='color']"
-  );
-
-  fakeNewColorInput.style.backgroundColor = formattedCurrentColor;
-  newColorInput.value = formattedCurrentColor;
+    fakeNewColorInput.style.backgroundColor = formattedCurrentColor;
+    newColorInput.value = formattedCurrentColor;
+  }
 }
 
-AppInterface.prototype.triggerColorInput = function ({ target }) {
-  const fakeColorInput = target;
-  const colorInput = fakeColorInput.nextElementSibling;
+AppInterface.prototype.triggerColorInput = function ({ target, key }) {
+  if (!key || key == "Enter") {
+    const fakeColorInput = target;
+    const colorInput = fakeColorInput.nextElementSibling;
 
-  colorInput.click();
-  colorInput.addEventListener("change", () => {
-    fakeColorInput.style.backgroundColor = colorInput.value;
-  });
+    colorInput.click();
+    colorInput.addEventListener("change", () => {
+      fakeColorInput.style.backgroundColor = colorInput.value;
+    });
+  }
 };
 
 AppInterface.prototype.applyDefaultColorValue = function () {
@@ -840,19 +861,25 @@ AppInterface.prototype.applyDefaultColorValue = function () {
   });
 };
 
-AppInterface.prototype.showPersonalizedThemePreview = function () {
-  this.modalOverlay.classList.add("invisible");
+AppInterface.prototype.showPersonalizedThemePreview = function ({ key }) {
+  if (!key || key == "Enter") {
+    this.modalOverlay.classList.add("invisible");
 
-  const colorInputs = document.getElementsByName("new-color");
+    const colorInputs = document.getElementsByName("new-color");
 
-  colorInputs.forEach((input, index) => {
-    document.body.style.setProperty(this.cssVariables[index], input.value);
-  });
+    colorInputs.forEach((input, index) => {
+      document.body.style.setProperty(this.cssVariables[index], input.value);
+    });
 
-  document.body.onmouseup = () => this.stopShowingPersonalizedThemePreview();
+    document.body.onmouseup = () => this.stopShowingPersonalizedThemePreview();
+    document.body.onkeyup = () => this.stopShowingPersonalizedThemePreview();
+  }
 };
 
 AppInterface.prototype.stopShowingPersonalizedThemePreview = function () {
+  document.body.onmouseup = null;
+  document.body.onkeyup = null;
+
   this.modalOverlay.classList.remove("invisible");
   document.body.onmouseup = null;
 

@@ -70,13 +70,17 @@ const fakeColorInputs = document.querySelectorAll(
 );
 fakeColorInputs.forEach((input) => {
   input.onclick = appInterface.triggerColorInput;
+  input.onkeydown = appInterface.triggerColorInput;
 });
 
 const setColorsToDefaultBtn = document.getElementById("clear-colors");
 setColorsToDefaultBtn.onclick = appInterface.applyDefaultColorValue;
 
 const previewThemeBtn = document.getElementById("preview-theme");
-previewThemeBtn.onmousedown = () => appInterface.showPersonalizedThemePreview();
+previewThemeBtn.onmousedown = (event) =>
+  appInterface.showPersonalizedThemePreview(event);
+previewThemeBtn.onkeydown = (event) =>
+  appInterface.showPersonalizedThemePreview(event);
 
 const saveThemeBtn = document.getElementById("save-theme");
 saveThemeBtn.onclick = () => appInterface.createPersonalizedTheme();

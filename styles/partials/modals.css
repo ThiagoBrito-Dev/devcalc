@@ -247,7 +247,7 @@ tbody tr th:first-child {
 }
 
 tbody tr td:first-of-type {
-  width: 321.5px;
+  width: 321px;
 }
 
 thead tr th:last-child,
@@ -276,9 +276,6 @@ tbody tr td input[type="text"] {
 td.current-color-data input.current-color {
   width: 45px;
   height: 45px;
-
-  background-color: #b8d1e0;
-  outline: none;
   cursor: pointer;
 }
 
