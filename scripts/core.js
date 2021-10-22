@@ -394,10 +394,7 @@ AppCore.prototype.handleSignRules = function (
 };
 
 AppCore.prototype.handleCalculationResult = function (expression) {
-  console.log(this.isNotCalculable);
-  console.log(this.haveSeparateCalculations);
   const numbersArray = this.handleGettingNumbersArray(expression);
-  console.log(numbersArray);
 
   if (!this.isNotCalculable) {
     let result = calculateResult(numbersArray, this.expressionOperators);
@@ -435,7 +432,6 @@ AppCore.prototype.handleGettingNumbersArray = function (expression) {
 
 AppCore.prototype.handleSeparateCalculations = function (expression) {
   let newExpression = expression.replace(/\π/g, Math.PI);
-  console.log(newExpression);
 
   if (newExpression.indexOf("e") !== -1) {
     const previousPosition = newExpression.indexOf("e") - 1;
@@ -530,12 +526,10 @@ AppCore.prototype.handleSeparateCalculations = function (expression) {
             conversionResult
           );
         } else {
-          console.log(expressionPartContent);
           const result = this.calculateMathFunctions(
             currentMathFunction,
             expressionPartContent
           );
-          console.log(result);
 
           newExpression = newExpression.replace(partOfExpression, result);
         }
@@ -816,16 +810,12 @@ AppCore.prototype.calculateMathFunctions = function (
   const resultMode = document.querySelector("#result-mode");
   let calculationResult;
 
-  console.log(currentMode);
   if (
     resultMode.textContent.trim() == "GRAU" &&
     (currentMode == "Sin" || currentMode == "Cos" || currentMode == "Tan")
   ) {
-    console.log("Chamou");
     value *= Math.PI / 180;
   }
-
-  console.log(value);
 
   if (
     String(value).includes("-") &&

@@ -77,10 +77,16 @@ const setColorsToDefaultBtn = document.getElementById("clear-colors");
 setColorsToDefaultBtn.onclick = appInterface.applyDefaultColorValue;
 
 const previewThemeBtn = document.getElementById("preview-theme");
-previewThemeBtn.onmousedown = (event) =>
-  appInterface.showPersonalizedThemePreview(event);
-previewThemeBtn.onkeydown = (event) =>
-  appInterface.showPersonalizedThemePreview(event);
+
+if (window.innerWidth <= 768) {
+  previewThemeBtn.onclick = (event) =>
+    appInterface.showPersonalizedThemePreview(event, true);
+} else {
+  previewThemeBtn.onmousedown = (event) =>
+    appInterface.showPersonalizedThemePreview(event);
+  previewThemeBtn.onkeydown = (event) =>
+    appInterface.showPersonalizedThemePreview(event);
+}
 
 const saveThemeBtn = document.getElementById("save-theme");
 saveThemeBtn.onclick = () => appInterface.createPersonalizedTheme();

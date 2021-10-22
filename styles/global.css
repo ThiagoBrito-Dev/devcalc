@@ -32,7 +32,7 @@ body {
 
 body::-webkit-scrollbar {
   width: 9px;
-  height: 11px;
+  height: 9px;
 }
 
 body::-webkit-scrollbar-thumb {
@@ -90,6 +90,6 @@ body main {
   }
 }
 
-.invisible {
+body .invisible {
   display: none;
 }

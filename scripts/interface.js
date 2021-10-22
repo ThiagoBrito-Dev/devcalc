@@ -377,9 +377,9 @@ AppInterface.prototype.toggleDevMode = function () {
   calcHeader.classList.toggle("space-between");
   topContainer.classList.toggle("invisible");
   actionsContainer.classList.toggle("invisible");
-  actionsContainer.classList.toggle("space-between");
   appCore.expressionInput.classList.toggle("stretch");
   appCore.expressionResult.classList.toggle("stretch");
+  this.resultContainer.classList.toggle("stretch");
   sideContainer.classList.toggle("invisible");
 
   appCore.expressionInput.classList.remove("has-transition");
@@ -861,7 +861,10 @@ AppInterface.prototype.applyDefaultColorValue = function () {
   });
 };
 
-AppInterface.prototype.showPersonalizedThemePreview = function ({ key }) {
+AppInterface.prototype.showPersonalizedThemePreview = function (
+  { key },
+  userIsAccessingFromMobileDevice = false
+) {
   if (!key || key == "Enter") {
     this.modalOverlay.classList.add("invisible");
 
@@ -871,24 +874,45 @@ AppInterface.prototype.showPersonalizedThemePreview = function ({ key }) {
       document.body.style.setProperty(this.cssVariables[index], input.value);
     });
 
-    document.body.onmouseup = () => this.stopShowingPersonalizedThemePreview();
+    if (userIsAccessingFromMobileDevice) {
+      setTimeout(() => {
+        document.body.onclick = () =>
+          this.stopShowingPersonalizedThemePreview(
+            userIsAccessingFromMobileDevice
+          );
+      }, 50);
+    } else {
+      document.body.onmouseup = () =>
+        this.stopShowingPersonalizedThemePreview();
+    }
+
     document.body.onkeyup = () => this.stopShowingPersonalizedThemePreview();
   }
 };
 
-AppInterface.prototype.stopShowingPersonalizedThemePreview = function () {
-  document.body.onmouseup = null;
+AppInterface.prototype.stopShowingPersonalizedThemePreview = function (
+  hasToAssignEventListener = false
+) {
+  const previewThemeButton = document.getElementById("preview-theme");
+
+  if (hasToAssignEventListener) {
+    document.body.onclick = null;
+    previewThemeButton.onclick = (event) =>
+      this.showPersonalizedThemePreview(event);
+  } else {
+    document.body.onmouseup = null;
+  }
   document.body.onkeyup = null;
 
   this.modalOverlay.classList.remove("invisible");
-  document.body.onmouseup = null;
-
   const userTheme = localStorage.getItem("devcalc-userDefaultTheme");
   document.body.removeAttribute("style");
 
   if (userTheme !== "" || userTheme != "dark-theme") {
     document.body.setAttribute("style", userTheme);
   }
+
+  previewThemeButton.focus();
 };
 
 AppInterface.prototype.createPersonalizedTheme = function () {

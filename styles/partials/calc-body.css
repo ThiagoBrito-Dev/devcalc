@@ -9,7 +9,7 @@ div#display p {
 
 div#display input {
   width: 226.75px;
-  height: 52px;
+  height: 54.75px;
   padding: 0 8px 0 4px;
 
   text-align: right;
@@ -29,20 +29,34 @@ div#display input::placeholder {
 }
 
 div#display input.stretch {
+  height: 58px;
   width: 100%;
 }
 
 div#display input.has-result {
-  height: 30.675px;
+  height: 32px;
   border-radius: 2px 2px 0 0;
   padding-top: 4px;
 }
 
+div#display input.has-result.stretch {
+  padding-top: 6px;
+}
+
 div#display div#result-container {
   text-align: right;
-  padding: 0 8px 2px 4px;
+  padding: 0 8px 4px 4px;
   background-color: var(--input-background);
   border-radius: 0 0 2px 2px;
+}
+
+div.stretch {
+  display: flex;
+  align-items: center;
+}
+
+div#display div#result-container.stretch {
+  height: 26px;
 }
 
 div#result-container p {
@@ -56,6 +70,7 @@ div#result-container p {
 }
 
 div#result-container p.stretch {
+  width: 100%;
   max-width: 279px;
 }
 
