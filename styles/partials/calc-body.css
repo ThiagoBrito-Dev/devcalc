@@ -29,7 +29,7 @@ div#display input::placeholder {
 }
 
 div#display input.stretch {
-  height: 62px;
+  height: 60px;
   width: 100%;
 }
 
@@ -40,7 +40,7 @@ div#display input.has-result {
 }
 
 div#display input.has-result.stretch {
-  height: 34px;
+  height: 33px;
   padding-top: 6px;
 }
 
@@ -57,7 +57,7 @@ div.stretch {
 }
 
 div#display div#result-container.stretch {
-  height: 28px;
+  height: 27px;
   padding-bottom: 6px;
 }
 
