@@ -17,9 +17,9 @@
     <a href="https://my-devcalc.netlify.app/">
       <img src="https://api.netlify.com/api/v1/badges/3bfdc191-3a42-4a5c-ac95-c9abfc608b98/deploy-status" />
     </a>
-    <img src="https://img.shields.io/github/license/ThiagoBrito-Dev/Podcastr?color=49aa26&style=for-the-badge" />
-    <img src="https://img.shields.io/static/v1?label=version&message=1.0.0&color=49aa26&style=for-the-badge" />
-    <img src="https://img.shields.io/static/v1?label=yarn&message=v1.22.5&color=49aa26&style=for-the-badge" />
+    <img src="https://img.shields.io/github/license/ThiagoBrito-Dev/Podcastr?color=5eddd3&style=for-the-badge" />
+    <img src="https://img.shields.io/static/v1?label=version&message=1.0.0&color=5eddd3&style=for-the-badge" />
+    <img src="https://img.shields.io/static/v1?label=yarn&message=v1.22.5&color=5eddd3&style=for-the-badge" />
   </div>
 </div>
 
@@ -30,6 +30,8 @@
 <p>
   DevCalc is, essentially, a calculator "for developers" which, in addition to being visually customizable, allowing the creation of custom themes, proposes to provide from basic mathematical calculations to more complex ones, such as Fibonacci Sequence, Trigonometric Functions and operations that involve the use of parentheses, all to provide a better experience for the user who is in constant contact with the world of mathematics.
 </p>
+
+<hr>
 
 ### 🏁 Status
 
@@ -50,10 +52,10 @@
 - [x] Notify user of invalid expressions;
 - [x] Format the current number;
 - [x] Clear expression;
-- [x] Delete last Character of expression;
+- [x] Delete last character of expression;
 - [x] Expand the result;
 - [x] Save, when the result is expanded, the expression and the current result, if both are valid, in the application history;
-- [x] Activate/deactivate "developer mode", which enables insertion and, posteriorly, calculation of unary operators and math functions; and
+- [x] Activate / deactivate "developer mode", which enables insertion and, posteriorly, calculation of unary operators and math functions; and
 - [x] Switch between application number base conversion types.
 
 #### Related to calculations
@@ -63,7 +65,6 @@
 - [x] Add operators to expression;
 - [x] Execute the sign rule when an operator is added in front of another and replace both with the resulting operator;
 - [x] Add unary operators and math functions to the expression;
-- [x] Adicionar conversão de base númerica à expressão;
 - [x] Add number base conversion to expression;
 - [x] Change the measurement unit to be used as the basis for the result of Trigonometric Functions calculations;
 - [x] Calculate and display the result of valid expressions in real time; and
@@ -72,10 +73,10 @@
 #### Related to modals
 
 - [x] Allow the user to transition between all modals, through shortcuts, without any conflicts of view;
-- [x] Open history modal, which stores past expressions and results, grouped by date;
+- [x] Open history modal, which stores past expressions and results grouped by date;
 - [x] Open shortcuts modal, which presents the user with all the application's shortcuts;
 - [x] Open personalization modal, which allows the user to create, through a descriptive table, a personalized theme;
-- [x] Retrieve the application's current colors and display them in the fields of the "Current Color" column, present in the customization table;
+- [x] Retrieve the application's current colors and display them in the fields of the "Current color" column, present in the customization table;
 - [x] Copy, in case of double-clicking on a field in the column "Current color", the value of the current color to the corresponding field in the column "New color";
 - [x] Clear new colors, which sets the default value (black) to all fields in the "New Color" column;
 - [x] Preview custom theme;
