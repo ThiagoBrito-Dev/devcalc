@@ -21,9 +21,9 @@
     <a href="https://my-devcalc.netlify.app/">
       <img src="https://api.netlify.com/api/v1/badges/3bfdc191-3a42-4a5c-ac95-c9abfc608b98/deploy-status" />
     </a>
-    <img src="https://img.shields.io/github/license/ThiagoBrito-Dev/Podcastr?color=49aa26&style=for-the-badge" />
-    <img src="https://img.shields.io/static/v1?label=version&message=1.0.0&color=49aa26&style=for-the-badge" />
-    <img src="https://img.shields.io/static/v1?label=yarn&message=v1.22.5&color=49aa26&style=for-the-badge" />
+    <img src="https://img.shields.io/github/license/ThiagoBrito-Dev/Podcastr?color=5eddd3&style=for-the-badge" />
+    <img src="https://img.shields.io/static/v1?label=version&message=1.0.0&color=5eddd3&style=for-the-badge" />
+    <img src="https://img.shields.io/static/v1?label=yarn&message=v1.22.5&color=5eddd3&style=for-the-badge" />
   </div>
 </div>
 
@@ -34,6 +34,8 @@
 <p>
   A DevCalc é, essencialmente, uma calculadora "para desenvolvedores" que, além de ser visualmente customizável, permitindo a criação de temas personalizados, se propõe a fornecer desde cálculos matemáticos básicos até alguns mais complexos, como Sequência de Fibonacci, Funções Trigonométricas e operações que envolvem o uso de parênteses, tudo para prover uma melhor experiência ao usuário que está em constante contato com o mundo da matemática.
 </p>
+
+<hr>
 
 ### 🏁 Status
 
