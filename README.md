@@ -3,7 +3,7 @@
     <h1>DevCalc</h1>
     <img src="./.github/devcalc.png" />
     <h3>
-      Uma aplicação JavaScript Vanilla para realização de cálculos matemáticos, de diferentes níves de complexidade, comuns entre desenvolvedores de software
+      🧮 Uma aplicação JavaScript Vanilla para realização de cálculos matemáticos, de diferentes níves de complexidade, comuns entre desenvolvedores de software
     </h3>
   </div>
 
