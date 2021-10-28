@@ -88,7 +88,7 @@
 
 Hey Dev, before starting your tests and / or contributions in the application, you will need to have the wonderful [GIT](https://git-scm.com) and a good text editor installed.
 
-Well, having everything ready and installed, we can proceed to the step-by-step of how to run the application.
+Well, having everything ready and installed, we can proceed to the step by step of how to run the application.
 
 ### 🕹️ Running the application
 
