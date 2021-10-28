@@ -53,8 +53,9 @@
 - [x] Alternar entre os temas da aplicação, incluindo o tema personalizado;
 - [x] Abrir caixa de opções;
 - [x] Lidar com conflitos de inserção;
-- [x] Notificar o usuário sobre expressões inválidas;
 - [x] Formatar o número atual;
+- [x] Diminuir / aumentar o tamanho da fonte com base no comprimento da expressão;
+- [x] Notificar o usuário sobre expressões inválidas;
 - [x] Limpar a expressão;
 - [x] Apagar último caractere da expressão;
 - [x] Ampliar o resultado;
