@@ -49,8 +49,9 @@
 - [x] Switch between application themes, including the custom theme;
 - [x] Open options box;
 - [x] Handle insertion conflicts;
-- [x] Notify user of invalid expressions;
 - [x] Format the current number;
+- [x] Decrease / increase font size based on expression length;
+- [x] Notify user of invalid expressions;
 - [x] Clear expression;
 - [x] Delete last character of expression;
 - [x] Expand the result;
