@@ -23,7 +23,6 @@
     </a>
     <img src="https://img.shields.io/github/license/ThiagoBrito-Dev/Podcastr?color=5eddd3&style=for-the-badge" />
     <img src="https://img.shields.io/static/v1?label=version&message=1.0.0&color=5eddd3&style=for-the-badge" />
-    <img src="https://img.shields.io/static/v1?label=yarn&message=v1.22.5&color=5eddd3&style=for-the-badge" />
   </div>
 </div>
 
