@@ -18,7 +18,7 @@
   </p>
 
   <div>
-    <img src="https://img.shields.io/github/license/ThiagoBrito-Dev/Podcastr?color=5eddd3&style=for-the-badge" />
+    <img src="https://img.shields.io/github/license/trybrito/Podcastr?color=5eddd3&style=for-the-badge" />
     <a href="https://my-devcalc.netlify.app/">
       <img src="https://api.netlify.com/api/v1/badges/3bfdc191-3a42-4a5c-ac95-c9abfc608b98/deploy-status" /></a>
     <img src="https://img.shields.io/static/v1?label=version&message=1.0.0&color=5eddd3&style=for-the-badge" />
@@ -98,7 +98,7 @@ Bom, com tudo instalado e pronto, podemos ir para o passo a passo de como rodar 
 
 ```bash
 # Primeiramente, clone este repositório com o GIT
-$ git clone <https://github.com/ThiagoBrito-Dev/devcalc>
+$ git clone <https://github.com/trybrito/devcalc>
 
 # Acesse a pasta do projeto pelo terminal de comando
 $ cd .../devcalc
@@ -119,7 +119,7 @@ $ cd .../devcalc
 ### 👨🏽‍🎓 Autor
 
 <div align="center">
-  <img src="https://github.com/ThiagoBrito-Dev.png" width="250px" />
+  <img src="https://github.com/trybrito.png" width="250px" />
 
   <br />
 
@@ -145,7 +145,7 @@ $ cd .../devcalc
 ### 📚 README versions
 
 <div>
-  <a href="https://github.com/ThiagoBrito-Dev/devcalc/blob/main/README.md">Portuguese (pt-br)</a>
+  <a href="https://github.com/trybrito/devcalc/blob/main/README.md">Portuguese (pt-br)</a>
   |
-  <a href="https://github.com/ThiagoBrito-Dev/devcalc/blob/main/README-en.md">English (en-us)</a>
+  <a href="https://github.com/trybrito/devcalc/blob/main/README-en.md">English (en-us)</a>
 </div>
