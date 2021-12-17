@@ -18,10 +18,9 @@ div#display input {
   background-color: var(--input-background);
   color: var(--input-text);
 
-  cursor: default;
-  outline: none;
   border: none;
   border-radius: 2px;
+  cursor: default;
 }
 
 div#display input::placeholder {
@@ -89,7 +88,7 @@ section#calc-body div#buttons-wrapper {
   grid-template-columns: 1fr auto;
   grid-template-rows: auto 1fr;
   grid-template-areas:
-    "top-container top-container"
+    "top-row-container top-row-container"
     "main-container side-container";
   margin-top: 20px;
 }
@@ -134,8 +133,8 @@ div#buttons-wrapper button:active {
   transform: scale(0.95);
 }
 
-.top-container {
-  grid-area: top-container;
+.top-row-container {
+  grid-area: top-row-container;
   display: flex;
 
   margin-bottom: 6px;
@@ -143,22 +142,22 @@ div#buttons-wrapper button:active {
   border-bottom: 1px solid var(--header-line);
 }
 
-div.top-container div.left-column-top-row div + div {
+div.top-row-container div.left-column div + div {
   margin-top: 6px;
 }
 
-div.left-column-top-row button + button,
+div.left-column button + button,
 div#main-container button + button {
   margin-left: 2px;
 }
 
-div.top-container div.right-column-top-row {
+div.top-row-container div.right-column {
   margin-left: 6px;
   padding-left: 6px;
   border-left: 1px solid var(--header-line);
 }
 
-div.right-column-top-row,
+div.right-column,
 .side-container {
   display: flex;
   flex-direction: column;

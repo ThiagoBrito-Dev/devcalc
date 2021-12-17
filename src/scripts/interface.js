@@ -367,7 +367,7 @@ AppInterface.prototype.toggleDevMode = function () {
   const actionsContainer = document.querySelector(
     ".expression-actions-container"
   );
-  const topContainer = document.querySelector(".top-container");
+  const topContainer = document.querySelector(".top-row-container");
   const sideContainer = document.querySelector(".side-container");
 
   if (actionsContainer.classList.value.includes("invisible")) {
