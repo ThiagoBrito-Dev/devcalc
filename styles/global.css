@@ -24,7 +24,7 @@ body {
   align-items: center;
   min-height: 100vh;
 
-  background-image: url("../../assets/background-md.jpg");
+  background-image: url("../assets/background-md.jpg");
   background-size: cover;
   font-size: 16px;
   padding: 12px 0;
