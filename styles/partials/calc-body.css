@@ -2,7 +2,7 @@ main > div section#calc-body {
   padding: 12px 14px;
 }
 
-div#display :is(input, p) {
+section#calc-body div#display :is(input, p) {
   letter-spacing: 0.75px;
 }
 
@@ -16,6 +16,7 @@ div#display input {
   color: var(--input-text);
   font-size: 20px;
 
+  outline: none;
   border: none;
   border-radius: 2px;
   cursor: default;
@@ -73,17 +74,7 @@ div#result-container p::-webkit-scrollbar {
 }
 
 section#calc-body div#buttons-wrapper {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-rows: auto 1fr;
-  grid-template-areas:
-    "top-row-container top-row-container"
-    "main-container side-container";
   margin-top: 20px;
-}
-
-div#buttons-wrapper div {
-  cursor: default;
 }
 
 div#buttons-wrapper button {
@@ -122,50 +113,31 @@ div#buttons-wrapper button:active {
   transform: scale(0.95);
 }
 
-.top-row-container {
-  grid-area: top-row-container;
-  display: flex;
-
+div#header-container {
   margin-bottom: 6px;
   padding-bottom: 6px;
   border-bottom: 1px solid var(--header-line);
 }
 
-div.top-row-container div.left-column div + div {
-  margin-top: 6px;
+div#header-container > div,
+div#main-container > div {
+  display: flex;
+  align-items: center;
+  gap: 6.25px;
 }
 
-div.left-column button + button,
-div#main-container button + button {
-  margin-left: 2px;
+div#header-container div + div,
+div#main-container div + div {
+  margin-top: 6.25px;
 }
 
-div.top-row-container div.right-column,
-div#buttons-wrapper div.side-container {
-  margin-left: 6px;
-  padding-left: 6px;
+div#header-container div div,
+div#main-container div div {
+  padding-left: 6.25px;
   border-left: 1px solid var(--header-line);
 }
 
-div.right-column button + button,
-div.side-container button + button {
-  display: block;
-  margin-top: 6px;
-}
-
-div#buttons-wrapper div#main-container {
-  grid-area: main-container;
-}
-
-div#main-container div + div {
-  margin-top: 6px;
-}
-
-div#main-container div:last-child button:first-child {
-  width: 48.675%;
+div#main-container > div:last-child > button:first-child {
+  width: 110px;
   border-radius: 25px;
-}
-
-div#buttons-wrapper div.side-container {
-  grid-area: side-container;
 }

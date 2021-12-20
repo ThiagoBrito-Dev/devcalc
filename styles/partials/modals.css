@@ -1,5 +1,5 @@
 /* GLOBAL STYLES */
-.modal-overlay {
+#modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -12,7 +12,7 @@
   background-color: rgba(0, 0, 0, 0.35);
 }
 
-div.modal-overlay section {
+div#modal-overlay > section {
   width: 310px;
   max-height: 350px;
 
@@ -21,11 +21,11 @@ div.modal-overlay section {
   overflow-y: auto;
 }
 
-div.modal-overlay section::-webkit-scrollbar {
+div#modal-overlay > section::-webkit-scrollbar {
   width: 6px;
 }
 
-div.modal-overlay section::-webkit-scrollbar-thumb {
+div#modal-overlay > section::-webkit-scrollbar-thumb {
   border-radius: 15px;
   background: linear-gradient(
     var(--colorized-button-background),
@@ -53,22 +53,21 @@ header#modal-header h2 {
 }
 
 section
-  :is(div.history-modal-content, div.shortcuts-modal-content, div.personalization-modal-content) {
+  :is(div#history-modal-content, div#shortcuts-modal-content, div#personalization-modal-content) {
   padding: 0 12px 12px;
 }
 /* END OF GLOBAL STYLES
 
 -> HISTORY MODAL */
-div.history-modal-content > div {
-  /* section */
+div#history-modal-content section {
   display: flex;
 }
 
-div.history-modal-content > div + div {
+div#history-modal-content section + section {
   margin-top: 16px;
 }
 
-div.history-modal-content h3 {
+div#history-modal-content h3 {
   min-width: 130px;
   height: fit-content;
   color: var(--button-text);
@@ -76,7 +75,7 @@ div.history-modal-content h3 {
   letter-spacing: 1px;
 }
 
-div.history-modal-content div.operations-info {
+div#history-modal-content div.operations-info {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -118,19 +117,19 @@ div.operations-info div p:last-child {
 /* END OF HISTORY MODAL
 
 -> SHORTCUTS MODAL */
-div.modal-overlay section.shortcuts-modal {
+div#modal-overlay section.shortcuts-modal {
   width: min(1050px, 96%);
   max-height: 430px;
 }
 
-div.shortcuts-modal-content {
+div#shortcuts-modal-content {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
   gap: 12px;
 }
 
-div.shortcuts-modal-content div.card {
+div#shortcuts-modal-content div.card {
   width: 236.75px;
   height: 160px;
   padding: 16px;
@@ -174,12 +173,12 @@ div.card p {
 /* END OF SHORTCUTS MODAL
 
 -> PERSONALIZATION MODAL */
-div.modal-overlay section.personalization-modal {
+div#modal-overlay section.personalization-modal {
   width: min(800px, 96.5%);
   max-height: 434px;
 }
 
-div.personalization-modal-content div#table-container {
+div#personalization-modal-content div#table-container {
   width: 100%;
   overflow-x: auto;
 }
@@ -290,7 +289,7 @@ input.untraceable {
   overflow: hidden;
 }
 
-div.personalization-modal-content section#actions {
+div#personalization-modal-content section#actions {
   display: flex;
   align-items: center;
   gap: 6px;

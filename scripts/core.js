@@ -332,7 +332,6 @@ AppCore.prototype.formatNumbers = function (expression, number = "") {
   if (expression && expression != "-") {
     if (this.currentNumber == "") {
       this.firstCurrentNumberPosition = this.expressionInput.value.length - 1;
-
       // We have to get first position of expressionInput.value variable because its
       // formatted, while expression isn't
     }
@@ -807,7 +806,7 @@ AppCore.prototype.calculateMathFunctions = function (
   value,
   operators = null
 ) {
-  const resultMode = document.querySelector("#result-mode");
+  const resultMode = document.getElementById("measurement-unit");
   let calculationResult;
 
   if (

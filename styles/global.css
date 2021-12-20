@@ -6,7 +6,7 @@
   outline-offset: 2px;
 }
 
-body {
+:root {
   --calc-background: #f5f5f5;
   --mode-button-text: #404040;
   --mode-button-background: #dfdfdf;
@@ -19,42 +19,9 @@ body {
   --button-background-effect: #c5c5c5;
   --colorized-button-background: #8f278a;
   --button-border: #9845cf;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-
-  background-image: url("../assets/background-md.jpg");
-  background-size: cover;
-  font-size: 16px;
-  -webkit-font-smoothing: antialiased;
-  padding: 12px 0;
 }
 
-body::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-body::-webkit-scrollbar-track {
-  background-color: #404040;
-}
-
-body::-webkit-scrollbar-thumb {
-  background-color: #b3b3b3;
-  border-radius: 8px;
-}
-
-body::-webkit-scrollbar-thumb:hover {
-  background-color: #999999;
-}
-
-body::-webkit-scrollbar-thumb:active {
-  background-color: #858585;
-}
-
-body.dark-theme {
+:root.dark-theme {
   --calc-background: #3c3c3c;
   --mode-button-text: #fcfcfc;
   --mode-button-background: #606060;
@@ -69,7 +36,42 @@ body.dark-theme {
   --button-border: #a1e7dd;
 }
 
-body main h1 {
+body#page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+
+  background-image: url("../assets/background-md.jpg");
+  background-size: cover;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  padding: 12px 0;
+}
+
+body#page::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+body#page::-webkit-scrollbar-track {
+  background-color: #404040;
+}
+
+body#page::-webkit-scrollbar-thumb {
+  background-color: #b3b3b3;
+  border-radius: 8px;
+}
+
+body#page::-webkit-scrollbar-thumb:hover {
+  background-color: #999999;
+}
+
+body#page::-webkit-scrollbar-thumb:active {
+  background-color: #858585;
+}
+
+body#page main h1 {
   display: block;
   width: 95.75%;
   margin: 0 auto;
@@ -85,12 +87,12 @@ body main h1 {
   border-radius: 20px 20px 0 0;
 }
 
-body main > div {
+body#page main > div {
   background-color: var(--calc-background);
   border-radius: 6px;
   box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.5);
 
-  /* animation: show-up 1.5s; */
+  animation: show-up 1.5s;
   transition-duration: 0.25s;
 }
 
@@ -99,11 +101,11 @@ button {
   border: none;
 }
 
-body .invisible {
+body#page .invisible {
   display: none;
 }
 
-body .sr-only {
+body#page .sr-only {
   position: absolute;
 
   width: 1px;
@@ -117,7 +119,7 @@ body .sr-only {
   border-width: 0;
 }
 
-body .close-modal {
+body#page .close-modal {
   font-size: 18px;
   font-weight: 500;
 
@@ -127,11 +129,11 @@ body .close-modal {
   transition-duration: 0.1s;
 }
 
-body .close-modal:active {
+body#page .close-modal:active {
   transform: scale(0.95);
 }
 
-body .has-transition {
+body#page .has-transition {
   transition-duration: 0.25s;
 }
 

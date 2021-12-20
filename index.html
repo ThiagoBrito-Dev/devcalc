@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -38,16 +38,16 @@
     <script type="module" src="./scripts/index.js" defer></script>
   </head>
 
-  <body class="">
+  <body id="page">
     <main>
       <h1 class="sr-only">DevCalc</h1>
 
       <div>
-        <header class="">
-          <div class="expression-actions-container invisible">
+        <header id="calc-header" class="">
+          <div id="expression-actions-container" class="invisible">
             <button
               type="button"
-              id="result-mode"
+              id="measurement-unit"
               aria-label="Alterar unidade de medida do resultado de funções trigonométricas"
             >
               RAD
@@ -55,7 +55,7 @@
             <div id="conversion-container">
               <button
                 type="button"
-                id="conversion-mode"
+                id="conversion-type"
                 aria-label="Alterar tipo de conversão de base numérica"
               >
                 BIN
@@ -65,8 +65,8 @@
 
               <button
                 type="button"
-                id="insert-conversion"
                 lang="en"
+                id="insert-conversion"
                 aria-label="Inserir tipo de conversão à expressão"
               >
                 INSERT
@@ -76,9 +76,9 @@
           <div id="interface-actions-container">
             <button
               type="button"
-              id="switch-theme"
+              id="change-theme"
               class="interaction-button"
-              aria-label="Alterar tema"
+              aria-label="Trocar tema da aplicação"
             >
               <i id="theme-icon" class="fas fa-moon" aria-hidden="true"></i>
             </button>
@@ -121,10 +121,11 @@
           </div>
         </header>
         <section id="calc-body">
-          <div id="display">
+          <div id="display" tabindex="0">
             <input
               type="text"
               class=""
+              tabindex="-1"
               aria-label="Expressão/resultado ampliado"
               placeholder="0"
               readonly
@@ -134,89 +135,93 @@
             </div>
           </div>
           <div id="buttons-wrapper">
-            <div class="top-row-container invisible">
-              <div class="left-column">
+            <div id="header-container" class="invisible">
+              <div>
+                <button
+                  type="button"
+                  lang="en"
+                  class="colorized-button letter-spacing expression-related"
+                  data-char="Sin("
+                  aria-label="Adicionar marcação de cálculo de seno ao display da expressão"
+                >
+                  sin
+                </button>
+                <button
+                  type="button"
+                  class="colorized-button letter-spacing expression-related"
+                  data-char="Cos("
+                  aria-label="Adicionar marcação de cálculo de cosseno"
+                >
+                  cos
+                </button>
+                <button
+                  type="button"
+                  class="colorized-button letter-spacing expression-related"
+                  data-char="Tan("
+                  aria-label="Adicionar marcação de cálculo de tangente"
+                >
+                  tan
+                </button>
+                <button
+                  type="button"
+                  lang="en"
+                  class="colorized-button letter-spacing expression-related"
+                  data-char="Hypot("
+                  aria-label="Adicionar marcação de cálculo de hipotenusa"
+                >
+                  hypot
+                </button>
+
                 <div>
                   <button
                     type="button"
-                    class="colorized-button letter-spacing expression-related"
-                    data-char="Sin("
-                    aria-label="Adicionar marcação de cálculo de seno ao display da expressão"
-                  >
-                    sin
-                  </button>
-                  <button
-                    type="button"
-                    class="colorized-button letter-spacing expression-related"
-                    data-char="Cos("
-                    aria-label="Adicionar marcação de cálculo de cosseno"
-                  >
-                    cos
-                  </button>
-                  <button
-                    type="button"
-                    class="colorized-button letter-spacing expression-related"
-                    data-char="Tan("
-                    aria-label="Adicionar marcação de cálculo de tangente"
-                  >
-                    tan
-                  </button>
-                  <button
-                    type="button"
-                    class="colorized-button letter-spacing expression-related"
-                    data-char="Hypot("
-                    aria-label="Adicionar marcação de cálculo de hipotenusa"
-                  >
-                    hypot
-                  </button>
-                </div>
-                <div>
-                  <button
-                    type="button"
                     class="colorized-button expression-related"
-                    aria-label="Adicionar abertura de parênteses à expressão"
+                    aria-label="Adicionar operador de fatorial à expressão"
                   >
-                    (
-                  </button>
-                  <button
-                    type="button"
-                    class="colorized-button expression-related"
-                    aria-label="Adicionar fechamento de parênteses"
-                  >
-                    )
-                  </button>
-                  <button
-                    type="button"
-                    class="colorized-button expression-related"
-                    data-char="**"
-                    aria-label="Adicionar operador de exponenciação"
-                  >
-                    ^
-                  </button>
-                  <button
-                    type="button"
-                    class="colorized-button expression-related"
-                    aria-label="Adicionar operador de porcentagem"
-                  >
-                    %
+                    !
                   </button>
                 </div>
               </div>
-              <div class="right-column">
+              <div>
                 <button
                   type="button"
                   class="colorized-button expression-related"
-                  aria-label="Adicionar operador de fatorial à expressão"
+                  aria-label="Adicionar abertura de parênteses à expressão"
                 >
-                  !
+                  (
                 </button>
                 <button
                   type="button"
                   class="colorized-button expression-related"
-                  aria-label="Adicionar operador de raiz quadrada"
+                  aria-label="Adicionar fechamento de parênteses"
                 >
-                  √
+                  )
                 </button>
+                <button
+                  type="button"
+                  class="colorized-button expression-related"
+                  data-char="**"
+                  aria-label="Adicionar operador de exponenciação"
+                >
+                  ^
+                </button>
+                <button
+                  type="button"
+                  class="colorized-button expression-related"
+                  aria-label="Adicionar operador de porcentagem"
+                >
+                  %
+                </button>
+
+                <div>
+                  <button
+                    type="button"
+                    class="colorized-button expression-related"
+                    aria-label="Adicionar operador de raiz quadrada"
+                  >
+                    √
+                  </button>
+                </div>
               </div>
             </div>
             <div id="main-container">
@@ -239,6 +244,7 @@
                 </button>
                 <button
                   type="button"
+                  lang="en"
                   id="dev-mode"
                   class="colorized-button letter-spacing"
                   aria-label="Ativar/desativar modo de desenvolvedor"
@@ -253,6 +259,17 @@
                 >
                   ÷
                 </button>
+
+                <div class="invisible">
+                  <button
+                    type="button"
+                    class="colorized-button letter-spacing expression-related"
+                    data-char="Log("
+                    aria-label="Adicionar marcação de cálculo de logaritmo"
+                  >
+                    log
+                  </button>
+                </div>
               </div>
               <div>
                 <button
@@ -284,6 +301,17 @@
                 >
                   x
                 </button>
+
+                <div class="invisible">
+                  <button
+                    type="button"
+                    data-char="Ln("
+                    class="colorized-button letter-spacing expression-related"
+                    aria-label="Adicionar marcação de cálculo de logaritmo neperiano"
+                  >
+                    ln
+                  </button>
+                </div>
               </div>
               <div>
                 <button
@@ -314,6 +342,17 @@
                 >
                   -
                 </button>
+
+                <div class="invisible">
+                  <button
+                    type="button"
+                    data-char="Fib("
+                    class="colorized-button letter-spacing expression-related"
+                    aria-label="Adicionar marcação de cálculo da Sequência de Fibonacci"
+                  >
+                    fib
+                  </button>
+                </div>
               </div>
               <div>
                 <button
@@ -344,6 +383,16 @@
                 >
                   +
                 </button>
+
+                <div class="invisible">
+                  <button
+                    type="button"
+                    class="colorized-button expression-related"
+                    aria-label="Adicionar símbolo de PI"
+                  >
+                    π
+                  </button>
+                </div>
               </div>
               <div>
                 <button
@@ -368,54 +417,24 @@
                 >
                   =
                 </button>
+
+                <div class="invisible">
+                  <button
+                    type="button"
+                    class="colorized-button expression-related"
+                    aria-label="Adicionar símbolo do número de Euler"
+                  >
+                    e
+                  </button>
+                </div>
               </div>
-            </div>
-            <div class="side-container invisible">
-              <button
-                type="button"
-                class="colorized-button letter-spacing expression-related"
-                data-char="Log("
-                aria-label="Adicionar marcação de cálculo de logaritmo à expressão"
-              >
-                log
-              </button>
-              <button
-                type="button"
-                data-char="Ln("
-                class="colorized-button letter-spacing expression-related"
-                aria-label="Adicionar marcação de cálculo de logaritmo neperiano"
-              >
-                ln
-              </button>
-              <button
-                type="button"
-                data-char="Fib("
-                class="colorized-button letter-spacing expression-related"
-                aria-label="Adicionar marcação de cálculo da Sequência de Fibonacci"
-              >
-                fib
-              </button>
-              <button
-                type="button"
-                class="colorized-button expression-related"
-                aria-label="Adicionar símbolo de PI"
-              >
-                π
-              </button>
-              <button
-                type="button"
-                class="colorized-button expression-related"
-                aria-label="Adicionar símbolo do número de Euler"
-              >
-                e
-              </button>
             </div>
           </div>
         </section>
       </div>
     </main>
 
-    <div class="modal-overlay invisible">
+    <div id="modal-overlay" class="invisible">
       <section class="">
         <header id="modal-header">
           <h2 id="modal-title"></h2>
@@ -424,54 +443,81 @@
           </button>
         </header>
 
-        <div class="history-modal-content invisible"></div>
-        <div class="shortcuts-modal-content invisible">
+        <div id="history-modal-content" class="invisible"></div>
+        <div id="shortcuts-modal-content" class="invisible">
           <div class="card">
             <button disabled>NUM</button>
             <!-- Maybe using a button in this case isn't the best decision, but my purpose 
               here is to give screen reader users the idea of a "keyboard key" when their 
               softwares read this element. -->
-            <p>Adiciona o número pressionado ao display da expressão</p>
+            <p>
+              Adiciona o número pressionado ao <span lang="en">display</span> da
+              expressão
+            </p>
           </div>
 
           <div class="card">
             <button disabled>+</button>
-            <p>Insere o operador de adição ao display da expressão</p>
+            <p>
+              Insere o operador de adição ao <span lang="en">display</span> da
+              expressão
+            </p>
           </div>
 
           <div class="card">
             <button disabled>-</button>
-            <p>Insere o operador de subtração ao display da expressão</p>
+            <p>
+              Insere o operador de subtração ao
+              <span lang="en">display</span> da expressão
+            </p>
           </div>
 
           <div class="card">
             <button disabled>*</button>
-            <p>Insere o operador de multiplicação ao display da expressão</p>
+            <p>
+              Insere o operador de multiplicação ao
+              <span lang="en">display</span> da expressão
+            </p>
           </div>
 
           <div class="card">
             <button disabled>/</button>
-            <p>Insere o operador de divisão ao display da expressão</p>
+            <p>
+              Insere o operador de divisão ao <span lang="en">display</span>da
+              expressão
+            </p>
           </div>
 
           <div class="card">
             <button disabled>^</button>
-            <p>Insere o operador de exponenciação ao display da expressão</p>
+            <p>
+              Insere o operador de exponenciação ao
+              <span lang="en">display</span> da expressão
+            </p>
           </div>
 
           <div class="card">
             <button disabled>%</button>
-            <p>Insere o operador de porcentagem ao display da expressão</p>
+            <p>
+              Insere o operador de porcentagem ao
+              <span lang="en">display</span> da expressão
+            </p>
           </div>
 
           <div class="card">
             <button disabled>(</button>
-            <p>Insere uma abertura de parênteses ao display da expressão</p>
+            <p>
+              Insere uma abertura de parênteses ao
+              <span lang="en">display</span> da expressão
+            </p>
           </div>
 
           <div class="card">
             <button disabled>)</button>
-            <p>Insere um fechamento de parênteses ao display da expressão</p>
+            <p>
+              Insere um fechamento de parênteses ao
+              <span lang="en">display</span> da expressão
+            </p>
           </div>
 
           <div class="card">
@@ -486,20 +532,25 @@
 
           <div class="card">
             <button disabled>S</button>
-            <p>Adiciona função para cálculo de seno ao display da expressão</p>
+            <p>
+              Adiciona função para cálculo de seno ao
+              <span lang="en">display</span> da expressão
+            </p>
           </div>
 
           <div class="card">
             <button disabled>C</button>
             <p>
-              Adiciona função para cálculo de cosseno ao display da expressão
+              Adiciona função para cálculo de cosseno ao
+              <span lang="en">display</span> da expressão
             </p>
           </div>
 
           <div class="card">
             <button disabled>T</button>
             <p>
-              Adiciona função para cálculo de tangente ao display da expressão
+              Adiciona função para cálculo de tangente ao
+              <span lang="en">display</span> da expressão
             </p>
           </div>
 
@@ -516,7 +567,8 @@
           <div class="card">
             <button disabled>L</button>
             <p>
-              Adiciona função para cálculo de logaritmo ao display da expressão
+              Adiciona função para cálculo de logaritmo ao
+              <span lang="en">display</span> da expressão
             </p>
           </div>
 
@@ -527,13 +579,17 @@
 
           <div class="card">
             <button disabled>P</button>
-            <p>Adiciona o símbolo de PI (π) ao display da expressão</p>
+            <p>
+              Adiciona o símbolo de PI (π) ao <span lang="en">display</span> da
+              expressão
+            </p>
           </div>
 
           <div class="card">
             <button disabled>P</button>
             <p>
-              Adiciona o símbolo do Número de Euler (e) ao display da expressão
+              Adiciona o símbolo do número de Euler (e) ao
+              <span lang="en">display</span> da expressão
             </p>
           </div>
 
@@ -541,7 +597,7 @@
             <button disabled>SHIFT + SCROLL</button>
             <p>
               Manipula a área de visão de expressões que excedem o tamanho do
-              display
+              <span lang="en">display</span>
             </p>
           </div>
 
@@ -555,19 +611,25 @@
 
           <div class="card">
             <button disabled>ALT + T</button>
-            <p>Altera o tema da aplicação (de light para dark, e vice-versa)</p>
+            <p>
+              Altera o tema da aplicação (de <span lang="en">light</span> para
+              <span lang="en">dark</span>, e vice-versa)
+            </p>
           </div>
 
           <div class="card">
             <button disabled>ALT + L</button>
-            <p>Realiza a limpeza completa do display da expressão</p>
+            <p>
+              Realiza a limpeza completa do <span lang="en">display</span> da
+              expressão
+            </p>
           </div>
 
           <div class="card">
             <button disabled>ALT + C</button>
             <p>
               Altera o tipo de conversão (de bases numéricas) que será inserido
-              no display da expressão
+              no <span lang="en">display</span> da expressão
             </p>
           </div>
 
@@ -602,7 +664,10 @@
 
           <div class="card">
             <button disabled>BACKSPACE</button>
-            <p>Apaga o último caractere adicionado ao display da expressão</p>
+            <p>
+              Apaga o último caractere adicionado ao
+              <span lang="en">display</span> da expressão
+            </p>
           </div>
 
           <div class="card">
@@ -613,7 +678,7 @@
             </p>
           </div>
         </div>
-        <div class="personalization-modal-content invisible">
+        <div id="personalization-modal-content" class="invisible">
           <div id="table-container">
             <table>
               <caption>
@@ -651,7 +716,10 @@
                 </tr>
                 <tr>
                   <th scope="row">Cor primária 2</th>
-                  <td>Aplicada ao texto do display da expressão</td>
+                  <td>
+                    Aplicada ao texto do <span lang="en">display</span> da
+                    expressão
+                  </td>
                   <td class="current-color-data"></td>
                   <td class="new-color-data">
                     <div class="inputs-container">
@@ -671,7 +739,10 @@
                 </tr>
                 <tr>
                   <th scope="row">Cor primária 3</th>
-                  <td>Aplicada ao fundo do display da expressão</td>
+                  <td>
+                    Aplicada ao fundo do <span lang="en">display</span> da
+                    expressão
+                  </td>
                   <td class="current-color-data"></td>
                   <td class="new-color-data">
                     <div class="inputs-container">

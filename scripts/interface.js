@@ -3,21 +3,19 @@ import AppCore from "./core.js";
 const appCore = new AppCore();
 
 export default function AppInterface() {
-  this.conversionMode = document.getElementById("conversion-mode");
+  this.conversionMode = document.getElementById("conversion-type");
   this.optionsBox = document.getElementById("options-box");
   this.resultContainer = document.getElementById("result-container");
 
-  this.modalOverlay = document.querySelector("div.modal-overlay");
-  this.modal = document.querySelector("div.modal-overlay section");
+  this.modalOverlay = document.getElementById("modal-overlay");
+  this.modal = document.querySelector("div#modal-overlay section");
   this.modalTitle = document.getElementById("modal-title");
-  this.historyModalContent = document.querySelector(
-    "div.history-modal-content"
+  this.historyModalContent = document.getElementById("history-modal-content");
+  this.shortcutsModalContent = document.getElementById(
+    "shortcuts-modal-content"
   );
-  this.shortcutsModalContent = document.querySelector(
-    "div.shortcuts-modal-content"
-  );
-  this.personalizationModalContent = document.querySelector(
-    "div.personalization-modal-content"
+  this.personalizationModalContent = document.getElementById(
+    "personalization-modal-content"
   );
 
   this.cssVariables = [
@@ -49,11 +47,11 @@ AppInterface.prototype.initialize = function () {
     });
   }
 
-  let userTheme = localStorage.getItem("devcalc-userDefaultTheme") || "";
+  const userTheme = localStorage.getItem("devcalc-userDefaultTheme") || "";
   const attributeName =
     userTheme !== "" && userTheme != "dark-theme" ? "style" : "class";
+  document.documentElement.setAttribute(attributeName, userTheme);
 
-  document.body.setAttribute(attributeName, userTheme);
   changeThemeIcon(userTheme);
   this.handleCurrentInputColor();
 };
@@ -197,7 +195,7 @@ AppInterface.prototype.toggleResultMode = function () {
     .replace(/\./g, "")
     .replace(/\,/g, ".");
 
-  const resultMode = document.getElementById("result-mode");
+  const resultMode = document.getElementById("measurement-unit");
   const currentResultMode = resultMode.textContent;
   resultMode.textContent = currentResultMode.includes("RAD") ? "GRAU" : "RAD";
   appCore.isNotCalculable = false;
@@ -236,21 +234,23 @@ AppInterface.prototype.handleAddingNumberBaseConversionOnInput = function () {
 
 AppInterface.prototype.changeTheme = function () {
   this.applyNewStylingClasses();
+
+  const htmlElement = document.documentElement;
   let currentTheme = "";
 
-  if (document.body.getAttribute("style")) {
-    document.body.removeAttribute("style");
+  if (htmlElement.getAttribute("style")) {
+    htmlElement.removeAttribute("style");
   } else {
-    document.body.classList.toggle("dark-theme");
+    htmlElement.classList.toggle("dark-theme");
 
     if (
-      document.body.classList.value == "" &&
+      htmlElement.classList.value == "" &&
       localStorage.getItem("devcalc-userCustomTheme")
     ) {
       currentTheme = localStorage.getItem("devcalc-userCustomTheme");
-      document.body.style = currentTheme;
+      htmlElement.style = currentTheme;
     } else {
-      currentTheme = document.body.classList.value;
+      currentTheme = htmlElement.classList.value;
     }
   }
 
@@ -363,24 +363,29 @@ AppInterface.prototype.deleteLastCharacter = function () {
 AppInterface.prototype.toggleDevMode = function () {
   this.isDevModeActivated = !this.isDevModeActivated;
 
-  const calcHeader = document.querySelector("main header");
-  const actionsContainer = document.querySelector(
-    ".expression-actions-container"
+  const calcHeader = document.getElementById("calc-header");
+  const actionsContainer = document.getElementById(
+    "expression-actions-container"
   );
-  const topContainer = document.querySelector(".top-row-container");
-  const sideContainer = document.querySelector(".side-container");
+  const headerContainer = document.getElementById("header-container");
+  const mainContainerLastElements = document.querySelectorAll(
+    "div#main-container div div"
+  );
 
   if (actionsContainer.classList.value.includes("invisible")) {
     this.conversionMode.textContent = "BIN";
   }
 
   calcHeader.classList.toggle("space-between");
-  topContainer.classList.toggle("invisible");
+  headerContainer.classList.toggle("invisible");
   actionsContainer.classList.toggle("invisible");
   appCore.expressionInput.classList.toggle("stretch");
   appCore.expressionResult.classList.toggle("stretch");
   this.resultContainer.classList.toggle("stretch");
-  sideContainer.classList.toggle("invisible");
+
+  mainContainerLastElements.forEach((element) => {
+    element.classList.toggle("invisible");
+  });
 
   appCore.expressionInput.classList.remove("has-transition");
   this.handleFontSize();
@@ -621,7 +626,7 @@ AppInterface.prototype.focalizeResult = function () {
       this.setDefaultStylingClasses();
       appCore.expressionInput.value = appCore.expressionResult.textContent;
       appCore.expressionResult.textContent = "";
-      appCore.currentNumber = expression;
+      appCore.currentNumber = appCore.expressionInput.value;
     } else {
       appCore.expressionInput.value = "Expressão inválida";
       appCore.currentNumber = "";
@@ -656,7 +661,7 @@ AppInterface.prototype.handleModalState = function () {
     this.clearModal();
 
     this.isDevModeActivated
-      ? document.getElementById("result-mode").focus()
+      ? document.getElementById("measurement-unit").focus()
       : document.getElementById("theme-icon").parentElement.focus();
   }
 
@@ -711,7 +716,7 @@ AppInterface.prototype.handleAddingOperationsOnHistory = function (
       this.operations[this.operations.length - 2].operationDate !==
         operationData.operationDate) ||
     (index &&
-      document.querySelector("div.history-modal-content div:last-of-type h3")
+      document.querySelector("div#history-modal-content section:last-child h3")
         .textContent != operationData.operationDate)
   ) {
     this.createContentElements(operationData, operationInfo);
@@ -719,7 +724,7 @@ AppInterface.prototype.handleAddingOperationsOnHistory = function (
   }
 
   const operationsInfo = document.querySelector(
-    "div.history-modal-content div:last-of-type div.operations-info"
+    "div#history-modal-content section:last-child div.operations-info"
   );
   operationsInfo.appendChild(operationInfo);
 };
@@ -728,7 +733,7 @@ AppInterface.prototype.createContentElements = function (
   operationData,
   operationInfo
 ) {
-  const contentContainer = document.createElement("div");
+  const contentSection = document.createElement("section");
 
   const operationsDate = document.createElement("h3");
   operationsDate.textContent = operationData.operationDate;
@@ -737,9 +742,9 @@ AppInterface.prototype.createContentElements = function (
   operationsInfo.classList.add("operations-info");
 
   operationsInfo.appendChild(operationInfo);
-  contentContainer.appendChild(operationsDate);
-  contentContainer.appendChild(operationsInfo);
-  this.historyModalContent.appendChild(contentContainer);
+  contentSection.appendChild(operationsDate);
+  contentSection.appendChild(operationsInfo);
+  this.historyModalContent.appendChild(contentSection);
 };
 
 function createOperationInfo(operationData) {
@@ -773,13 +778,14 @@ AppInterface.prototype.handleAccessingPersonalizationModal = function () {
 };
 
 AppInterface.prototype.handleCurrentInputColor = function () {
-  const bodyTheme = document.body.classList.value.includes("dark-theme")
+  const htmlElement = document.documentElement;
+  const appTheme = htmlElement.classList.value.includes("dark-theme")
     ? ".dark-theme"
     : "body";
 
   this.cssVariables.forEach((variable, index) => {
     const currentColor = getComputedStyle(
-      document.querySelector(bodyTheme)
+      document.querySelector(appTheme)
     ).getPropertyValue(variable);
     const currentColorTableData = document.querySelector(
       `tbody tr:nth-child(${index + 1}) td.current-color-data`
@@ -803,8 +809,8 @@ AppInterface.prototype.handleCurrentInputColor = function () {
   });
 };
 
-function copyCurrentColorValueToNewColorValue({ target, key }) {
-  if (!key || key == "Enter") {
+function copyCurrentColorValueToNewColorValue({ target, key, code }) {
+  if (!key || key == "Enter" || code == "Space") {
     const currentColorInput = target;
     const unformattedCurrentColor = currentColorInput.style.backgroundColor;
     const splittedCurrentColor = unformattedCurrentColor
@@ -838,8 +844,8 @@ function copyCurrentColorValueToNewColorValue({ target, key }) {
   }
 }
 
-AppInterface.prototype.triggerColorInput = function ({ target, key }) {
-  if (!key || key == "Enter") {
+AppInterface.prototype.triggerColorInput = function ({ target, key, code }) {
+  if (!key || key == "Enter" || code == "Space") {
     const fakeColorInput = target;
     const colorInput = fakeColorInput.nextElementSibling;
 
@@ -866,12 +872,13 @@ AppInterface.prototype.showPersonalizedThemePreview = function (
   userIsAccessingFromMobileDevice = false
 ) {
   if (!key || key == "Enter") {
+    const htmlElement = document.documentElement;
     this.modalOverlay.classList.add("invisible");
 
     const colorInputs = document.getElementsByName("new-color");
 
     colorInputs.forEach((input, index) => {
-      document.body.style.setProperty(this.cssVariables[index], input.value);
+      htmlElement.style.setProperty(this.cssVariables[index], input.value);
     });
 
     if (userIsAccessingFromMobileDevice) {
@@ -893,6 +900,7 @@ AppInterface.prototype.showPersonalizedThemePreview = function (
 AppInterface.prototype.stopShowingPersonalizedThemePreview = function (
   hasToAssignEventListener = false
 ) {
+  const htmlElement = document.documentElement;
   const previewThemeButton = document.getElementById("preview-theme");
 
   if (hasToAssignEventListener) {
@@ -905,26 +913,28 @@ AppInterface.prototype.stopShowingPersonalizedThemePreview = function (
   document.body.onkeyup = null;
 
   this.modalOverlay.classList.remove("invisible");
+  htmlElement.removeAttribute("style");
+
   const userTheme = localStorage.getItem("devcalc-userDefaultTheme");
-  document.body.removeAttribute("style");
 
   if (userTheme !== "" || userTheme != "dark-theme") {
-    document.body.setAttribute("style", userTheme);
+    htmlElement.setAttribute("style", userTheme);
   }
 
   previewThemeButton.focus();
 };
 
 AppInterface.prototype.createPersonalizedTheme = function () {
+  const htmlElement = document.documentElement;
   const colorInputs = document.getElementsByName("new-color");
   const isValidTheme = appCore.validateThemes(colorInputs);
 
   if (isValidTheme) {
     colorInputs.forEach((input, index) => {
-      document.body.style.setProperty(this.cssVariables[index], input.value);
+      htmlElement.style.setProperty(this.cssVariables[index], input.value);
     });
 
-    const currentTheme = document.body.getAttribute("style");
+    const currentTheme = htmlElement.getAttribute("style");
 
     localStorage.setItem("devcalc-userCustomTheme", currentTheme);
     localStorage.setItem("devcalc-userDefaultTheme", currentTheme);

@@ -7,45 +7,45 @@ document.body.onkeydown = (event) =>
   appInterface.handleKeyboardShortcuts(event);
 
 // CALCULATOR HEADER EVENTS --------------------------------------------
-const resultModeBtn = document.getElementById("result-mode");
-resultModeBtn.onclick = appInterface.toggleResultMode;
+const btnMeasurementUnit = document.getElementById("measurement-unit");
+btnMeasurementUnit.onclick = appInterface.toggleResultMode;
 
-const conversionModeBtn = document.getElementById("conversion-mode");
-conversionModeBtn.onclick = () => appInterface.changeNumberBaseConversion();
+const btnConversionType = document.getElementById("conversion-type");
+btnConversionType.onclick = () => appInterface.changeNumberBaseConversion();
 
-const insertConversionBtn = document.getElementById("insert-conversion");
-insertConversionBtn.onclick = () =>
+const btnInsertConversion = document.getElementById("insert-conversion");
+btnInsertConversion.onclick = () =>
   appInterface.handleAddingNumberBaseConversionOnInput();
 
-const switchThemeBtn = document.getElementById("switch-theme");
-switchThemeBtn.onclick = () => appInterface.changeTheme();
+const btnChangeTheme = document.getElementById("change-theme");
+btnChangeTheme.onclick = () => appInterface.changeTheme();
 
 // OPTIONS BOX EVENTS --------------------------------------------------
-const openOptionsBoxBtn = document.getElementById("open-options-box");
-openOptionsBoxBtn.onclick = () => appInterface.handleOptionsBoxState();
+const btnOpenOptionsBox = document.getElementById("open-options-box");
+btnOpenOptionsBox.onclick = () => appInterface.handleOptionsBoxState();
 
-const openHistoryModalBtn = document.getElementById("open-history");
-openHistoryModalBtn.onclick = () => appInterface.handleAccessingHistoryModal();
+const btnOpenHistoryModal = document.getElementById("open-history");
+btnOpenHistoryModal.onclick = () => appInterface.handleAccessingHistoryModal();
 
-const openShortcutsModalBtn = document.getElementById("open-shortcuts");
-openShortcutsModalBtn.onclick = () =>
+const btnOpenShortcutsModal = document.getElementById("open-shortcuts");
+btnOpenShortcutsModal.onclick = () =>
   appInterface.handleAccessingShortcutsModal();
 
-const openPersonalizationModalBtn = document.getElementById(
+const btnOpenPersonalizationModal = document.getElementById(
   "open-personalization"
 );
-openPersonalizationModalBtn.onclick = () =>
+btnOpenPersonalizationModal.onclick = () =>
   appInterface.handleAccessingPersonalizationModal();
 
 // CALCULATOR BODY BUTTONS EVENTS --------------------------------------
-const clearExpressionBtn = document.getElementById("clear-expression");
-clearExpressionBtn.onclick = () => appInterface.handleDisplayCleaning();
+const btnClearExpression = document.getElementById("clear-expression");
+btnClearExpression.onclick = () => appInterface.handleDisplayCleaning();
 
-const deleteLastCharBtn = document.getElementById("delete-last-char");
-deleteLastCharBtn.onclick = () => appInterface.deleteLastCharacter();
+const btnDeleteLastChar = document.getElementById("delete-last-char");
+btnDeleteLastChar.onclick = () => appInterface.deleteLastCharacter();
 
-const toggleDevModeBtn = document.getElementById("dev-mode");
-toggleDevModeBtn.onclick = () => appInterface.toggleDevMode();
+const btnToggleDevMode = document.getElementById("dev-mode");
+btnToggleDevMode.onclick = () => appInterface.toggleDevMode();
 
 const buttons = document.querySelectorAll("button.expression-related");
 buttons.forEach((button) => {
@@ -58,35 +58,37 @@ buttons.forEach((button) => {
   };
 });
 
-const resultBtn = document.getElementById("focalize-result");
-resultBtn.onclick = () => appInterface.focalizeResult();
+const btnFocalizeResult = document.getElementById("focalize-result");
+btnFocalizeResult.onclick = () => appInterface.focalizeResult();
 
 // MODAL EVENTS --------------------------------------------------------
-const closeModalBtn = document.querySelector("header#modal-header button");
-closeModalBtn.onclick = () => appInterface.handleModalState();
+const btnCloseModal = document.querySelector(
+  "header#modal-header button.close-modal"
+);
+btnCloseModal.onclick = () => appInterface.handleModalState();
 
 const fakeColorInputs = document.querySelectorAll(
-  ".inputs-container input[type='text']"
+  "div.inputs-container input[type='text']"
 );
 fakeColorInputs.forEach((input) => {
   input.onclick = appInterface.triggerColorInput;
   input.onkeydown = appInterface.triggerColorInput;
 });
 
-const setColorsToDefaultBtn = document.getElementById("clear-colors");
-setColorsToDefaultBtn.onclick = appInterface.applyDefaultColorValue;
+const btnClearColors = document.getElementById("clear-colors");
+btnClearColors.onclick = appInterface.applyDefaultColorValue;
 
-const previewThemeBtn = document.getElementById("preview-theme");
+const btnPreviewTheme = document.getElementById("preview-theme");
 
 if (window.innerWidth <= 768) {
-  previewThemeBtn.onclick = (event) =>
+  btnPreviewTheme.onclick = (event) =>
     appInterface.showPersonalizedThemePreview(event, true);
 } else {
-  previewThemeBtn.onmousedown = (event) =>
+  btnPreviewTheme.onmousedown = (event) =>
     appInterface.showPersonalizedThemePreview(event);
-  previewThemeBtn.onkeydown = (event) =>
+  btnPreviewTheme.onkeydown = (event) =>
     appInterface.showPersonalizedThemePreview(event);
 }
 
-const saveThemeBtn = document.getElementById("save-theme");
-saveThemeBtn.onclick = () => appInterface.createPersonalizedTheme();
+const btnSaveTheme = document.getElementById("save-theme");
+btnSaveTheme.onclick = () => appInterface.createPersonalizedTheme();

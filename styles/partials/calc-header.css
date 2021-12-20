@@ -1,4 +1,4 @@
-main > div > header {
+main > div header#calc-header {
   display: flex;
   justify-content: flex-end;
 
@@ -6,16 +6,16 @@ main > div > header {
   border-bottom: 1px solid var(--header-line);
 }
 
-header.space-between {
+header#calc-header.space-between {
   justify-content: space-between;
 }
 
-div.expression-actions-container,
+div#expression-actions-container,
 div#conversion-container {
   display: flex;
 }
 
-div.expression-actions-container button {
+div#expression-actions-container button {
   padding: 4px 8px;
   font-size: 14.35px;
   font-weight: 500;
@@ -27,11 +27,11 @@ div.expression-actions-container button {
   border-radius: 2px;
 }
 
-div.expression-actions-container button:hover {
+div#expression-actions-container button:hover {
   filter: brightness(0.95);
 }
 
-div.expression-actions-container div#conversion-container {
+div#expression-actions-container div#conversion-container {
   align-items: center;
   gap: 8px;
 
@@ -45,7 +45,7 @@ div#conversion-container i {
   font-size: 14px;
 }
 
-header div#interface-actions-container {
+header#calc-header div#interface-actions-container {
   position: relative;
   display: flex;
   align-items: center;
