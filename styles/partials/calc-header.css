@@ -1,4 +1,4 @@
-main header {
+main > div > header {
   display: flex;
   justify-content: flex-end;
 
@@ -10,35 +10,34 @@ header.space-between {
   justify-content: space-between;
 }
 
-.expression-actions-container,
+div.expression-actions-container,
 div#conversion-container {
   display: flex;
 }
 
 div.expression-actions-container button {
-  background-color: var(--mode-button-background);
-  color: var(--mode-button-text);
-
-  border: none;
-  border-radius: 2px;
-
   padding: 4px 8px;
   font-size: 14.35px;
   font-weight: 500;
   letter-spacing: 0.75px;
+
+  background-color: var(--mode-button-background);
+  color: var(--mode-button-text);
+  border: none;
+  border-radius: 2px;
 }
 
 div.expression-actions-container button:hover {
   filter: brightness(0.95);
 }
 
-div#conversion-container {
+div.expression-actions-container div#conversion-container {
   align-items: center;
   gap: 8px;
 
   margin-left: 6px;
   padding-left: 6px;
-  border-left: 0.5px solid var(--header-line);
+  border-left: 1px solid var(--header-line);
 }
 
 div#conversion-container i {
@@ -46,56 +45,58 @@ div#conversion-container i {
   font-size: 14px;
 }
 
-div#interface-actions-container {
+header div#interface-actions-container {
   position: relative;
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
-div#interface-actions-container button {
-  color: var(--input-background);
+div#interface-actions-container > button {
   background-color: transparent;
+  color: var(--input-background);
   font-size: 17.5px;
-}
-
-button.interaction-button {
   transition-duration: 0.15s;
 }
 
-button.interaction-button:active {
-  transform: scale(0.97);
+div#interface-actions-container > button:active {
+  transform: scale(0.95);
 }
 
-div#interface-actions-container div#options-box {
+div#interface-actions-container section#options-box {
   position: absolute;
   z-index: 1;
-  right: 0;
   top: 0;
+  right: 0;
 
   width: 152px;
   padding: 6px;
   background-color: var(--input-background);
-  border-radius: 4px;
+
   border: 1px solid var(--button-text);
+  border-radius: 4px;
   overflow-x: auto;
 }
 
-div#options-box h2 {
+section#options-box header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
   margin-bottom: 10px;
+  padding-right: 1px;
+}
+
+section#options-box header h2 {
   font-size: 20px;
   color: var(--calc-background);
 }
 
-div#options-box div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 2.5px;
+section#options-box header button {
+  color: var(--calc-background);
 }
 
-div#options-box div button {
+section#options-box div button {
   position: relative;
   width: 100%;
   height: 39.25px;
@@ -109,11 +110,15 @@ div#options-box div button {
   border-radius: 6px;
 }
 
-div#options-box div button::before {
+section#options-box div button + button {
+  margin-top: 2.5px;
+}
+
+section#options-box div button::before {
   content: "";
   position: absolute;
-  left: 0;
   top: 0;
+  left: 0;
   width: 0;
   height: 100%;
 
@@ -122,12 +127,12 @@ div#options-box div button::before {
   transition-duration: 1s;
 }
 
-div#options-box div button:hover::before {
+section#options-box div button:hover::before {
   width: 100%;
 }
 
-div#options-box div span {
+section#options-box div span {
   position: absolute;
-  transform: translate(-50%, -50%);
   font-size: 16px;
+  transform: translate(-50%, -50%);
 }

@@ -40,463 +40,471 @@
 
   <body class="">
     <main>
-      <!-- <h1>DevCalc</h1> -->
+      <h1 class="sr-only">DevCalc</h1>
 
-      <header class="">
-        <div class="expression-actions-container invisible">
-          <button
-            type="button"
-            id="result-mode"
-            aria-label="Alterar unidade de medida do resultado de funções trigonométricas"
-          >
-            RAD
-          </button>
-          <div id="conversion-container">
+      <div>
+        <header class="">
+          <div class="expression-actions-container invisible">
             <button
               type="button"
-              id="conversion-mode"
-              aria-label="Alterar tipo de conversão de base numérica"
+              id="result-mode"
+              aria-label="Alterar unidade de medida do resultado de funções trigonométricas"
             >
-              BIN
+              RAD
             </button>
-
-            <i class="fas fa-angle-double-right" aria-hidden="true"></i>
-
-            <button
-              type="button"
-              id="insert-conversion"
-              lang="en"
-              aria-label="Inserir tipo de conversão à expressão"
-            >
-              INSERT
-            </button>
-          </div>
-        </div>
-        <div id="interface-actions-container">
-          <button
-            type="button"
-            id="switch-theme"
-            class="interaction-button"
-            aria-label="Alterar tema"
-          >
-            <i id="theme-icon" class="fas fa-moon" aria-hidden="true"></i>
-          </button>
-          <button
-            type="button"
-            id="open-options-box"
-            class="interaction-button"
-            aria-label="Abrir caixa de opções"
-          >
-            <i id="options-icon" class="fas fa-ellipsis-v"></i>
-          </button>
-          <div id="options-box" class="invisible">
-            <h2>Opções</h2>
-
-            <div>
+            <div id="conversion-container">
               <button
                 type="button"
-                id="open-history"
-                aria-label="Abrir histórico de operações"
+                id="conversion-mode"
+                aria-label="Alterar tipo de conversão de base numérica"
               >
-                <span>Histórico</span>
+                BIN
               </button>
+
+              <i class="fas fa-angle-double-right" aria-hidden="true"></i>
+
               <button
                 type="button"
-                id="open-shortcuts"
-                aria-label="Abrir página de atalhos"
+                id="insert-conversion"
+                lang="en"
+                aria-label="Inserir tipo de conversão à expressão"
               >
-                <span>Atalhos</span>
-              </button>
-              <button
-                type="button"
-                id="open-personalization"
-                aria-label="Abrir página de criação de temas personalizados"
-              >
-                <span>Personalizar</span>
+                INSERT
               </button>
             </div>
           </div>
-        </div>
-      </header>
-      <section id="calc-body">
-        <div id="display">
-          <input
-            type="text"
-            class=""
-            aria-label="Expressão/resultado ampliado"
-            placeholder="0"
-            readonly
-          />
-          <div id="result-container" class="invisible">
-            <p aria-label="Resultado"></p>
+          <div id="interface-actions-container">
+            <button
+              type="button"
+              id="switch-theme"
+              class="interaction-button"
+              aria-label="Alterar tema"
+            >
+              <i id="theme-icon" class="fas fa-moon" aria-hidden="true"></i>
+            </button>
+            <button
+              type="button"
+              id="open-options-box"
+              class="interaction-button"
+              aria-label="Abrir caixa de opções"
+            >
+              <i
+                id="options-icon"
+                class="fas fa-ellipsis-v"
+                aria-hidden="true"
+              ></i>
+            </button>
+            <section id="options-box" class="invisible">
+              <header>
+                <h2>Opções</h2>
+                <button
+                  type="button"
+                  class="close-modal"
+                  aria-label="Fechar caixa de opções"
+                >
+                  X
+                </button>
+              </header>
+
+              <div>
+                <button type="button" id="open-history">
+                  <span>Histórico</span>
+                </button>
+                <button type="button" id="open-shortcuts">
+                  <span>Atalhos</span>
+                </button>
+                <button type="button" id="open-personalization">
+                  <span>Personalizar</span>
+                </button>
+              </div>
+            </section>
           </div>
-        </div>
-        <div id="buttons-wrapper">
-          <div class="top-row-container invisible">
-            <div class="left-column">
+        </header>
+        <section id="calc-body">
+          <div id="display">
+            <input
+              type="text"
+              class=""
+              aria-label="Expressão/resultado ampliado"
+              placeholder="0"
+              readonly
+            />
+            <div id="result-container" class="invisible">
+              <p aria-label="Resultado"></p>
+            </div>
+          </div>
+          <div id="buttons-wrapper">
+            <div class="top-row-container invisible">
+              <div class="left-column">
+                <div>
+                  <button
+                    type="button"
+                    class="colorized-button letter-spacing expression-related"
+                    data-char="Sin("
+                    aria-label="Adicionar marcação de cálculo de seno ao display da expressão"
+                  >
+                    sin
+                  </button>
+                  <button
+                    type="button"
+                    class="colorized-button letter-spacing expression-related"
+                    data-char="Cos("
+                    aria-label="Adicionar marcação de cálculo de cosseno"
+                  >
+                    cos
+                  </button>
+                  <button
+                    type="button"
+                    class="colorized-button letter-spacing expression-related"
+                    data-char="Tan("
+                    aria-label="Adicionar marcação de cálculo de tangente"
+                  >
+                    tan
+                  </button>
+                  <button
+                    type="button"
+                    class="colorized-button letter-spacing expression-related"
+                    data-char="Hypot("
+                    aria-label="Adicionar marcação de cálculo de hipotenusa"
+                  >
+                    hypot
+                  </button>
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    class="colorized-button expression-related"
+                    aria-label="Adicionar abertura de parênteses à expressão"
+                  >
+                    (
+                  </button>
+                  <button
+                    type="button"
+                    class="colorized-button expression-related"
+                    aria-label="Adicionar fechamento de parênteses"
+                  >
+                    )
+                  </button>
+                  <button
+                    type="button"
+                    class="colorized-button expression-related"
+                    data-char="**"
+                    aria-label="Adicionar operador de exponenciação"
+                  >
+                    ^
+                  </button>
+                  <button
+                    type="button"
+                    class="colorized-button expression-related"
+                    aria-label="Adicionar operador de porcentagem"
+                  >
+                    %
+                  </button>
+                </div>
+              </div>
+              <div class="right-column">
+                <button
+                  type="button"
+                  class="colorized-button expression-related"
+                  aria-label="Adicionar operador de fatorial à expressão"
+                >
+                  !
+                </button>
+                <button
+                  type="button"
+                  class="colorized-button expression-related"
+                  aria-label="Adicionar operador de raiz quadrada"
+                >
+                  √
+                </button>
+              </div>
+            </div>
+            <div id="main-container">
               <div>
                 <button
                   type="button"
-                  class="colorized-button letter-spacing expression-related"
-                  data-char="Sin("
-                  aria-label="Adicionar marcação de cálculo de seno ao display da expressão"
+                  id="clear-expression"
+                  class="colorized-button"
+                  aria-label="Limpar expressão"
                 >
-                  sin
+                  C
                 </button>
                 <button
                   type="button"
-                  class="colorized-button letter-spacing expression-related"
-                  data-char="Cos("
-                  aria-label="Adicionar marcação de cálculo de cosseno"
+                  id="delete-last-char"
+                  class="colorized-button colorized-icon-button"
+                  aria-label="Apagar caractere anterior"
                 >
-                  cos
+                  <i class="fas fa-backspace" aria-hidden="true"></i>
                 </button>
                 <button
                   type="button"
-                  class="colorized-button letter-spacing expression-related"
-                  data-char="Tan("
-                  aria-label="Adicionar marcação de cálculo de tangente"
+                  id="dev-mode"
+                  class="colorized-button letter-spacing"
+                  aria-label="Ativar/desativar modo de desenvolvedor"
                 >
-                  tan
+                  DEV
                 </button>
                 <button
                   type="button"
-                  class="colorized-button letter-spacing expression-related"
-                  data-char="Hypot("
-                  aria-label="Adicionar marcação de cálculo de hipotenusa"
+                  class="colorized-button expression-related"
+                  data-char="/"
+                  aria-label="Adicionar sinal de divisão à expressão"
                 >
-                  hypot
+                  ÷
                 </button>
               </div>
               <div>
                 <button
                   type="button"
-                  class="colorized-button expression-related"
-                  aria-label="Adicionar abertura de parênteses à expressão"
+                  class="expression-related"
+                  aria-label="Adicionar número 7 à expressão"
                 >
-                  (
+                  7
+                </button>
+                <button
+                  type="button"
+                  class="expression-related"
+                  aria-label="Adicionar número 8"
+                >
+                  8
+                </button>
+                <button
+                  type="button"
+                  class="expression-related"
+                  aria-label="Adicionar número 9"
+                >
+                  9
                 </button>
                 <button
                   type="button"
                   class="colorized-button expression-related"
-                  aria-label="Adicionar fechamento de parênteses"
+                  data-char="*"
+                  aria-label="Adicionar sinal de multiplicação"
                 >
-                  )
+                  x
+                </button>
+              </div>
+              <div>
+                <button
+                  type="button"
+                  class="expression-related"
+                  aria-label="Adicionar número 4 à expressão"
+                >
+                  4
+                </button>
+                <button
+                  type="button"
+                  class="expression-related"
+                  aria-label="Adicionar número 5"
+                >
+                  5
+                </button>
+                <button
+                  type="button"
+                  class="expression-related"
+                  aria-label="Adicionar número 6"
+                >
+                  6
                 </button>
                 <button
                   type="button"
                   class="colorized-button expression-related"
-                  data-char="**"
-                  aria-label="Adicionar operador de exponenciação"
+                  aria-label="Adicionar sinal de subtração"
                 >
-                  ^
+                  -
+                </button>
+              </div>
+              <div>
+                <button
+                  type="button"
+                  class="expression-related"
+                  aria-label="Adicionar número 1 à expressão"
+                >
+                  1
+                </button>
+                <button
+                  type="button"
+                  class="expression-related"
+                  aria-label="Adicionar número 2"
+                >
+                  2
+                </button>
+                <button
+                  type="button"
+                  class="expression-related"
+                  aria-label="Adicionar número 3"
+                >
+                  3
                 </button>
                 <button
                   type="button"
                   class="colorized-button expression-related"
-                  aria-label="Adicionar operador de porcentagem"
+                  aria-label="Adicionar sinal de adição"
                 >
-                  %
+                  +
+                </button>
+              </div>
+              <div>
+                <button
+                  type="button"
+                  class="expression-related"
+                  aria-label="Adicionar número 0 à expressão"
+                >
+                  0
+                </button>
+                <button
+                  type="button"
+                  class="expression-related"
+                  aria-label="Adicionar vírgula"
+                >
+                  ,
+                </button>
+                <button
+                  type="button"
+                  id="focalize-result"
+                  class="colorized-button"
+                  aria-label="Ampliar resultado da expressão"
+                >
+                  =
                 </button>
               </div>
             </div>
-            <div class="right-column">
+            <div class="side-container invisible">
               <button
                 type="button"
-                class="colorized-button expression-related"
-                aria-label="Adicionar operador de fatorial à expressão"
+                class="colorized-button letter-spacing expression-related"
+                data-char="Log("
+                aria-label="Adicionar marcação de cálculo de logaritmo à expressão"
               >
-                !
+                log
+              </button>
+              <button
+                type="button"
+                data-char="Ln("
+                class="colorized-button letter-spacing expression-related"
+                aria-label="Adicionar marcação de cálculo de logaritmo neperiano"
+              >
+                ln
+              </button>
+              <button
+                type="button"
+                data-char="Fib("
+                class="colorized-button letter-spacing expression-related"
+                aria-label="Adicionar marcação de cálculo da Sequência de Fibonacci"
+              >
+                fib
               </button>
               <button
                 type="button"
                 class="colorized-button expression-related"
-                aria-label="Adicionar operador de raiz quadrada"
+                aria-label="Adicionar símbolo de PI"
               >
-                √
+                π
+              </button>
+              <button
+                type="button"
+                class="colorized-button expression-related"
+                aria-label="Adicionar símbolo do número de Euler"
+              >
+                e
               </button>
             </div>
           </div>
-          <div id="main-container">
-            <div>
-              <button
-                type="button"
-                id="clear-expression"
-                class="colorized-button"
-                aria-label="Limpar expressão"
-              >
-                C
-              </button>
-              <button
-                type="button"
-                id="delete-last-char"
-                class="colorized-button colorized-icon-button"
-                aria-label="Apagar caractere anterior"
-              >
-                <i class="fas fa-backspace" aria-hidden="true"></i>
-              </button>
-              <button
-                type="button"
-                id="dev-mode"
-                class="colorized-button letter-spacing"
-                aria-label="Ativar/desativar modo de desenvolvedor"
-              >
-                DEV
-              </button>
-              <button
-                type="button"
-                class="colorized-button expression-related"
-                data-char="/"
-                aria-label="Adicionar sinal de divisão à expressão"
-              >
-                ÷
-              </button>
-            </div>
-            <div>
-              <button
-                type="button"
-                class="expression-related"
-                aria-label="Adicionar número 7 à expressão"
-              >
-                7
-              </button>
-              <button
-                type="button"
-                class="expression-related"
-                aria-label="Adicionar número 8"
-              >
-                8
-              </button>
-              <button
-                type="button"
-                class="expression-related"
-                aria-label="Adicionar número 9"
-              >
-                9
-              </button>
-              <button
-                type="button"
-                class="colorized-button expression-related"
-                data-char="*"
-                aria-label="Adicionar sinal de multiplicação"
-              >
-                x
-              </button>
-            </div>
-            <div>
-              <button
-                type="button"
-                class="expression-related"
-                aria-label="Adicionar número 4 à expressão"
-              >
-                4
-              </button>
-              <button
-                type="button"
-                class="expression-related"
-                aria-label="Adicionar número 5"
-              >
-                5
-              </button>
-              <button
-                type="button"
-                class="expression-related"
-                aria-label="Adicionar número 6"
-              >
-                6
-              </button>
-              <button
-                type="button"
-                class="colorized-button expression-related"
-                aria-label="Adicionar sinal de subtração"
-              >
-                -
-              </button>
-            </div>
-            <div>
-              <button
-                type="button"
-                class="expression-related"
-                aria-label="Adicionar número 1 à expressão"
-              >
-                1
-              </button>
-              <button
-                type="button"
-                class="expression-related"
-                aria-label="Adicionar número 2"
-              >
-                2
-              </button>
-              <button
-                type="button"
-                class="expression-related"
-                aria-label="Adicionar número 3"
-              >
-                3
-              </button>
-              <button
-                type="button"
-                class="colorized-button expression-related"
-                aria-label="Adicionar sinal de adição"
-              >
-                +
-              </button>
-            </div>
-            <div>
-              <button
-                type="button"
-                class="expression-related"
-                aria-label="Adicionar número 0 à expressão"
-              >
-                0
-              </button>
-              <button
-                type="button"
-                class="expression-related"
-                aria-label="Adicionar vírgula"
-              >
-                ,
-              </button>
-              <button
-                type="button"
-                id="focalize-result"
-                class="colorized-button"
-                aria-label="Ampliar resultado da expressão"
-              >
-                =
-              </button>
-            </div>
-          </div>
-          <div class="side-container invisible">
-            <button
-              type="button"
-              class="colorized-button letter-spacing expression-related"
-              data-char="Log("
-              aria-label="Adicionar marcação de cálculo de logaritmo à expressão"
-            >
-              log
-            </button>
-            <button
-              type="button"
-              data-char="Ln("
-              class="colorized-button letter-spacing expression-related"
-              aria-label="Adicionar marcação de cálculo de logaritmo neperiano"
-            >
-              ln
-            </button>
-            <button
-              type="button"
-              data-char="Fib("
-              class="colorized-button letter-spacing expression-related"
-              aria-label="Adicionar marcação de cálculo da Sequência de Fibonacci"
-            >
-              fib
-            </button>
-            <button
-              type="button"
-              class="colorized-button expression-related"
-              aria-label="Adicionar símbolo de PI"
-            >
-              π
-            </button>
-            <button
-              type="button"
-              class="colorized-button expression-related"
-              aria-label="Adicionar símbolo do número de Euler"
-            >
-              e
-            </button>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
 
     <div class="modal-overlay invisible">
       <section class="">
         <header id="modal-header">
           <h2 id="modal-title"></h2>
-          <button type="button" aria-label="Fechar modal">X</button>
+          <button type="button" class="close-modal" aria-label="Fechar modal">
+            X
+          </button>
         </header>
 
         <div class="history-modal-content invisible"></div>
         <div class="shortcuts-modal-content invisible">
           <div class="card">
-            <button>NUM</button>
+            <button disabled>NUM</button>
+            <!-- Maybe using a button in this case isn't the best decision, but my purpose 
+              here is to give screen reader users the idea of a "keyboard key" when their 
+              softwares read this element. -->
             <p>Adiciona o número pressionado ao display da expressão</p>
           </div>
 
           <div class="card">
-            <button>+</button>
+            <button disabled>+</button>
             <p>Insere o operador de adição ao display da expressão</p>
           </div>
 
           <div class="card">
-            <button>-</button>
+            <button disabled>-</button>
             <p>Insere o operador de subtração ao display da expressão</p>
           </div>
 
           <div class="card">
-            <button>*</button>
+            <button disabled>*</button>
             <p>Insere o operador de multiplicação ao display da expressão</p>
           </div>
 
           <div class="card">
-            <button>/</button>
+            <button disabled>/</button>
             <p>Insere o operador de divisão ao display da expressão</p>
           </div>
 
           <div class="card">
-            <button>^</button>
+            <button disabled>^</button>
             <p>Insere o operador de exponenciação ao display da expressão</p>
           </div>
 
           <div class="card">
-            <button>%</button>
+            <button disabled>%</button>
             <p>Insere o operador de porcentagem ao display da expressão</p>
           </div>
 
           <div class="card">
-            <button>(</button>
+            <button disabled>(</button>
             <p>Insere uma abertura de parênteses ao display da expressão</p>
           </div>
 
           <div class="card">
-            <button>)</button>
+            <button disabled>)</button>
             <p>Insere um fechamento de parênteses ao display da expressão</p>
           </div>
 
           <div class="card">
-            <button>!</button>
+            <button disabled>!</button>
             <p>Adiciona marcador para cálculos de fatorial e duplo fatorial</p>
           </div>
 
           <div class="card">
-            <button>;</button>
+            <button disabled>;</button>
             <p>Adiciona marcador para cálculos de raiz quadrada</p>
           </div>
 
           <div class="card">
-            <button>S</button>
+            <button disabled>S</button>
             <p>Adiciona função para cálculo de seno ao display da expressão</p>
           </div>
 
           <div class="card">
-            <button>C</button>
+            <button disabled>C</button>
             <p>
               Adiciona função para cálculo de cosseno ao display da expressão
             </p>
           </div>
 
           <div class="card">
-            <button>T</button>
+            <button disabled>T</button>
             <p>
               Adiciona função para cálculo de tangente ao display da expressão
             </p>
           </div>
 
           <div class="card">
-            <button>H</button>
+            <button disabled>H</button>
             <p>
               Adiciona função para cálculo da hipotenusa de um triângulo
               retângulo (note que a função receberá dois valores, um para o
@@ -506,31 +514,31 @@
           </div>
 
           <div class="card">
-            <button>L</button>
+            <button disabled>L</button>
             <p>
               Adiciona função para cálculo de logaritmo ao display da expressão
             </p>
           </div>
 
           <div class="card">
-            <button>N</button>
+            <button disabled>N</button>
             <p>Adiciona função para cálculo de logaritmo neperiano</p>
           </div>
 
           <div class="card">
-            <button>P</button>
+            <button disabled>P</button>
             <p>Adiciona o símbolo de PI (π) ao display da expressão</p>
           </div>
 
           <div class="card">
-            <button>P</button>
+            <button disabled>P</button>
             <p>
               Adiciona o símbolo do Número de Euler (e) ao display da expressão
             </p>
           </div>
 
           <div class="card">
-            <button>SHIFT + SCROLL</button>
+            <button disabled>SHIFT + SCROLL</button>
             <p>
               Manipula a área de visão de expressões que excedem o tamanho do
               display
@@ -538,7 +546,7 @@
           </div>
 
           <div class="card">
-            <button>R</button>
+            <button disabled>R</button>
             <p>
               Altera o modo de exibição do resultado de funções trigonométricas
               (seno, cosseno e tangente)
@@ -546,17 +554,17 @@
           </div>
 
           <div class="card">
-            <button>ALT + T</button>
+            <button disabled>ALT + T</button>
             <p>Altera o tema da aplicação (de light para dark, e vice-versa)</p>
           </div>
 
           <div class="card">
-            <button>ALT + L</button>
+            <button disabled>ALT + L</button>
             <p>Realiza a limpeza completa do display da expressão</p>
           </div>
 
           <div class="card">
-            <button>ALT + C</button>
+            <button disabled>ALT + C</button>
             <p>
               Altera o tipo de conversão (de bases numéricas) que será inserido
               no display da expressão
@@ -564,41 +572,41 @@
           </div>
 
           <div class="card">
-            <button>O</button>
+            <button disabled>O</button>
             <p>Realiza a abertura, e o fechamento, da caixa de opções</p>
           </div>
 
           <div class="card">
-            <button>ALT + H</button>
+            <button disabled>ALT + H</button>
             <p>Abre/fecha o histórico de operações da aplicação</p>
           </div>
 
           <div class="card">
-            <button>A</button>
+            <button disabled>A</button>
             <p>
               Abre/fecha a página de informação sobre os atalhos da aplicação
             </p>
           </div>
 
           <div class="card">
-            <button>ALT + P</button>
+            <button disabled>ALT + P</button>
             <p>Abre/fecha a página de personalização do tema da aplicação</p>
           </div>
 
           <div class="card">
-            <button>RIGHT ALT</button>
+            <button disabled>RIGHT ALT</button>
             <p>
               Ativa/desativa o modo de desenvolvedor (calculadora científica)
             </p>
           </div>
 
           <div class="card">
-            <button>BACKSPACE</button>
+            <button disabled>BACKSPACE</button>
             <p>Apaga o último caractere adicionado ao display da expressão</p>
           </div>
 
           <div class="card">
-            <button>ALT + ENTER</button>
+            <button disabled>ALT + ENTER</button>
             <p>
               Amplia o resultado da expressão e registra a operação atual no
               histórico
@@ -867,29 +875,13 @@
             </table>
           </div>
 
-          <div id="actions">
-            <button
-              type="button"
-              id="clear-colors"
-              aria-label="Limpar cores selecionadas"
-            >
-              Limpar
-            </button>
-            <button
-              type="button"
-              id="preview-theme"
-              aria-label="Pré-visualizar tema escolhido"
-            >
-              Visualizar
-            </button>
-            <button
-              type="button"
-              id="save-theme"
-              aria-label="Salvar tema personalizado"
-            >
-              Salvar
-            </button>
-          </div>
+          <section id="actions">
+            <h3 class="sr-only">Ações:</h3>
+
+            <button type="button" id="clear-colors">Limpar cores</button>
+            <button type="button" id="preview-theme">Visualizar tema</button>
+            <button type="button" id="save-theme">Salvar tema</button>
+          </section>
         </div>
       </section>
     </div>

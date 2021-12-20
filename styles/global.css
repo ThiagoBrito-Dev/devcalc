@@ -3,6 +3,7 @@
   padding: 0;
   box-sizing: border-box;
   font-family: "Roboto", sans-serif;
+  outline-offset: 2px;
 }
 
 body {
@@ -27,12 +28,17 @@ body {
   background-image: url("../assets/background-md.jpg");
   background-size: cover;
   font-size: 16px;
+  -webkit-font-smoothing: antialiased;
   padding: 12px 0;
 }
 
 body::-webkit-scrollbar {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
+}
+
+body::-webkit-scrollbar-track {
+  background-color: #404040;
 }
 
 body::-webkit-scrollbar-thumb {
@@ -48,11 +54,7 @@ body::-webkit-scrollbar-thumb:active {
   background-color: #858585;
 }
 
-body::-webkit-scrollbar-track {
-  background-color: #404040;
-}
-
-.dark-theme {
+body.dark-theme {
   --calc-background: #3c3c3c;
   --mode-button-text: #fcfcfc;
   --mode-button-background: #606060;
@@ -67,17 +69,69 @@ body::-webkit-scrollbar-track {
   --button-border: #a1e7dd;
 }
 
+body main h1 {
+  display: block;
+  width: 95.75%;
+  margin: 0 auto;
+  text-align: center;
+  padding: 2px 0;
+
+  background-color: var(--input-background);
+  color: var(--button-text);
+  font-size: 28px;
+
+  border: 2px solid var(--calc-background);
+  border-bottom: 0;
+  border-radius: 20px 20px 0 0;
+}
+
+body main > div {
+  background-color: var(--calc-background);
+  border-radius: 6px;
+  box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.5);
+
+  /* animation: show-up 1.5s; */
+  transition-duration: 0.25s;
+}
+
 button {
   cursor: pointer;
   border: none;
 }
 
-body main {
-  background-color: var(--calc-background);
-  border-radius: 6px;
-  box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.5);
+body .invisible {
+  display: none;
+}
 
-  animation: show-up 1.5s;
+body .sr-only {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+body .close-modal {
+  font-size: 18px;
+  font-weight: 500;
+
+  background: transparent;
+  color: var(--input-background);
+  border: none;
+  transition-duration: 0.1s;
+}
+
+body .close-modal:active {
+  transform: scale(0.95);
+}
+
+body .has-transition {
   transition-duration: 0.25s;
 }
 
@@ -88,8 +142,4 @@ body main {
   to {
     opacity: 1;
   }
-}
-
-body .invisible {
-  display: none;
 }
