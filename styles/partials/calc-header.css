@@ -2,8 +2,8 @@ main > div header#calc-header {
   display: flex;
   justify-content: flex-end;
 
-  padding: 12px 14px 10px;
-  border-bottom: 1px solid var(--header-line);
+  padding: 1.125rem 1.25rem 1rem;
+  border-bottom: 0.125rem solid var(--header-line);
 }
 
 header#calc-header.space-between {
@@ -16,15 +16,15 @@ div#conversion-container {
 }
 
 div#expression-actions-container button {
-  padding: 4px 8px;
-  font-size: 14.35px;
+  padding: 0.375rem 0.8rem;
+  font-size: 1.375rem;
   font-weight: 500;
   letter-spacing: 0.75px;
 
   background-color: var(--mode-button-background);
   color: var(--mode-button-text);
   border: none;
-  border-radius: 2px;
+  border-radius: 0.25rem;
 }
 
 div#expression-actions-container button:hover {
@@ -33,29 +33,29 @@ div#expression-actions-container button:hover {
 
 div#expression-actions-container div#conversion-container {
   align-items: center;
-  gap: 8px;
+  gap: 0.75rem;
 
-  margin-left: 6px;
-  padding-left: 6px;
-  border-left: 1px solid var(--header-line);
+  margin-left: 0.625rem;
+  padding-left: 0.625rem;
+  border-left: 0.125rem solid var(--header-line);
 }
 
 div#conversion-container i {
   color: var(--input-background);
-  font-size: 14px;
+  font-size: 1.375rem;
 }
 
 header#calc-header div#interface-actions-container {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 1.375rem;
 }
 
 div#interface-actions-container > button {
   background-color: transparent;
   color: var(--input-background);
-  font-size: 17.5px;
+  font-size: 1.625rem;
   transition-duration: 0.15s;
 }
 
@@ -69,12 +69,12 @@ div#interface-actions-container section#options-box {
   top: 0;
   right: 0;
 
-  width: 152px;
-  padding: 6px;
+  width: 9.5rem;
+  padding: 0.375rem;
   background-color: var(--input-background);
 
-  border: 1px solid var(--button-text);
-  border-radius: 4px;
+  border: 0.0625rem solid var(--button-text);
+  border-radius: 0.25rem;
   overflow-x: auto;
 }
 
@@ -83,35 +83,35 @@ section#options-box header {
   justify-content: space-between;
   align-items: center;
 
-  margin-bottom: 10px;
-  padding-right: 1px;
+  margin-bottom: 0.625rem;
+  padding-right: 0.0625rem;
 }
 
 section#options-box header h2 {
-  font-size: 20px;
+  font-size: 1.25rem;
   color: var(--calc-background);
 }
 
-section#options-box header button {
+section#options-box header button.close-modal {
   color: var(--calc-background);
 }
 
 section#options-box div button {
   position: relative;
   width: 100%;
-  height: 39.25px;
+  height: 2.453125rem;
 
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 500;
   background-color: var(--calc-background);
   color: var(--mode-button-text);
 
-  border: 2px solid var(--colorized-button-background);
-  border-radius: 6px;
+  border: 0.125rem solid var(--colorized-button-background);
+  border-radius: 0.375rem;
 }
 
 section#options-box div button + button {
-  margin-top: 2.5px;
+  margin-top: 0.15625rem;
 }
 
 section#options-box div button::before {
@@ -123,7 +123,7 @@ section#options-box div button::before {
   height: 100%;
 
   background-color: var(--button-background-effect);
-  border-radius: 4px;
+  border-radius: 0.25rem;
   transition-duration: 1s;
 }
 
@@ -133,6 +133,6 @@ section#options-box div button:hover::before {
 
 section#options-box div span {
   position: absolute;
-  font-size: 16px;
+  font-size: 1rem;
   transform: translate(-50%, -50%);
 }

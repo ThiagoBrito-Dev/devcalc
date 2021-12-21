@@ -44,14 +44,14 @@ body#page {
 
   background-image: url("../assets/background-md.jpg");
   background-size: cover;
-  font-size: 16px;
+  font-size: 1rem;
   -webkit-font-smoothing: antialiased;
-  padding: 12px 0;
+  padding: 0.75rem 0;
 }
 
 body#page::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 0.5rem;
+  height: 0.5rem;
 }
 
 body#page::-webkit-scrollbar-track {
@@ -60,7 +60,7 @@ body#page::-webkit-scrollbar-track {
 
 body#page::-webkit-scrollbar-thumb {
   background-color: #b3b3b3;
-  border-radius: 8px;
+  border-radius: 0.5rem;
 }
 
 body#page::-webkit-scrollbar-thumb:hover {
@@ -76,27 +76,28 @@ body#page main h1 {
   width: 95.75%;
   margin: 0 auto;
   text-align: center;
-  padding: 2px 0;
+  padding: 0.125rem 0;
 
   background-color: var(--input-background);
   color: var(--button-text);
-  font-size: 28px;
+  font-size: 1.75rem;
 
-  border: 2px solid var(--calc-background);
+  border: 0.125rem solid var(--calc-background);
   border-bottom: 0;
   border-radius: 20px 20px 0 0;
 }
 
 body#page main > div {
+  width: min-content;
   background-color: var(--calc-background);
-  border-radius: 6px;
-  box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.5);
+  border-radius: 0.625rem;
+  box-shadow: 0.5rem 0.5rem 1.5rem rgba(0, 0, 0, 0.5);
 
   animation: show-up 1.5s;
   transition-duration: 0.25s;
 }
 
-button {
+body#page button {
   cursor: pointer;
   border: none;
 }
@@ -120,7 +121,7 @@ body#page .sr-only {
 }
 
 body#page .close-modal {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 500;
 
   background: transparent;

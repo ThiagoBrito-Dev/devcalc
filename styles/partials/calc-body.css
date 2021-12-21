@@ -1,5 +1,5 @@
 main > div section#calc-body {
-  padding: 12px 14px;
+  padding: 1.125rem 1.25rem 1.25rem;
 }
 
 section#calc-body div#display :is(input, p) {
@@ -8,17 +8,17 @@ section#calc-body div#display :is(input, p) {
 
 div#display input {
   text-align: right;
-  width: 226.75px;
-  height: 54.75px;
-  padding: 0 8px 0 4px;
+  width: 100%;
+  height: 5.125rem;
+  padding: 0 0.75rem 0 0.5rem;
 
   background-color: var(--input-background);
   color: var(--input-text);
-  font-size: 20px;
+  font-size: 1.875rem;
 
   outline: none;
   border: none;
-  border-radius: 2px;
+  border-radius: 0.25rem;
   cursor: default;
 }
 
@@ -27,46 +27,45 @@ div#display input::placeholder {
 }
 
 div#display input.stretch {
-  width: 100%;
-  height: 60px;
+  height: 5.75rem;
 }
 
 div#display input.has-result {
-  height: 32px;
-  border-radius: 2px 2px 0 0;
-  padding-top: 4px;
+  height: 2.875rem;
+  border-radius: 0.25rem 0.25rem 0 0;
+  padding-top: 0.375rem;
 }
 
 div#display input.has-result.stretch {
-  height: 33px;
-  padding-top: 6px;
+  height: 3.25rem;
+  padding-top: 0.5rem;
 }
 
 div#display div#result-container {
   text-align: right;
-  padding: 0 8px 4px 4px;
+  padding: 0 0.75rem 0.5rem 0.5rem;
   background-color: var(--input-background);
-  border-radius: 0 0 2px 2px;
+  border-radius: 0 0 0.25rem 0.25rem;
 }
 
 div#display div#result-container.stretch {
-  height: 27px;
-  padding-bottom: 6px;
+  height: 2.5rem;
+  padding-bottom: 0.5rem;
 }
 
 div#result-container p {
-  max-width: 214.75px;
+  max-width: 20.5rem;
+  font-size: 1.5rem;
   color: var(--p-text);
 
+  cursor: default;
+  border-radius: 99px;
   overflow-x: auto;
   white-space: nowrap;
-  border-radius: 8px;
-  cursor: default;
 }
 
 div#result-container.stretch p {
-  max-width: 279px;
-  width: 100%;
+  max-width: 27.5rem;
 }
 
 div#result-container p::-webkit-scrollbar {
@@ -74,21 +73,24 @@ div#result-container p::-webkit-scrollbar {
 }
 
 section#calc-body div#buttons-wrapper {
-  margin-top: 20px;
+  margin-top: 1.875rem;
 }
 
 div#buttons-wrapper button {
-  width: 52px;
-  height: 52px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 4.875rem;
+  height: 4.875rem;
 
-  font-size: 16px;
+  font-size: 1.5rem;
   font-weight: 500;
   letter-spacing: 0.5px;
   background-color: var(--button-background);
   color: var(--button-text);
 
   border-radius: 50%;
-  box-shadow: 0 0 2px var(--button-border);
+  box-shadow: 0 0 0.125rem var(--button-border);
   transition-duration: 0.25s;
 }
 
@@ -101,11 +103,11 @@ div#buttons-wrapper button.colorized-button {
 }
 
 div#buttons-wrapper button.colorized-icon-button {
-  font-size: 19px;
+  font-size: 1.775rem;
 }
 
 div#buttons-wrapper button:hover {
-  filter: brightness(0.97);
+  filter: brightness(0.95);
   transform: scale(1.05);
 }
 
@@ -114,30 +116,30 @@ div#buttons-wrapper button:active {
 }
 
 div#header-container {
-  margin-bottom: 6px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--header-line);
+  margin-bottom: 0.625rem;
+  padding-bottom: 0.625rem;
+  border-bottom: 0.125rem solid var(--header-line);
 }
 
 div#header-container > div,
 div#main-container > div {
   display: flex;
   align-items: center;
-  gap: 6.25px;
+  gap: 0.625rem;
 }
 
-div#header-container div + div,
-div#main-container div + div {
-  margin-top: 6.25px;
+div#header-container > div + div,
+div#main-container > div + div {
+  margin-top: 0.625rem;
 }
 
 div#header-container div div,
 div#main-container div div {
-  padding-left: 6.25px;
-  border-left: 1px solid var(--header-line);
+  padding-left: 0.625rem;
+  border-left: 0.125rem solid var(--header-line);
 }
 
 div#main-container > div:last-child > button:first-child {
-  width: 110px;
-  border-radius: 25px;
+  width: 10.355rem;
+  border-radius: 99px;
 }
