@@ -50,8 +50,8 @@ body#page {
 }
 
 body#page::-webkit-scrollbar {
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 0.75rem;
+  height: 0.75rem;
 }
 
 body#page::-webkit-scrollbar-track {
@@ -76,15 +76,15 @@ body#page main h1 {
   width: 95.75%;
   margin: 0 auto;
   text-align: center;
-  padding: 0.125rem 0;
+  padding: 0.25rem 0;
 
   background-color: var(--input-background);
   color: var(--button-text);
-  font-size: 1.75rem;
+  font-size: 2.625rem;
 
-  border: 0.125rem solid var(--calc-background);
+  border: 0.1875rem solid var(--calc-background);
   border-bottom: 0;
-  border-radius: 20px 20px 0 0;
+  border-radius: 2rem 2rem 0 0;
 }
 
 body#page main > div {
@@ -121,7 +121,7 @@ body#page .sr-only {
 }
 
 body#page .close-modal {
-  font-size: 1.125rem;
+  font-size: 1.75rem;
   font-weight: 500;
 
   background: transparent;
@@ -144,5 +144,17 @@ body#page .has-transition {
   }
   to {
     opacity: 1;
+  }
+}
+
+@media (max-width: 1280px) {
+  html {
+    font-size: 75%; /* 12px */
+  }
+}
+
+@media (max-width: 375px) {
+  html {
+    font-size: 63.5%; /* 10px */
   }
 }
