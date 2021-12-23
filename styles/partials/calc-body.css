@@ -9,7 +9,7 @@ section#calc-body div#display :is(input, p) {
 div#display input {
   text-align: right;
   width: 100%;
-  height: 5.125rem;
+  height: 5.1875rem;
   padding: 0 0.75rem 0 0.5rem;
 
   background-color: var(--input-background);

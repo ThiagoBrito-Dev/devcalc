@@ -11,13 +11,15 @@
   --mode-button-text: #404040;
   --mode-button-background: #dfdfdf;
   --header-line: #e0e0e0;
+  --history-dashed-line: #0077a5;
+  --history-date: #97008f;
   --input-text: #f0f0f0;
   --input-background: #454545;
   --p-text: #d5d5d5;
-  --button-text: #5eddd3;
+  --button-text: #00ffeb;
   --button-background: #353535;
   --button-background-effect: #c5c5c5;
-  --colorized-button-background: #8f278a;
+  --colorized-button-background: #870082;
   --button-border: #9845cf;
 }
 
@@ -26,13 +28,15 @@
   --mode-button-text: #fcfcfc;
   --mode-button-background: #606060;
   --header-line: #484848;
+  --history-dashed-line: #f975f3;
+  --history-date: #00e7e7;
   --input-text: #505050;
   --input-background: #f6f6f6;
-  --p-text: #787878;
-  --button-text: #b113b1;
+  --p-text: #707070;
+  --button-text: #890089;
   --button-background: #ededed;
   --button-background-effect: #606060;
-  --colorized-button-background: #03ffff;
+  --colorized-button-background: #4fffff;
   --button-border: #a1e7dd;
 }
 

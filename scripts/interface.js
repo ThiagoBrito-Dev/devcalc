@@ -794,6 +794,7 @@ AppInterface.prototype.handleCurrentInputColor = function () {
     const currentColorInput = document.createElement("input");
     currentColorInput.setAttribute("type", "text");
     currentColorInput.setAttribute("readonly", "true");
+    currentColorInput.setAttribute("aria-label", `Código: ${currentColor}`); // study the possibility of getting, through the code, the name of the color and display it to the user.
     currentColorInput.classList.add("current-color", "has-transition");
     currentColorInput.style.backgroundColor = currentColor;
 
