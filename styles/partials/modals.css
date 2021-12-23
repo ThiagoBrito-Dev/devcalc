@@ -124,14 +124,18 @@ div#modal-overlay section.shortcuts-modal {
 }
 
 div#shortcuts-modal-content {
+  /* display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(21.75rem, 1fr)); */
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+  /* gap: 1.25rem; */
   gap: 1.125rem;
 }
 
 div#shortcuts-modal-content div.card {
-  width: 22.625rem;
+  /* width: 100%; */
+  width: 23rem;
   height: 15.25rem;
   padding: 1.5rem;
 
@@ -190,7 +194,6 @@ div#table-container::-webkit-scrollbar {
 
 div#table-container table {
   width: 100%;
-  /* min-width: 42.03125rem; */
   padding: 0.75rem 1rem;
 
   font-size: 1.5rem;
