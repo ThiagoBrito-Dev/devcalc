@@ -201,7 +201,7 @@ div#table-container table {
 }
 
 table caption {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.625rem;
   font-size: 1.5rem;
   color: var(--mode-button-text);
   opacity: 0.75;
@@ -223,8 +223,8 @@ tbody tr th:first-child {
 }
 
 tbody tr td:first-of-type {
-  min-width: 33.75rem;
-  width: 33.75rem;
+  min-width: 30.75rem;
+  width: 30.75rem;
 }
 
 thead tr th:last-child,
@@ -252,8 +252,8 @@ tbody tr td input[type="text"] {
 }
 
 td.current-color-data input.current-color {
-  width: 4.5rem;
-  height: 4.5rem;
+  width: 4.375rem;
+  height: 4.375rem;
   cursor: pointer;
 }
 
@@ -264,8 +264,8 @@ input.current-color:active {
 td.new-color-data div.inputs-container {
   position: relative;
   margin: 0 auto;
-  width: 4.5rem;
-  height: 4.5rem;
+  width: 4.375rem;
+  height: 4.375rem;
 }
 
 div.inputs-container input[type="text"] {
