@@ -155,6 +155,6 @@ body#page .has-transition {
 
 @media (max-width: 375px) {
   html {
-    font-size: 63.5%; /* 10px */
+    font-size: 65.625%; /* 10.5px */
   }
 }
