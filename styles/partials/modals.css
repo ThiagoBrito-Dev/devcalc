@@ -1,6 +1,7 @@
 /* GLOBAL STYLES */
 #modal-overlay {
   position: fixed;
+  z-index: 1;
   top: 0;
   left: 0;
 
@@ -207,7 +208,7 @@ div#table-container table {
 }
 
 table caption {
-  margin-bottom: 0.625rem;
+  margin-bottom: 0.5rem;
   font-size: 1.5rem;
   color: var(--mode-button-text);
   opacity: 0.8;
@@ -276,7 +277,7 @@ td.new-color-data div.inputs-container {
 
 div.inputs-container input[type="text"] {
   caret-color: transparent;
-  background-color: #000;
+  background-color: var(--mode-button-text);
   width: 100%;
   height: 100%;
   cursor: pointer;

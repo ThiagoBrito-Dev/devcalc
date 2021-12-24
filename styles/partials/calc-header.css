@@ -2,7 +2,7 @@ main > div header#calc-header {
   display: flex;
   justify-content: flex-end;
 
-  padding: 1.25rem 1.25rem 0.875rem;
+  padding: 1.125rem 1.25rem 0.875rem;
   border-bottom: 0.125rem solid var(--header-line);
 }
 

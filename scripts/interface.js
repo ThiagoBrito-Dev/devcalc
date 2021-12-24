@@ -3,7 +3,7 @@ import AppCore from "./core.js";
 const appCore = new AppCore();
 
 export default function AppInterface() {
-  this.conversionMode = document.getElementById("conversion-type");
+  this.conversionType = document.getElementById("conversion-type");
   this.optionsBox = document.getElementById("options-box");
   this.resultContainer = document.getElementById("result-container");
 
@@ -32,6 +32,7 @@ export default function AppInterface() {
     "--button-background-effect",
     "--button-border",
   ];
+  this.lastFocusedElements = [];
   this.isDevModeActivated = false;
   this.hasExpressionInvalidMessage = false;
   this.resultCantBeContinued = false;
@@ -53,6 +54,7 @@ AppInterface.prototype.initialize = function () {
   document.documentElement.setAttribute(attributeName, userTheme);
 
   changeThemeIcon(userTheme);
+  setNewColorInputDefaultValue();
   this.handleCurrentInputColor();
 };
 
@@ -129,7 +131,7 @@ AppInterface.prototype.handleKeyboardShortcuts = function ({ altKey, key }) {
       if (this.isDevModeActivated) {
         switch (key) {
           case "c":
-            this.changeNumberBaseConversion();
+            this.changeNumberBaseConversionType();
             break;
         }
       }
@@ -195,9 +197,11 @@ AppInterface.prototype.toggleResultMode = function () {
     .replace(/\./g, "")
     .replace(/\,/g, ".");
 
-  const resultMode = document.getElementById("measurement-unit");
-  const currentResultMode = resultMode.textContent;
-  resultMode.textContent = currentResultMode.includes("RAD") ? "GRAU" : "RAD";
+  const measurementUnit = document.getElementById("measurement-unit");
+  const currentResultMode = measurementUnit.textContent;
+  measurementUnit.textContent = currentResultMode.includes("RAD")
+    ? "GRAU"
+    : "RAD";
   appCore.isNotCalculable = false;
 
   if (
@@ -209,23 +213,23 @@ AppInterface.prototype.toggleResultMode = function () {
   }
 };
 
-AppInterface.prototype.changeNumberBaseConversion = function () {
-  const modes = ["BIN", "OCT", "HEX"];
-  const currentMode = this.conversionMode.textContent.trim();
+AppInterface.prototype.changeNumberBaseConversionType = function () {
+  const conversionTypes = ["BIN", "OCT", "HEX"];
+  const currentType = this.conversionType.textContent.trim();
 
-  modes.forEach((mode, index) => {
-    if (mode === currentMode) {
-      this.conversionMode.textContent = modes[++index];
+  conversionTypes.forEach((mode, index) => {
+    if (mode === currentType) {
+      this.conversionType.textContent = conversionTypes[++index];
 
-      if (this.conversionMode.textContent === "") {
-        this.conversionMode.textContent = modes[0];
+      if (this.conversionType.textContent === "") {
+        this.conversionType.textContent = conversionTypes[0];
       }
     }
   });
 };
 
 AppInterface.prototype.handleAddingNumberBaseConversionOnInput = function () {
-  let currentMode = [...this.conversionMode.textContent.trim().toLowerCase()];
+  let currentMode = [...this.conversionType.textContent.trim().toLowerCase()];
   currentMode[0] = currentMode[0].toUpperCase();
   currentMode = currentMode.join("");
 
@@ -256,6 +260,7 @@ AppInterface.prototype.changeTheme = function () {
 
   localStorage.setItem("devcalc-userDefaultTheme", currentTheme);
   changeThemeIcon(currentTheme);
+  setNewColorInputDefaultValue();
   this.handleCurrentInputColor();
 };
 
@@ -271,15 +276,81 @@ function changeThemeIcon(theme) {
   themeIcon.setAttribute("class", iconClass);
 }
 
-AppInterface.prototype.handleOptionsBoxState = function () {
+AppInterface.prototype.handleModalFocus = function (modal) {
+  if (modal.classList.value.includes("invisible")) {
+    const lastPosition = this.lastFocusedElements.length - 1;
+    this.lastFocusedElements[lastPosition].focus();
+    this.lastFocusedElements.pop();
+
+    return;
+  }
+
+  this.lastFocusedElements.push(document.activeElement);
+  if (modal.id == "modal-overlay") {
+    const modalSection = modal.firstElementChild;
+    modalSection.focus();
+  } else {
+    modal.focus();
+  }
+};
+
+function createFocusTrap(event, modal) {
+  if (event.key == "Tab") {
+    const focusedElement = document.activeElement;
+
+    if (event.shiftKey) {
+      if (
+        focusedElement === modal ||
+        focusedElement.classList.value.includes("close-modal")
+      ) {
+        event.preventDefault();
+      }
+    } else {
+      const modalContent = modal.querySelector(
+        "div#modal-overlay > section > div:not(.invisible)"
+      );
+
+      if (
+        focusedElement.id == "open-personalization" ||
+        (modalContent?.id == "history-modal-content" &&
+          focusedElement.classList.value.includes("close-modal")) ||
+        (focusedElement.classList.value.includes("card") &&
+          !focusedElement.nextElementSibling) ||
+        focusedElement.id == "save-theme"
+      ) {
+        event.preventDefault();
+      }
+    }
+  }
+}
+
+AppInterface.prototype.handleOptionsBoxState = function (event = null) {
   if (this.optionsBox.classList.value.includes("invisible")) {
     this.optionsBox.classList.remove("invisible");
+    this.handleModalFocus(this.optionsBox);
+
     setTimeout(() => {
-      document.body.onclick = () => this.handleOptionsBoxState();
+      document.body.onclick = (event) => this.handleOptionsBoxState(event);
     }, 50);
-  } else {
+    document.body.onkeydown = (event) => {
+      this.handleKeyboardShortcuts(event);
+      createFocusTrap(event, this.optionsBox);
+    };
+  } else if (this.modalOverlay.classList.value.includes("invisible")) {
+    if (
+      event?.target.parentElement.id == "modal-header" &&
+      event?.target.classList.value.includes("close-modal")
+    ) {
+      return;
+    }
+
     this.optionsBox.classList.add("invisible");
+    this.handleModalFocus(this.optionsBox);
+
     document.body.onclick = null;
+    document.body.onkeydown = (event) => {
+      this.handleKeyboardShortcuts(event);
+    };
   }
 };
 
@@ -373,7 +444,7 @@ AppInterface.prototype.toggleDevMode = function () {
   );
 
   if (actionsContainer.classList.value.includes("invisible")) {
-    this.conversionMode.textContent = "BIN";
+    this.conversionType.textContent = "BIN";
   }
 
   calcHeader.classList.toggle("space-between");
@@ -657,27 +728,32 @@ AppInterface.prototype.clearModal = function () {
 };
 
 AppInterface.prototype.handleModalState = function () {
-  if (!this.modalOverlay.classList.value.includes("invisible")) {
+  this.modalOverlay.classList.toggle("invisible");
+  this.handleModalFocus(this.modalOverlay);
+
+  if (this.modalOverlay.classList.value.includes("invisible")) {
     this.clearModal();
 
-    this.isDevModeActivated
-      ? document.getElementById("measurement-unit").focus()
-      : document.getElementById("theme-icon").parentElement.focus();
+    document.body.onkeydown = (event) => {
+      this.handleKeyboardShortcuts(event);
+    };
+
+    return;
   }
 
-  this.modalOverlay.classList.toggle("invisible");
+  document.body.onkeydown = (event) => {
+    this.handleKeyboardShortcuts(event);
+    createFocusTrap(event, this.modal);
+  };
 };
 
 AppInterface.prototype.handleModalVisibilityConflicts = function () {
-  !this.modalOverlay.classList.value.includes("invisible")
-    ? this.clearModal()
-    : this.handleModalState();
-
-  if (!this.optionsBox.classList.value.includes("invisible")) {
-    this.handleOptionsBoxState();
+  if (!this.modalOverlay.classList.value.includes("invisible")) {
+    this.clearModal();
+    this.handleModalFocus(this.modalOverlay);
+  } else {
+    this.handleModalState();
   }
-
-  this.modalTitle.nextElementSibling.focus();
 };
 
 AppInterface.prototype.handleAccessingHistoryModal = function () {
@@ -857,14 +933,28 @@ AppInterface.prototype.triggerColorInput = function ({ target, key, code }) {
   }
 };
 
+function setNewColorInputDefaultValue() {
+  const newColorInputs = document.getElementsByName("new-color");
+  const colorValue = getComputedStyle(document.documentElement)
+    .getPropertyValue("--mode-button-text")
+    .replace(" ", "");
+
+  newColorInputs.forEach((input) => {
+    input.value = colorValue;
+  });
+}
+
 AppInterface.prototype.applyDefaultColorValue = function () {
-  const colorInputs = document.getElementsByName("new-color");
+  const newColorInputs = document.getElementsByName("new-color");
+  const colorValue = getComputedStyle(document.documentElement)
+    .getPropertyValue("--mode-button-text")
+    .replace(" ", "");
 
-  colorInputs.forEach((input) => {
-    const fakeColorInput = input.previousElementSibling;
+  newColorInputs.forEach((input) => {
+    const fakeNewColorInput = input.previousElementSibling;
 
-    fakeColorInput.style.backgroundColor = "#000000";
-    input.value = "#000000";
+    fakeNewColorInput.removeAttribute("style");
+    input.value = colorValue;
   });
 };
 

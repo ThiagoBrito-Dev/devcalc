@@ -11,7 +11,7 @@ const btnMeasurementUnit = document.getElementById("measurement-unit");
 btnMeasurementUnit.onclick = appInterface.toggleResultMode;
 
 const btnConversionType = document.getElementById("conversion-type");
-btnConversionType.onclick = () => appInterface.changeNumberBaseConversion();
+btnConversionType.onclick = () => appInterface.changeNumberBaseConversionType();
 
 const btnInsertConversion = document.getElementById("insert-conversion");
 btnInsertConversion.onclick = () =>
@@ -22,7 +22,8 @@ btnChangeTheme.onclick = () => appInterface.changeTheme();
 
 // OPTIONS BOX EVENTS --------------------------------------------------
 const btnOpenOptionsBox = document.getElementById("open-options-box");
-btnOpenOptionsBox.onclick = () => appInterface.handleOptionsBoxState();
+btnOpenOptionsBox.onclick = (event) =>
+  appInterface.handleOptionsBoxState(event);
 
 const btnOpenHistoryModal = document.getElementById("open-history");
 btnOpenHistoryModal.onclick = () => appInterface.handleAccessingHistoryModal();
