@@ -786,7 +786,7 @@ AppInterface.prototype.handleAddingOperationsOnHistory = function (
     });
 
     operationData = {
-      operationDate: dateFormatter.format(Date.now()),
+      date: dateFormatter.format(Date.now()),
       expression: appCore.expressionInput.value,
       result: appCore.expressionResult.textContent,
     };
@@ -795,17 +795,17 @@ AppInterface.prototype.handleAddingOperationsOnHistory = function (
     localStorage.setItem("devcalc-history", JSON.stringify(this.operations));
   }
 
-  let operationInfo = createOperationInfo(operationData);
+  const operationInfo = createOperationInfo(operationData);
 
   if (
     index === 0 ||
     this.operations.length === 1 ||
     (index === null &&
-      this.operations[this.operations.length - 2].operationDate !==
-        operationData.operationDate) ||
+      this.operations[this.operations.length - 2].date !==
+        operationData.date) ||
     (index &&
       document.querySelector("div#history-modal-content section:last-child h3")
-        .textContent != operationData.operationDate)
+        .textContent != operationData.date)
   ) {
     this.createContentElements(operationData, operationInfo);
     return;
@@ -824,7 +824,7 @@ AppInterface.prototype.createContentElements = function (
   const contentSection = document.createElement("section");
 
   const operationsDate = document.createElement("h3");
-  operationsDate.textContent = operationData.operationDate;
+  operationsDate.textContent = operationData.date;
 
   const operationsInfo = document.createElement("div");
   operationsInfo.classList.add("operations-info");
