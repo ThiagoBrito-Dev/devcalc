@@ -19,18 +19,20 @@ export default function AppInterface() {
   );
 
   this.cssVariables = [
-    "--calc-background",
-    "--input-text",
-    "--input-background",
-    "--p-text",
-    "--button-text",
-    "--button-background",
-    "--mode-button-text",
-    "--mode-button-background",
-    "--colorized-button-background",
-    "--header-line",
-    "--button-background-effect",
-    "--button-border",
+    "--calc-background", // primary
+    "--input-text", // primary
+    "--input-background", // primary
+    "--p-text", // primary
+    "--button-text", // primary
+    "--button-background", // primary
+    "--mode-button-text", // secondary
+    "--mode-button-background", // secondary
+    "--colorized-button-background", // secondary
+    "--history-date", // secondary
+    "--header-line", // tertiary
+    "--history-dashed-line", // tertiary
+    "--button-background-effect", // tertiary
+    "--button-border", // tertiary
   ];
   this.lastFocusedElements = [];
   this.isDevModeActivated = false;
@@ -277,21 +279,28 @@ function changeThemeIcon(theme) {
 }
 
 AppInterface.prototype.handleModalFocus = function (modal) {
-  if (modal.classList.value.includes("invisible")) {
-    const lastPosition = this.lastFocusedElements.length - 1;
-    this.lastFocusedElements[lastPosition].focus();
-    this.lastFocusedElements.pop();
+  const modalParent = modal.parentElement;
+
+  if (
+    modal.classList.value.includes("invisible") ||
+    modalParent.classList.value.includes("invisible")
+  ) {
+    if (this.lastFocusedElements.length) {
+      const elementToBeFocused = this.lastFocusedElements.pop();
+      elementToBeFocused.focus();
+    } else {
+      const changeTheme = document.getElementById("change-theme");
+      const measurementUnit = document.getElementById("measurement-unit");
+
+      this.isDevModeActivated ? measurementUnit.focus() : changeTheme.focus();
+    }
 
     return;
   }
 
-  this.lastFocusedElements.push(document.activeElement);
-  if (modal.id == "modal-overlay") {
-    const modalSection = modal.firstElementChild;
-    modalSection.focus();
-  } else {
-    modal.focus();
-  }
+  document.activeElement.id !== "page" &&
+    this.lastFocusedElements.push(document.activeElement);
+  modal.focus();
 };
 
 function createFocusTrap(event, modal) {
@@ -337,10 +346,7 @@ AppInterface.prototype.handleOptionsBoxState = function (event = null) {
       createFocusTrap(event, this.optionsBox);
     };
   } else if (this.modalOverlay.classList.value.includes("invisible")) {
-    if (
-      event?.target.parentElement.id == "modal-header" &&
-      event?.target.classList.value.includes("close-modal")
-    ) {
+    if (event?.target.parentElement.id == "modal-header") {
       return;
     }
 
@@ -729,7 +735,7 @@ AppInterface.prototype.clearModal = function () {
 
 AppInterface.prototype.handleModalState = function () {
   this.modalOverlay.classList.toggle("invisible");
-  this.handleModalFocus(this.modalOverlay);
+  this.handleModalFocus(this.modal);
 
   if (this.modalOverlay.classList.value.includes("invisible")) {
     this.clearModal();
@@ -750,7 +756,7 @@ AppInterface.prototype.handleModalState = function () {
 AppInterface.prototype.handleModalVisibilityConflicts = function () {
   if (!this.modalOverlay.classList.value.includes("invisible")) {
     this.clearModal();
-    this.handleModalFocus(this.modalOverlay);
+    this.modal.focus();
   } else {
     this.handleModalState();
   }
