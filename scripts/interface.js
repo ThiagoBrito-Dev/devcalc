@@ -94,6 +94,12 @@ AppInterface.prototype.handleKeyboardShortcuts = function ({ altKey, key }) {
         case "Backspace":
           this.deleteLastCharacter();
           break;
+        case "Escape":
+          if (!this.modalOverlay.classList.value.includes("invisible")) {
+            this.handleModalState();
+          }
+
+          break;
       }
     }
 
