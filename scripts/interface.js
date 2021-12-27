@@ -804,7 +804,7 @@ AppInterface.prototype.handleAddingOperationsOnHistory = function (
       this.operations[this.operations.length - 2].date !==
         operationData.date) ||
     (index &&
-      document.querySelector("div#history-modal-content section:last-child h3")
+      document.querySelector("div#history-modal-content section:first-child h3")
         .textContent != operationData.date)
   ) {
     this.createContentElements(operationData, operationInfo);
@@ -812,7 +812,7 @@ AppInterface.prototype.handleAddingOperationsOnHistory = function (
   }
 
   const operationsInfo = document.querySelector(
-    "div#history-modal-content section:last-child div.operations-info"
+    "div#history-modal-content section:first-child div.operations-info"
   );
   operationsInfo.appendChild(operationInfo);
 };
@@ -821,6 +821,9 @@ AppInterface.prototype.createContentElements = function (
   operationData,
   operationInfo
 ) {
+  const firstSection = document.querySelector(
+    "div#history-modal-content section:first-child"
+  );
   const contentSection = document.createElement("section");
 
   const operationsDate = document.createElement("h3");
@@ -832,7 +835,7 @@ AppInterface.prototype.createContentElements = function (
   operationsInfo.appendChild(operationInfo);
   contentSection.appendChild(operationsDate);
   contentSection.appendChild(operationsInfo);
-  this.historyModalContent.appendChild(contentSection);
+  this.historyModalContent.insertBefore(contentSection, firstSection);
 };
 
 function createOperationInfo(operationData) {
