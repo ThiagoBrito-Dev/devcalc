@@ -30,6 +30,7 @@
       referrerpolicy="no-referrer"
     />
 
+    <link rel="stylesheet" href="./styles/partials/toast.css" />
     <link rel="stylesheet" href="./styles/partials/calc-header.css" />
     <link rel="stylesheet" href="./styles/partials/calc-body.css" />
     <link rel="stylesheet" href="./styles/partials/modals.css" />
@@ -44,7 +45,12 @@
 
       <div>
         <header id="calc-header" class="">
-          <div id="expression-actions-container" class="invisible">
+          <div
+            id="expression-actions-container"
+            class="invisible"
+            aria-live="polite"
+            role="status"
+          >
             <button
               type="button"
               id="measurement-unit"
@@ -130,12 +136,22 @@
               placeholder="0"
               readonly
             />
-            <div id="result-container" class="invisible">
+            <div
+              id="result-container"
+              class="invisible"
+              aria-live="polite"
+              role="status"
+            >
               <p aria-label="Resultado"></p>
             </div>
           </div>
           <div id="buttons-wrapper">
-            <div id="header-container" class="invisible">
+            <div
+              id="header-container"
+              class="invisible"
+              aria-live="polite"
+              role="status"
+            >
               <div>
                 <button
                   type="button"
@@ -224,7 +240,7 @@
                 </div>
               </div>
             </div>
-            <div id="main-container">
+            <div id="main-container" aria-live="polite" role="status">
               <div>
                 <button
                   type="button"
@@ -828,6 +844,34 @@
                 </tr>
                 <tr>
                   <th scope="row">Cor secundária 4</th>
+                  <td>Aplicada ao fundo da caixa de mensagem</td>
+                  <td class="current-color-data"></td>
+                  <td class="new-color-data">
+                    <div class="inputs-container">
+                      <input
+                        type="text"
+                        aria-label="Abrir menu de seleção de cores"
+                      />
+                      <input type="color" name="new-color" class="hidden" />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Cor secundária 5</th>
+                  <td>Aplicada ao texto da caixa de mensagem</td>
+                  <td class="current-color-data"></td>
+                  <td class="new-color-data">
+                    <div class="inputs-container">
+                      <input
+                        type="text"
+                        aria-label="Abrir menu de seleção de cores"
+                      />
+                      <input type="color" name="new-color" class="hidden" />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Cor secundária 6</th>
                   <td>Aplicada ao texto das datas do histórico</td>
                   <td class="current-color-data"></td>
                   <td class="new-color-data">

@@ -1,0 +1,42 @@
+body#page div.toast {
+  position: fixed;
+  z-index: 1;
+  top: 0;
+
+  text-align: center;
+  max-width: 21.5rem;
+  padding: 0.875rem 0.75rem;
+
+  background-color: var(--toast-background);
+  color: var(--toast-text);
+  font-size: 1.375rem;
+  font-weight: 500;
+
+  border: 0.1975rem solid var(--colorized-button-background);
+  border-radius: 0.625rem;
+  animation-name: swipe-up;
+  animation-duration: 1.25s;
+}
+
+body#page div.toast.active {
+  animation-name: swipe-down;
+  margin-top: 0.5rem;
+}
+
+@keyframes swipe-up {
+  from {
+    margin-top: 0.5rem;
+  }
+  to {
+    margin-top: -3.875rem;
+  }
+}
+
+@keyframes swipe-down {
+  from {
+    margin-top: -3.875rem;
+  }
+  to {
+    margin-top: 0.5rem;
+  }
+}

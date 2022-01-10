@@ -28,6 +28,8 @@ export default function AppInterface() {
     "--mode-button-text", // secondary
     "--mode-button-background", // secondary
     "--colorized-button-background", // secondary
+    "--toast-background", // secondary
+    "--toast-text", // secondary
     "--history-date", // secondary
     "--header-line", // tertiary
     "--history-dashed-line", // tertiary
@@ -718,11 +720,42 @@ AppInterface.prototype.focalizeResult = function () {
 
     appCore.firstCurrentNumberPosition = 0;
   } else {
-    alert(
-      "Desculpe, mas, para que o resultado seja ampliado, a expressão deve ser finalizada!"
-    );
+    handleInsertingToastMessage("A expressão deve ser finalizada");
   }
 };
+
+function createToast() {
+  const toast = document.createElement("div");
+  toast.setAttribute("class", "toast");
+  toast.setAttribute("aria-live", "polite");
+  toast.setAttribute("role", "status");
+
+  insertToastOnDocument(toast);
+  return toast;
+}
+
+function insertToastOnDocument(toast) {
+  const mainContent = document.querySelector("body main");
+  document.body.insertBefore(toast, mainContent);
+}
+
+function handleInsertingToastMessage(message = "") {
+  const toast = createToast();
+  toast.classList.add("active");
+  toast.textContent = message;
+
+  setTimeout(() => {
+    toast.classList.remove("active");
+    removeToast(toast);
+  }, 3000);
+}
+
+function removeToast() {
+  setTimeout(() => {
+    const toast = document.querySelector("body div:first-child");
+    document.body.removeChild(toast);
+  }, 1250);
+}
 
 AppInterface.prototype.setDefaultStylingClasses = function () {
   this.resultContainer.classList.add("invisible");
